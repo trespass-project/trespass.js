@@ -1,0 +1,18 @@
+{
+  "name": "trespass.js",
+  "description": "TREsPASS javascript library",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/trespass.js",
+  "scripts": {},
+  "author": "",
+  "devDependencies": {
+    "chalk": "^1.0.0",
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-webpack": "^1.3.0",
+    "mocha": "^2.1.0",
+    "node-notifier": "^4.1.2"
+  }
+}
