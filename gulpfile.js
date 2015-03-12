@@ -6,7 +6,6 @@ var notifier = require('node-notifier');
 var path = require('path');
 var docco = require('gulp-docco');
 var changed = require('gulp-changed');
-var clean = require('gulp-clean');
 
 var name = 'trespass';
 var src_dir = './src';
@@ -20,12 +19,7 @@ var docs_dir = './docs';
 var docs_file_pattern = source_file_pattern;
 
 
-gulp.task('clean-docco', function() {
-	return gulp.src(docs_dir, { read: false })
-		.pipe(clean());
-});
-
-gulp.task('docco', /*['clean-docco'],*/ function() {
+gulp.task('docco', function() {
 	return gulp.src(docs_file_pattern)
 		.pipe(changed(docs_dir)) // incremental build
 		.pipe(docco({
@@ -63,10 +57,9 @@ gulp.task('webpack', function() {
 
 
 gulp.task('watch', function() {
-	gulp.watch([source_file_pattern, test_file_pattern], ['mocha']);
+	// gulp.watch([source_file_pattern, test_file_pattern], ['mocha']);
 	gulp.watch(source_file_pattern, ['docco']);
 });
 
 
-gulp.task('default', ['mocha', 'watch'/*, 'webpack'*/]);
-
+gulp.task('default', ['watch'/*, 'webpack'*/]);
