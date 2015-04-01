@@ -2,7 +2,7 @@ var assert = require('assert');
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
-var libxml = require('libxmljs');
+// var libxml = require('libxmljs');
 
 var root_dir = path.join(__dirname, '..');
 
