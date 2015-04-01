@@ -2,6 +2,8 @@
 
 > the [TREsPASS](https://www.trespass-project.eu) javascript library
 
+it is a commonJS module to be used in js / node.js projects.
+
 ---
 
 ## as dependency
