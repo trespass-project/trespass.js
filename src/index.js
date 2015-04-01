@@ -8,3 +8,4 @@ module.exports = {
 	// description ...
 	/*placeholder: require('./placeholder.js')*/
 };
+

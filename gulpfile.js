@@ -4,7 +4,10 @@ var rename = require('gulp-rename');
 var mocha = require('gulp-mocha');
 var notifier = require('node-notifier');
 var path = require('path');
+var rimraf = require('rimraf');
 var docco = require('gulp-docco');
+var sass = require('gulp-sass');
+var gulpSequence = require('gulp-sequence');
 var changed = require('gulp-changed');
 
 var name = 'trespass';
@@ -19,13 +22,33 @@ var docs_dir = './docs';
 var docs_file_pattern = source_file_pattern;
 
 
-gulp.task('docco', function() {
+gulp.task('docco:sass', function() {
+	return gulp.src( path.join(src_dir, 'docco.scss') )
+		.pipe(sass({
+			// indentedSyntax: true,
+			errLogToConsole: true
+		}))
+		.pipe(
+			gulp.dest( path.join(docs_dir) )
+		);
+});
+
+gulp.task('docco:rm', function(cb) {
+	var p = path.join(docs_dir, 'public', 'fonts');
+	rimraf(p, cb);
+});
+
+gulp.task('docco:docco', function() {
 	return gulp.src(docs_file_pattern)
 		.pipe(changed(docs_dir)) // incremental build
 		.pipe(docco({
 			// css: 'path/to/custom/docco.css'
 		}))
-		.pipe(gulp.dest(docs_dir))
+		.pipe(gulp.dest(docs_dir));
+});
+
+gulp.task('docco', function(cb) {
+	gulpSequence('docco:docco', ['docco:sass', 'docco:rm'], cb);
 });
 
 
@@ -62,4 +85,4 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', ['watch'/*, 'webpack'*/]);
+gulp.task('default', ['watch', 'webpack']);
