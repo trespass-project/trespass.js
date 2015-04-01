@@ -3,7 +3,7 @@
   "description": "TREsPASS javascript library",
   "private": true,
   "version": "0.0.0",
-  "main": "src/index.js",
+  "main": "src/trespass.js",
   "scripts": {
     "start": "gulp",
     "test": "mocha",

@@ -4,8 +4,7 @@
 // it consists of the following sub-modules:
 
 module.exports = {
-	// ## [trespass.placeholder](placeholder.js.html)
+	// ## [trespass.model](model.html)
 	// description ...
-	/*placeholder: require('./placeholder.js')*/
+	model: require('./model.js')
 };
-
