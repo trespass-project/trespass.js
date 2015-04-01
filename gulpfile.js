@@ -13,17 +13,19 @@ var changed = require('gulp-changed');
 var name = 'trespass';
 var src_dir = './src';
 var output_dir = './dist';
-var main_filename = 'index.js';
+var main_filename = 'trespass.js';
 var main_filepath = path.join(src_dir, main_filename);
 var source_file_pattern = path.join(src_dir, '**/*.js');
 var test_dir = './test';
 var test_file_pattern = path.join(test_dir, '*.js');
 var docs_dir = './docs';
 var docs_file_pattern = source_file_pattern;
+var docco_sass_filename = 'docco.scss';
+var docco_sass_pattern = path.join(src_dir, docco_sass_filename);
 
 
 gulp.task('docco:sass', function() {
-	return gulp.src( path.join(src_dir, 'docco.scss') )
+	return gulp.src( path.join(src_dir, docco_sass_filename) )
 		.pipe(sass({
 			// indentedSyntax: true,
 			errLogToConsole: true
@@ -33,9 +35,13 @@ gulp.task('docco:sass', function() {
 		);
 });
 
-gulp.task('docco:rm', function(cb) {
+gulp.task('docco:rm-fonts', function(cb) {
 	var p = path.join(docs_dir, 'public', 'fonts');
 	rimraf(p, cb);
+});
+
+gulp.task('docco:clean', function(cb) {
+	rimraf(docs_dir, cb);
 });
 
 gulp.task('docco:docco', function() {
@@ -48,7 +54,7 @@ gulp.task('docco:docco', function() {
 });
 
 gulp.task('docco', function(cb) {
-	gulpSequence('docco:docco', ['docco:sass', 'docco:rm'], cb);
+	gulpSequence('docco:clean', 'docco:docco', ['docco:sass', 'docco:rm-fonts'], cb);
 });
 
 
@@ -82,7 +88,8 @@ gulp.task('webpack', function() {
 gulp.task('watch', function() {
 	// gulp.watch([source_file_pattern, test_file_pattern], ['mocha']);
 	gulp.watch(source_file_pattern, ['docco']);
+	gulp.watch(docco_sass_pattern, ['docco:sass']);
 });
 
 
-gulp.task('default', ['watch', 'webpack']);
+gulp.task('default', ['watch', 'webpack', 'docco']);
