@@ -17,3 +17,13 @@ it is a commonJS module to be used in js / node.js projects.
 	}
 }
 ```
+
+---
+
+## documentation
+
+to generate the documentation, run:
+
+```javascript
+gulp docco
+```
