@@ -83,7 +83,7 @@ prepare = function(
 		});
 
 	// TODO:
-	// - prcesses
+	// - processes
 	// - policies
 
 	/* predicates */
