@@ -1,732 +1,1439 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<system
-		xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd"
-		author="Christian W Probst"
-		date="14-12-2014"
-		version="1.0">
-	<title>TREsPASS cloud infrastructure model</title>
-	<locations>
-		<!-- rooms in building -->
-		<location id="outside" domain="physical"/>
-		<location id="door_building" domain="physical"/>
-		<location id="hallway" domain="physical"/>
-		<location id="door_office" domain="physical" />
-		<location id="office" domain="physical"/>
-		<location id="door_datacenter" domain="physical"/>
-		<location id="datacenter" domain="physical"/>
-		<!-- cyber infrastructure -->
-		<location id="laptop" domain="cyber" />
-		<location id="gateway" domain="cyber" />
-		<location id="switch" domain="cyber" />
-		<location id="repository" domain="cyber" />
-		<!-- cyber infrastructure server 1-->
-		<location id="server1" domain="cyber" />
-		<location id="vfw1" domain="cyber" />
-		<location id="hypervisor1" domain="cyber" />
-		<location id="switch1" domain="cyber" />
-		<location id="vm1loc" domain="cyber">
-			<atLocations>vm1</atLocations>
-		</location>
-		<location id="vm2loc" domain="cyber">
-			<atLocations>vm2</atLocations>
-		</location>
-		<location id="vm3loc" domain="cyber">
-			<atLocations>vm3</atLocations>
-		</location>
-		<!-- cyber infrastructure server 2-->
-		<location id="server2" domain="cyber" />
-		<location id="vfw2" domain="cyber" />
-		<location id="hypervisor2" domain="cyber" />
-		<location id="switch2" domain="cyber" />
-	</locations>
-	<edges>
-		<!-- connectivity building -->
-		<edge>
-			<source>outside</source><target>door_building</target>
-		</edge>
-		<edge>
-			<source>door_building</source><target>hallway</target>
-		</edge>
-		<edge>
-			<source>hallway</source><target>outside</target>
-		</edge>
-		<edge>
-			<source>hallway</source><target>door_office</target>
-		</edge>
-		<edge>
-			<source>door_office</source><target>office</target>
-		</edge>
-		<edge>
-			<source>office</source><target>hallway</target>
-		</edge>
-		<edge directed="false">
-			<source>office</source><target>door_datacenter</target>
-		</edge>
-		<edge directed="false">
-			<source>door_datacenter</source><target>datacenter</target>
-		</edge>
-		<!-- computers -->
-		<edge directed="false">
-			<source>laptop</source><target>office</target>
-		</edge>
-		<edge directed="false">
-			<source>server1</source><target>datacenter</target>
-		</edge>
-		<edge directed="false">
-			<source>server2</source><target>datacenter</target>
-		</edge>
-		<edge directed="false">
-			<source>repository</source><target>datacenter</target>
-		</edge>
-		<!-- connectivity cyber -->
-		<edge directed="false">
-			<source>laptop</source><target>gateway</target>
-		</edge>
-		<edge directed="false">
-			<source>gateway</source><target>switch</target>
-		</edge>
-		<!-- connectivity switch -->
-		<edge directed="false">
-			<source>server1</source><target>switch</target>
-		</edge>
-		<edge directed="false">
-			<source>server2</source><target>switch</target>
-		</edge>
-		<edge directed="false">
-			<source>repository</source><target>switch</target>
-		</edge>
-		<!-- connectivity server 1 -->
-		<edge directed="false">
-			<source>vfw1</source><target>server1</target>
-		</edge>
-		<edge directed="false">
-			<source>switch1</source><target>vfw1</target>
-		</edge>
-		<edge directed="false">
-			<source>vm1loc</source><target>switch1</target>
-		</edge>
-		<edge directed="false">
-			<source>vm2loc</source><target>switch1</target>
-		</edge>
-		<edge directed="false">
-			<source>vm3loc</source><target>switch1</target>
-		</edge>
-		<edge directed="false">
-			<source>hypervisor1</source><target>switch1</target>
-		</edge>
-		<!-- connectivity server 2 -->
-		<edge directed="false">
-			<source>vfw2</source><target>server1</target>
-		</edge>
-		<edge directed="false">
-			<source>switch2</source><target>vfw1</target>
-		</edge>
-		<edge directed="false">
-			<source>hypervisor2</source><target>switch1</target>
-		</edge>
-	</edges>
-	<assets>
-		<item name="idcard" id="x002">
-			<atLocations>Sydney</atLocations>
-		</item>
-		<item name="idcard" id="x003">
-			<atLocations>Terry</atLocations>
-		</item>
-		<item name="idcard" id="x004">
-			<atLocations>Ethan</atLocations>
-		</item>
-		<item name="idcard" id="x005">
-			<atLocations>Finn</atLocations>
-		</item>
-		<item name="vm1" id="vm1">
-			<atLocations>server1</atLocations>
-		</item>
-		<item name="vm2" id="vm2">
-			<atLocations>server1</atLocations>
-		</item>
-		<item name="vm3" id="vm3">
-			<atLocations>server1</atLocations>
-		</item>
-		<data name="pin" id="x006" value="1">
-			<atLocations>Sydney x002</atLocations>
-		</data>
-		<data name="pin" id="x007" value="2">
-			<atLocations>Terry x003</atLocations>
-		</data>
-		<data name="pin" id="x008" value="3">
-			<atLocations>Ethan x004</atLocations>
-		</data>
-		<data name="pin" id="x009" value="4">
-			<atLocations>Finn x005</atLocations>
-		</data>
-		<data name="owner" id="x010" value="Sydney">
-			<atLocations>x002</atLocations>
-		</data>
-		<data name="owner" id="x011" value="Terry">
-			<atLocations>x003</atLocations>
-		</data>
-		<data name="owner" id="x012" value="Ethan">
-			<atLocations>x004</atLocations>
-		</data>
-		<data name="owner" id="x013" value="Finn">
-			<atLocations>x005</atLocations>
-		</data>
-		<data name="fileX" id="fileX" value="42">
-			<atLocations>vm1loc</atLocations>
-		</data>
-		<data name="password" id="pwdethan" value="1234">
-			<atLocations>Ethan</atLocations>
-		</data>
-		<data name="password" id="pwdsydney" value="2345">
-			<atLocations>Sydney</atLocations>
-		</data>
-		<data name="password" id="admpwdsydney" value="3456">
-			<atLocations>Sydney</atLocations>
-		</data>
-	</assets>
-	<actors>
-		<actor id="Finn">
-			<atLocations>office</atLocations>
-		</actor>
-		<actor id="Ethan">
-			<atLocations>office</atLocations>
-		</actor>
-		<actor id="Sydney">
-			<atLocations>office</atLocations>
-		</actor>
-		<actor id="Terry">
-			<atLocations>datacenter</atLocations>
-		</actor>
-	</actors>
-	<policies>
-		<policy id="p001">
-			<credentials>
-				<credItem name="idcard"><credData name="pin"><variable>Y</variable></credData></credItem>
-				<credData name="pin"><variable>Y</variable></credData>
-			</credentials>
-			<enabled><move /></enabled>
-			<atLocations>door_building</atLocations>
-		</policy>
-		<policy id="p002">
-			<credentials>
-				<credItem name="idcard"><credData name="owner"><variable>X</variable></credData><credData name="pin"><variable>Y</variable></credData></credItem>
-				<credPredicate name="role"><value>employee</value><variable>X</variable></credPredicate>
-				<credData name="pin"><variable>Y</variable></credData>
-			</credentials>
-			<enabled><move /></enabled>
-			<atLocations>door_office</atLocations>
-		</policy>
-		<policy id="p003">
-			<credentials>
-				<credItem name="idcard"><credData name="owner"><variable>X</variable></credData><credData name="pin"><variable>Y</variable></credData></credItem>
-				<credPredicate name="role"><value>administrator</value><variable>X</variable></credPredicate>
-				<credData name="pin"><variable>Y</variable></credData>
-			</credentials>
-			<enabled><move /></enabled>
-			<atLocations>door_datacenter</atLocations>
-		</policy>
-		<policy id="p004">
-			<credentials>
-				<credItem name="idcard"><credData name="owner"><variable>X</variable></credData><credData name="pin"><variable>Y</variable></credData></credItem>
-				<credPredicate name="role"><value>technician</value><variable>X</variable></credPredicate>
-				<credData name="pin"><variable>Y</variable></credData>
-			</credentials>
-			<enabled><move /></enabled>
-			<atLocations>door_datacenter</atLocations>
-		</policy>
-		<policy id="p005">
-			<credentials>
-				<credData name="user"><variable>U</variable></credData>
-				<credData name="password"><variable>P</variable></credData>
-				<credPredicate name="isPassword"><value>vm1</value><variable>U</variable><variable>P</variable></credPredicate>
-			</credentials>
-			<enabled><in/></enabled>
-			<atLocations>vm1loc</atLocations>
-		</policy>
-		<policy id="p006">
-			<credentials>
-				<credData name="user">
-					<variable>U</variable>
-				</credData>
-				<credData name="password">
-					<variable>P</variable>
-				</credData>
-				<credPredicate name="isPassword">
-					<value>hypervisor1</value>
-					<variable>U</variable>
-					<variable>P</variable>
-				</credPredicate>
-			</credentials>
-			<enabled>
-				<out>
-					<var>source</var><val>hypervisor1</val><var>request</var><var>U</var><var>P</var>
-				</out>
-			</enabled>
-			<atLocations>hypervisor1</atLocations>
-		</policy>
-	</policies>
-	<processes>
-<!--                       -->
-<!-- routing at gateway -->
-<!--                       -->
-<!-- routing at gateway to vm1loc via switch -->
-<process id="gateway_1_1">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>gateway</atLocations>
-</process>
-<!-- routing at gateway to hypervisor1 via switch -->
-<process id="gateway_1_2">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>gateway</atLocations>
-</process>
-<!-- routing at gateway to laptop via laptop -->
-<process id="gateway_2_1">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="laptop"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>gateway</atLocations>
-</process>
-<!--                       -->
-<!-- routing at switch -->
-<!--                       -->
-<!-- routing at switch to vm1loc via server1 -->
-<process id="switch_1_1">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!-- routing at switch to vm2loc via server1 -->
-<process id="switch_1_2">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!-- routing at switch to vm3loc via server1 -->
-<process id="switch_1_3">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!-- routing at switch to hypervisor1 via server1 -->
-<process id="switch_1_4">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!-- routing at switch to laptop via gateway -->
-<process id="switch_2_1">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="gateway"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!-- routing at switch to repository via repository -->
-<process id="switch_3_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="repository"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch</atLocations>
-</process>
-<!--                       -->
-<!-- routing at server1 -->
-<!--                       -->
-<!-- routing at server1 to repository via switch -->
-<process id="server1_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!-- routing at server1 to laptop via switch -->
-<process id="server1_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!-- routing at server1 to vm1loc via vfw1 -->
-<process id="server1_2_1">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!-- routing at server1 to vm2loc via vfw1 -->
-<process id="server1_2_2">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!-- routing at server1 to vm3loc via vfw1 -->
-<process id="server1_2_3">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!-- routing at server1 to hypervisor1 via vfw1 -->
-<process id="server1_2_4">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server1</atLocations>
-</process>
-<!--                       -->
-<!-- routing at vfw1 -->
-<!--                       -->
-<!-- routing at vfw1 to repository via server1 -->
-<process id="vfw1_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!-- routing at vfw1 to laptop via server1 -->
-<process id="vfw1_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!-- routing at vfw1 to vm1loc via switch1 -->
-<process id="vfw1_2_1">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch1"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!-- routing at vfw1 to vm2loc via switch1 -->
-<process id="vfw1_2_2">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch1"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!-- routing at vfw1 to vm3loc via switch1 -->
-<process id="vfw1_2_3">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch1"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!-- routing at vfw1 to hypervisor1 via switch1 -->
-<process id="vfw1_2_4">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch1"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw1</atLocations>
-</process>
-<!--                       -->
-<!-- routing at switch1 -->
-<!--                       -->
-<!-- routing at switch1 to repository via vfw1 -->
-<process id="switch1_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!-- routing at switch1 to laptop via vfw1 -->
-<process id="switch1_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!-- routing at switch1 to vm1loc via vm1loc -->
-<process id="switch1_2_1">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vm1loc"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!-- routing at switch1 to vm2loc via vm1loc -->
-<process id="switch1_2_2">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vm1loc"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!-- routing at switch1 to vm3loc via vm1loc -->
-<process id="switch1_2_3">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vm1loc"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!-- routing at switch1 to hypervisor1 via vm1loc -->
-<process id="switch1_2_4">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vm1loc"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch1</atLocations>
-</process>
-<!--                       -->
-<!-- routing at server2 -->
-<!--                       -->
-<!-- routing at server2 to repository via switch -->
-<process id="server2_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to laptop via switch -->
-<process id="server2_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to vm1loc via switch -->
-<process id="server2_1_3">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to vm2loc via switch -->
-<process id="server2_1_4">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to vm3loc via switch -->
-<process id="server2_1_5">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to hypervisor1 via switch -->
-<process id="server2_1_6">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!-- routing at server2 to hypervisor2 via vfw2 -->
-<process id="server2_2_1">
-	<actions>
-		<in><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw2"><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>server2</atLocations>
-</process>
-<!--                       -->
-<!-- routing at vfw2 -->
-<!--                       -->
-<!-- routing at vfw2 to repository via server1 -->
-<process id="vfw2_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to laptop via server1 -->
-<process id="vfw2_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to vm1loc via server1 -->
-<process id="vfw2_1_3">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to vm2loc via server1 -->
-<process id="vfw2_1_4">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to vm3loc via server1 -->
-<process id="vfw2_1_5">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to hypervisor1 via server1 -->
-<process id="vfw2_1_6">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="server1"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!-- routing at vfw2 to hypervisor2 via switch2 -->
-<process id="vfw2_2_1">
-	<actions>
-		<in><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="switch2"><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>vfw2</atLocations>
-</process>
-<!--                       -->
-<!-- routing at switch2 -->
-<!--                       -->
-<!-- routing at switch2 to repository via vfw1 -->
-<process id="switch2_1_1">
-	<actions>
-		<in><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>repository</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to laptop via vfw1 -->
-<process id="switch2_1_2">
-	<actions>
-		<in><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>laptop</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to vm1loc via vfw1 -->
-<process id="switch2_1_3">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm1loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to vm2loc via vfw1 -->
-<process id="switch2_1_4">
-	<actions>
-		<in><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm2loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to vm3loc via vfw1 -->
-<process id="switch2_1_5">
-	<actions>
-		<in><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>vm3loc</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to hypervisor1 via vfw1 -->
-<process id="switch2_1_6">
-	<actions>
-		<in><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="vfw1"><var>source</var><val>hypervisor1</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- routing at switch2 to hypervisor2 via hypervisor2 -->
-<process id="switch2_2_1">
-	<actions>
-		<in><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></in>
-		<out target="hypervisor2"><var>source</var><val>hypervisor2</val><var>request</var><var>user</var><var>password</var></out>
-	</actions>
-	<atLocations>switch2</atLocations>
-</process>
-<!-- get the file at vm1 -->
-<process id="getfile">
-	<actions>
-		<in><var>source</var><val>vm1loc</val><val>get(fileX)</val><val>Ethan</val><val>pwdEthan</val></in>
-		<in><val>fileX</val><var>content</var></in>
-		<out><val>vm1loc</val><var>source</var><val>reply</val><val>fileX</val><var>content</var></out>
-	</actions>
-	<atLocations>vm1loc</atLocations>
-</process>
-<!-- start the migration -->
-<process id="hypervisor1_migrate">
-	<actions>
-		<in><val>migrate</val></in>
-		<in><val>vm1</val><var>vm</var></in>
-		<out target="vfw1"><val>hypervisor1</val><val>repository</val><val>migrate</val><val>vm1</val><var>vm</var></out>
-	</actions>
-	<atLocations>vm1loc</atLocations>
-</process>
-<!-- handle migration at repository -->
-<process id="repository_migrate">
-	<actions>
-		<in><val>hypervisor1</val><val>repository</val><val>migrate</val><var>name</var><var>vm</var></in>
-		<out target="switch"><val>repository</val><val>hypervisor2</val><val>migrate</val><var>name</var><var>vm</var></out>
-	</actions>
-	<atLocations>vm1loc</atLocations>
-</process>
-<!-- install vm at hypervisor2 -->
-<process id="hypervisor2_migrate">
-	<actions>
-		<in><val>repository</val><val>hypervisor2</val><val>migrate</val><var>name</var><var>vm</var></in>
-		<out target="server2"><var>name</var><var>vm</var></out>
-	</actions>
-	<atLocations>vm1loc</atLocations>
-</process>
-	</processes>
-	<predicates>
-		<predicate id="role" arity="2">
-			<value>administrator Sydney</value>
-			<value>technician Terry</value>
-			<value>accountant Finn</value>
-			<value>investigator Ethan</value>
-			<value>employee Finn</value>
-			<value>employee Ethan</value>
-			<value>employee Sydney</value>
-			<value>employee Terry</value>
-		</predicate>
-		<predicate id="isPassword" arity="3">
-			<value>vm1 Ethan pwdethan</value>
-			<value>laptop Ethan pwdethan</value>
-			<value>laptop Sydney pwdsydney</value>
-			<value>hypervisor1 Sydney admpwdsydney</value>
-		</predicate>
-	</predicates>
+<?xml version="1.0" encoding="UTF-8" ?>
+<system xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd" author="Christian W Probst" date="14-12-2014" version="1.0">
+    <title>TREsPASS cloud infrastructure model</title>
+    <locations>
+        <!-- rooms in building -->
+        <location id="outside" domain="physical" />
+        <location id="door_building" domain="physical" />
+        <location id="hallway" domain="physical" />
+        <location id="door_office" domain="physical" />
+        <location id="office" domain="physical" />
+        <location id="door_datacenter" domain="physical" />
+        <location id="datacenter" domain="physical" />
+        <!-- cyber infrastructure -->
+        <location id="laptop" domain="cyber" />
+        <location id="gateway" domain="cyber" />
+        <location id="switch" domain="cyber" />
+        <location id="repository" domain="cyber" />
+        <!-- cyber infrastructure server 1-->
+        <location id="server1" domain="cyber" />
+        <location id="vfw1" domain="cyber" />
+        <location id="hypervisor1" domain="cyber" />
+        <location id="switch1" domain="cyber" />
+        <location id="vm1loc" domain="cyber">
+            <atLocations>vm1</atLocations>
+        </location>
+        <location id="vm2loc" domain="cyber">
+            <atLocations>vm2</atLocations>
+        </location>
+        <location id="vm3loc" domain="cyber">
+            <atLocations>vm3</atLocations>
+        </location>
+        <!-- cyber infrastructure server 2-->
+        <location id="server2" domain="cyber" />
+        <location id="vfw2" domain="cyber" />
+        <location id="hypervisor2" domain="cyber" />
+        <location id="switch2" domain="cyber" />
+    </locations>
+    <edges>
+        <!-- connectivity building -->
+        <edge>
+            <source>outside</source>
+            <target>door_building</target>
+        </edge>
+        <edge>
+            <source>door_building</source>
+            <target>hallway</target>
+        </edge>
+        <edge>
+            <source>hallway</source>
+            <target>outside</target>
+        </edge>
+        <edge>
+            <source>hallway</source>
+            <target>door_office</target>
+        </edge>
+        <edge>
+            <source>door_office</source>
+            <target>office</target>
+        </edge>
+        <edge>
+            <source>office</source>
+            <target>hallway</target>
+        </edge>
+        <edge directed="false">
+            <source>office</source>
+            <target>door_datacenter</target>
+        </edge>
+        <edge directed="false">
+            <source>door_datacenter</source>
+            <target>datacenter</target>
+        </edge>
+        <!-- computers -->
+        <edge directed="false">
+            <source>laptop</source>
+            <target>office</target>
+        </edge>
+        <edge directed="false">
+            <source>server1</source>
+            <target>datacenter</target>
+        </edge>
+        <edge directed="false">
+            <source>server2</source>
+            <target>datacenter</target>
+        </edge>
+        <edge directed="false">
+            <source>repository</source>
+            <target>datacenter</target>
+        </edge>
+        <!-- connectivity cyber -->
+        <edge directed="false">
+            <source>laptop</source>
+            <target>gateway</target>
+        </edge>
+        <edge directed="false">
+            <source>gateway</source>
+            <target>switch</target>
+        </edge>
+        <!-- connectivity switch -->
+        <edge directed="false">
+            <source>server1</source>
+            <target>switch</target>
+        </edge>
+        <edge directed="false">
+            <source>server2</source>
+            <target>switch</target>
+        </edge>
+        <edge directed="false">
+            <source>repository</source>
+            <target>switch</target>
+        </edge>
+        <!-- connectivity server 1 -->
+        <edge directed="false">
+            <source>vfw1</source>
+            <target>server1</target>
+        </edge>
+        <edge directed="false">
+            <source>switch1</source>
+            <target>vfw1</target>
+        </edge>
+        <edge directed="false">
+            <source>vm1loc</source>
+            <target>switch1</target>
+        </edge>
+        <edge directed="false">
+            <source>vm2loc</source>
+            <target>switch1</target>
+        </edge>
+        <edge directed="false">
+            <source>vm3loc</source>
+            <target>switch1</target>
+        </edge>
+        <edge directed="false">
+            <source>hypervisor1</source>
+            <target>switch1</target>
+        </edge>
+        <!-- connectivity server 2 -->
+        <edge directed="false">
+            <source>vfw2</source>
+            <target>server1</target>
+        </edge>
+        <edge directed="false">
+            <source>switch2</source>
+            <target>vfw1</target>
+        </edge>
+        <edge directed="false">
+            <source>hypervisor2</source>
+            <target>switch1</target>
+        </edge>
+    </edges>
+    <assets>
+        <item name="idcard" id="x002">
+            <atLocations>Sydney</atLocations>
+        </item>
+        <item name="idcard" id="x003">
+            <atLocations>Terry</atLocations>
+        </item>
+        <item name="idcard" id="x004">
+            <atLocations>Ethan</atLocations>
+        </item>
+        <item name="idcard" id="x005">
+            <atLocations>Finn</atLocations>
+        </item>
+        <item name="vm1" id="vm1">
+            <atLocations>server1</atLocations>
+        </item>
+        <item name="vm2" id="vm2">
+            <atLocations>server1</atLocations>
+        </item>
+        <item name="vm3" id="vm3">
+            <atLocations>server1</atLocations>
+        </item>
+        <data name="pin" id="x006" value="1">
+            <atLocations>Sydney x002</atLocations>
+        </data>
+        <data name="pin" id="x007" value="2">
+            <atLocations>Terry x003</atLocations>
+        </data>
+        <data name="pin" id="x008" value="3">
+            <atLocations>Ethan x004</atLocations>
+        </data>
+        <data name="pin" id="x009" value="4">
+            <atLocations>Finn x005</atLocations>
+        </data>
+        <data name="owner" id="x010" value="Sydney">
+            <atLocations>x002</atLocations>
+        </data>
+        <data name="owner" id="x011" value="Terry">
+            <atLocations>x003</atLocations>
+        </data>
+        <data name="owner" id="x012" value="Ethan">
+            <atLocations>x004</atLocations>
+        </data>
+        <data name="owner" id="x013" value="Finn">
+            <atLocations>x005</atLocations>
+        </data>
+        <data name="fileX" id="fileX" value="42">
+            <atLocations>vm1loc</atLocations>
+        </data>
+        <data name="password" id="pwdethan" value="1234">
+            <atLocations>Ethan</atLocations>
+        </data>
+        <data name="password" id="pwdsydney" value="2345">
+            <atLocations>Sydney</atLocations>
+        </data>
+        <data name="password" id="admpwdsydney" value="3456">
+            <atLocations>Sydney</atLocations>
+        </data>
+    </assets>
+    <actors>
+        <actor id="Finn">
+            <atLocations>office</atLocations>
+        </actor>
+        <actor id="Ethan">
+            <atLocations>office</atLocations>
+        </actor>
+        <actor id="Sydney">
+            <atLocations>office</atLocations>
+        </actor>
+        <actor id="Terry">
+            <atLocations>datacenter</atLocations>
+        </actor>
+    </actors>
+    <policies>
+        <policy id="p001">
+            <credentials>
+                <credItem name="idcard">
+                    <credData name="pin">
+                        <variable>Y</variable>
+                    </credData>
+                </credItem>
+                <credData name="pin">
+                    <variable>Y</variable>
+                </credData>
+            </credentials>
+            <enabled>
+                <move />
+            </enabled>
+            <atLocations>door_building</atLocations>
+        </policy>
+        <policy id="p002">
+            <credentials>
+                <credItem name="idcard">
+                    <credData name="owner">
+                        <variable>X</variable>
+                    </credData>
+                    <credData name="pin">
+                        <variable>Y</variable>
+                    </credData>
+                </credItem>
+                <credPredicate name="role">
+                    <value>employee</value>
+                    <variable>X</variable>
+                </credPredicate>
+                <credData name="pin">
+                    <variable>Y</variable>
+                </credData>
+            </credentials>
+            <enabled>
+                <move />
+            </enabled>
+            <atLocations>door_office</atLocations>
+        </policy>
+        <policy id="p003">
+            <credentials>
+                <credItem name="idcard">
+                    <credData name="owner">
+                        <variable>X</variable>
+                    </credData>
+                    <credData name="pin">
+                        <variable>Y</variable>
+                    </credData>
+                </credItem>
+                <credPredicate name="role">
+                    <value>administrator</value>
+                    <variable>X</variable>
+                </credPredicate>
+                <credData name="pin">
+                    <variable>Y</variable>
+                </credData>
+            </credentials>
+            <enabled>
+                <move />
+            </enabled>
+            <atLocations>door_datacenter</atLocations>
+        </policy>
+        <policy id="p004">
+            <credentials>
+                <credItem name="idcard">
+                    <credData name="owner">
+                        <variable>X</variable>
+                    </credData>
+                    <credData name="pin">
+                        <variable>Y</variable>
+                    </credData>
+                </credItem>
+                <credPredicate name="role">
+                    <value>technician</value>
+                    <variable>X</variable>
+                </credPredicate>
+                <credData name="pin">
+                    <variable>Y</variable>
+                </credData>
+            </credentials>
+            <enabled>
+                <move />
+            </enabled>
+            <atLocations>door_datacenter</atLocations>
+        </policy>
+        <policy id="p005">
+            <credentials>
+                <credData name="user">
+                    <variable>U</variable>
+                </credData>
+                <credData name="password">
+                    <variable>P</variable>
+                </credData>
+                <credPredicate name="isPassword">
+                    <value>vm1</value>
+                    <variable>U</variable>
+                    <variable>P</variable>
+                </credPredicate>
+            </credentials>
+            <enabled>
+                <in/>
+            </enabled>
+            <atLocations>vm1loc</atLocations>
+        </policy>
+        <policy id="p006">
+            <credentials>
+                <credData name="user">
+                    <variable>U</variable>
+                </credData>
+                <credData name="password">
+                    <variable>P</variable>
+                </credData>
+                <credPredicate name="isPassword">
+                    <value>hypervisor1</value>
+                    <variable>U</variable>
+                    <variable>P</variable>
+                </credPredicate>
+            </credentials>
+            <enabled>
+                <out>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>U</var>
+                    <var>P</var>
+                </out>
+            </enabled>
+            <atLocations>hypervisor1</atLocations>
+        </policy>
+    </policies>
+    <processes>
+        <!--                       -->
+        <!-- routing at gateway -->
+        <!--                       -->
+        <!-- routing at gateway to vm1loc via switch -->
+        <process id="gateway_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>gateway</atLocations>
+        </process>
+        <!-- routing at gateway to hypervisor1 via switch -->
+        <process id="gateway_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>gateway</atLocations>
+        </process>
+        <!-- routing at gateway to laptop via laptop -->
+        <process id="gateway_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="laptop">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>gateway</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at switch -->
+        <!--                       -->
+        <!-- routing at switch to vm1loc via server1 -->
+        <process id="switch_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!-- routing at switch to vm2loc via server1 -->
+        <process id="switch_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!-- routing at switch to vm3loc via server1 -->
+        <process id="switch_1_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!-- routing at switch to hypervisor1 via server1 -->
+        <process id="switch_1_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!-- routing at switch to laptop via gateway -->
+        <process id="switch_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="gateway">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!-- routing at switch to repository via repository -->
+        <process id="switch_3_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="repository">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at server1 -->
+        <!--                       -->
+        <!-- routing at server1 to repository via switch -->
+        <process id="server1_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!-- routing at server1 to laptop via switch -->
+        <process id="server1_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!-- routing at server1 to vm1loc via vfw1 -->
+        <process id="server1_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!-- routing at server1 to vm2loc via vfw1 -->
+        <process id="server1_2_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!-- routing at server1 to vm3loc via vfw1 -->
+        <process id="server1_2_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!-- routing at server1 to hypervisor1 via vfw1 -->
+        <process id="server1_2_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server1</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at vfw1 -->
+        <!--                       -->
+        <!-- routing at vfw1 to repository via server1 -->
+        <process id="vfw1_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!-- routing at vfw1 to laptop via server1 -->
+        <process id="vfw1_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!-- routing at vfw1 to vm1loc via switch1 -->
+        <process id="vfw1_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch1">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!-- routing at vfw1 to vm2loc via switch1 -->
+        <process id="vfw1_2_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch1">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!-- routing at vfw1 to vm3loc via switch1 -->
+        <process id="vfw1_2_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch1">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!-- routing at vfw1 to hypervisor1 via switch1 -->
+        <process id="vfw1_2_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch1">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw1</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at switch1 -->
+        <!--                       -->
+        <!-- routing at switch1 to repository via vfw1 -->
+        <process id="switch1_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!-- routing at switch1 to laptop via vfw1 -->
+        <process id="switch1_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!-- routing at switch1 to vm1loc via vm1loc -->
+        <process id="switch1_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vm1loc">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!-- routing at switch1 to vm2loc via vm1loc -->
+        <process id="switch1_2_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vm1loc">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!-- routing at switch1 to vm3loc via vm1loc -->
+        <process id="switch1_2_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vm1loc">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!-- routing at switch1 to hypervisor1 via vm1loc -->
+        <process id="switch1_2_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vm1loc">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch1</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at server2 -->
+        <!--                       -->
+        <!-- routing at server2 to repository via switch -->
+        <process id="server2_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to laptop via switch -->
+        <process id="server2_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to vm1loc via switch -->
+        <process id="server2_1_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to vm2loc via switch -->
+        <process id="server2_1_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to vm3loc via switch -->
+        <process id="server2_1_5">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to hypervisor1 via switch -->
+        <process id="server2_1_6">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!-- routing at server2 to hypervisor2 via vfw2 -->
+        <process id="server2_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw2">
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>server2</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at vfw2 -->
+        <!--                       -->
+        <!-- routing at vfw2 to repository via server1 -->
+        <process id="vfw2_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to laptop via server1 -->
+        <process id="vfw2_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to vm1loc via server1 -->
+        <process id="vfw2_1_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to vm2loc via server1 -->
+        <process id="vfw2_1_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to vm3loc via server1 -->
+        <process id="vfw2_1_5">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to hypervisor1 via server1 -->
+        <process id="vfw2_1_6">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="server1">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!-- routing at vfw2 to hypervisor2 via switch2 -->
+        <process id="vfw2_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="switch2">
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>vfw2</atLocations>
+        </process>
+        <!--                       -->
+        <!-- routing at switch2 -->
+        <!--                       -->
+        <!-- routing at switch2 to repository via vfw1 -->
+        <process id="switch2_1_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>repository</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to laptop via vfw1 -->
+        <process id="switch2_1_2">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>laptop</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to vm1loc via vfw1 -->
+        <process id="switch2_1_3">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to vm2loc via vfw1 -->
+        <process id="switch2_1_4">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm2loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to vm3loc via vfw1 -->
+        <process id="switch2_1_5">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>vm3loc</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to hypervisor1 via vfw1 -->
+        <process id="switch2_1_6">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="vfw1">
+                    <var>source</var>
+                    <val>hypervisor1</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- routing at switch2 to hypervisor2 via hypervisor2 -->
+        <process id="switch2_2_1">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </in>
+                <out target="hypervisor2">
+                    <var>source</var>
+                    <val>hypervisor2</val>
+                    <var>request</var>
+                    <var>user</var>
+                    <var>password</var>
+                </out>
+            </actions>
+            <atLocations>switch2</atLocations>
+        </process>
+        <!-- get the file at vm1 -->
+        <process id="getfile">
+            <actions>
+                <in>
+                    <var>source</var>
+                    <val>vm1loc</val>
+                    <val>get(fileX)</val>
+                    <val>Ethan</val>
+                    <val>pwdEthan</val>
+                </in>
+                <in>
+                    <val>fileX</val>
+                    <var>content</var>
+                </in>
+                <out>
+                    <val>vm1loc</val>
+                    <var>source</var>
+                    <val>reply</val>
+                    <val>fileX</val>
+                    <var>content</var>
+                </out>
+            </actions>
+            <atLocations>vm1loc</atLocations>
+        </process>
+        <!-- start the migration -->
+        <process id="hypervisor1_migrate">
+            <actions>
+                <in>
+                    <val>migrate</val>
+                </in>
+                <in>
+                    <val>vm1</val>
+                    <var>vm</var>
+                </in>
+                <out target="vfw1">
+                    <val>hypervisor1</val>
+                    <val>repository</val>
+                    <val>migrate</val>
+                    <val>vm1</val>
+                    <var>vm</var>
+                </out>
+            </actions>
+            <atLocations>vm1loc</atLocations>
+        </process>
+        <!-- handle migration at repository -->
+        <process id="repository_migrate">
+            <actions>
+                <in>
+                    <val>hypervisor1</val>
+                    <val>repository</val>
+                    <val>migrate</val>
+                    <var>name</var>
+                    <var>vm</var>
+                </in>
+                <out target="switch">
+                    <val>repository</val>
+                    <val>hypervisor2</val>
+                    <val>migrate</val>
+                    <var>name</var>
+                    <var>vm</var>
+                </out>
+            </actions>
+            <atLocations>vm1loc</atLocations>
+        </process>
+        <!-- install vm at hypervisor2 -->
+        <process id="hypervisor2_migrate">
+            <actions>
+                <in>
+                    <val>repository</val>
+                    <val>hypervisor2</val>
+                    <val>migrate</val>
+                    <var>name</var>
+                    <var>vm</var>
+                </in>
+                <out target="server2">
+                    <var>name</var>
+                    <var>vm</var>
+                </out>
+            </actions>
+            <atLocations>vm1loc</atLocations>
+        </process>
+    </processes>
+    <predicates>
+        <predicate id="role" arity="2">
+            <value>administrator Sydney</value>
+            <value>technician Terry</value>
+            <value>accountant Finn</value>
+            <value>investigator Ethan</value>
+            <value>employee Finn</value>
+            <value>employee Ethan</value>
+            <value>employee Sydney</value>
+            <value>employee Terry</value>
+        </predicate>
+        <predicate id="isPassword" arity="3">
+            <value>vm1 Ethan pwdethan</value>
+            <value>laptop Ethan pwdethan</value>
+            <value>laptop Sydney pwdsydney</value>
+            <value>hypervisor1 Sydney admpwdsydney</value>
+        </predicate>
+    </predicates>
 </system>

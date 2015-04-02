@@ -5,8 +5,14 @@
 
 module.exports = {
 	// ## [trespass.model](model.html)
+	// processing the socio-technical model XML format
 	model: require('./model.js'),
 
+	// ## [trespass.tree](tree.html)
+	// processing attack trees
+	tree: require('./tree.js'),
+
 	// ## [trespass.util](util.html)
+	// all kinds of helper functions
 	util: require('./util.js'),
 };
