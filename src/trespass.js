@@ -5,6 +5,8 @@
 
 module.exports = {
 	// ## [trespass.model](model.html)
-	// description ...
-	model: require('./model.js')
+	model: require('./model.js'),
+
+	// ## [trespass.util](util.html)
+	util: require('./util.js'),
 };
