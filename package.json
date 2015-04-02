@@ -2,7 +2,7 @@
   "name": "trespass.js",
   "description": "TREsPASS javascript library",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "main": "src/trespass.js",
   "scripts": {
     "start": "gulp",
