@@ -58,18 +58,6 @@ p {
 	margin: 15px 0 0px;
 }
 
-// .annotation ul,
-// .annotation ol {
-// 	margin: 25px 0;
-// }
-
-// .annotation ul li,
-// .annotation ol li {
-// 	font-size: 14px;
-// 	line-height: 18px;
-// 	margin: 10px 0;
-// }
-
 h1,
 h2,
 h3,
@@ -109,10 +97,7 @@ code {
 	display: block;
 	margin: 0;
 	padding: 7px 10px;
-	background: #fcfcfc;
-	-moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-	box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+	background: $bgcolor;
 	overflow-x: auto;
 }
 
@@ -172,8 +157,6 @@ ul.sections > li > div {
 #jump_page {
 	margin: 0;
 	background: white;
-	-webkit-box-shadow: 0 0 25px #777;
-	-moz-box-shadow: 0 0 25px #777;
 	-webkit-border-bottom-left-radius: 5px;
 	-moz-border-radius-bottomleft: 5px;
 	font: $font-size sans-serif;
@@ -247,8 +230,6 @@ ul.sections > li > div {
 	}
 	ul.sections > li > div.content {
 		overflow-x: auto;
-		-webkit-box-shadow: inset 0 0 5px #e5e5ee;
-		box-shadow: inset 0 0 5px #e5e5ee;
 		border: 1px solid #dedede;
 		margin: 5px 10px 5px 10px;
 		padding-bottom: 5px;
@@ -261,8 +242,7 @@ ul.sections > li > div {
 	.annotation code {
 		background: $bgcolor;
 		border: 1px solid #dedede;
-		// font-size: 12px;
-		font-size: 14px;
+		font-size: $font-size;
 		padding: /* 0 */ 0.2em;
 	}
 }
@@ -273,7 +253,6 @@ ul.sections > li > div {
 		position: relative;
 	}
 	body {
-		// background-color: $bgcolor;
 		background-color: $bgcolor;
 		font-size: 15px;
 		line-height: 21px;
@@ -345,8 +324,6 @@ ul.sections > li > div {
 		padding: 13px;
 		vertical-align: top;
 		border: none;
-		-webkit-box-shadow: none;
-		box-shadow: none;
 	}
 	.pilwrap {
 		position: relative;
