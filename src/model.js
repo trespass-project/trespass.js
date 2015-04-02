@@ -24,85 +24,85 @@ module.exports.prepare =
 prepare = function(
 	$system /* selection */
 ) {
-	var model = {};
+	var model = {
+		locations: [],
+		edges: [],
+		assets: [],
+		actors: [],
+		predicates: [],
+		processes: [],
+		policies: []
+	};
+
+	function process($selection, fn, destination) {
+		$selection.each(function(index, elem) {
+			var $item = $(elem, util.cheerio_opts);
+			var item = _.extend({}, $item.attr());
+			fn($item, item);
+			destination.push(item);
+		});
+	}
 
 	/* locations */
-	model.locations = [];
-	$system.find('locations > location')
-		.each(function(index, elem) {
-			var $location = $(elem, util.cheerio_opts);
-			var atlocs = util.get_children_text($location, 'atlocations');
-			var loc = _.extend({},
-				$location.attr(),
-				{
-					atLocations: atlocs
-				}
-			);
-			model.locations.push(loc);
-		});
+	process(
+		$system.find('locations > location'),
+		function($item, item) {
+			_.extend(item, {
+				atLocations: util.get_children_text($item, 'atlocations')
+			});
+		},
+		model.locations
+	);
 
 	/* edges */
-	model.edges = [];
-	$system.find('edges > edge')
-		.each(function(index, elem) {
-			var $edge = $(elem, util.cheerio_opts);
-			var edge = _.extend({},
-				$edge.attr(),
-				util.children_to_obj($edge, 'source, target')
-			);
-			model.edges.push(edge);
-		});
+	process(
+		$system.find('edges > edge'),
+		function($item, item) {
+			_.extend(item, util.children_to_obj($item, 'source, target'));
+		},
+		model.edges
+	);
 
 	/* assets */
-	model.assets = [];
-	$system.find('assets > item, assets > data')
-		.each(function(index, elem) {
-			var $asset = $(elem, util.cheerio_opts);
-			var asset = _.extend({},
-				$asset.attr(),
-				{
-					type: elem.name,
-					atLocations: util.get_children_text($asset, 'atlocations')
-				}
-			);
-			model.assets.push(asset);
-		});
+	process(
+		$system.find('assets > item, assets > data'),
+		function($item, item) {
+			_.extend(item, {
+				type: item.name,
+				atLocations: util.get_children_text($item, 'atlocations')
+			});
+		},
+		model.assets
+	);
 
 	/* actors */
-	model.actors = [];
-	$system.find('actors > actor')
-		.each(function(index, elem) {
-			var $actor = $(elem, util.cheerio_opts);
-			var actor = _.extend({},
-				$actor.attr(),
-				{
-					atLocations: util.get_children_text($actor, 'atlocations')
-				}
-			);
-			model.actors.push(actor);
-		});
+	process(
+		$system.find('actors > actor'),
+		function($item, item) {
+			_.extend(item, {
+				atLocations: util.get_children_text($item, 'atlocations')
+			});
+		},
+		model.actors
+	);
 
 	// TODO:
 	// - processes
 	// - policies
 
 	/* predicates */
-	model.predicates = [];
-	$system.find('predicates > predicate')
-		.each(function(index, elem) {
-			var $predicate = $(elem, util.cheerio_opts);
-			var predicate = _.extend({},
-				$predicate.attr(),
-				{
-					values: util.get_children_text($predicate, 'value')
-						.map(function(vals) {
-							return vals.split(' ')
-						})
-				}
-			);
-			console.log(predicate);
-			model.predicates.push(predicate);
-		});
+	process(
+		$system.find('predicates > predicate'),
+		function($item, item) {
+			_.extend(item, {
+				values: util.get_children_text($item, 'value')
+					.map(function(vals) {
+						return vals.split(' ');
+					})
+			});
+		},
+		model.predicates
+	);
 
 	return model;
 };
