@@ -11,6 +11,10 @@ body {
 	tab-size: 4;
 }
 
+todo {
+	background-color: rgb(255, 128, 128);
+}
+
 * {
 	border: none !important;
 	text-decoration: none !important;
@@ -68,7 +72,6 @@ h6 {
 	line-height: 1em;
 	font-weight: normal;
 	font-family: sans-serif;
-	// text-transform: uppercase;
 	margin: 30px 0 15px 0;
 }
 
@@ -86,8 +89,6 @@ hr {
 pre,
 tt,
 code {
-	font-size: $font-size;
-	line-height: $line-height;
 	font-family: $monospaced;
 	margin: 0;
 	padding: 0;
@@ -115,8 +116,6 @@ blockquote {
 
 .sections blockquote p {
 	font-family: $monospaced;
-	font-size: 12px;
-	line-height: 16px;
 	color: #999;
 	margin: 10px 0 0;
 	white-space: pre-wrap;
@@ -159,7 +158,7 @@ ul.sections > li > div {
 	background: white;
 	-webkit-border-bottom-left-radius: 5px;
 	-moz-border-radius-bottomleft: 5px;
-	font: $font-size sans-serif;
+	font-family: sans-serif;
 	cursor: pointer;
 	text-align: right;
 	list-style: none;
@@ -174,7 +173,6 @@ ul.sections > li > div {
 }
 
 #jump_to a.small {
-	font-size: 22px;
 	font-weight: bold;
 	color: #676767;
 }
@@ -242,7 +240,6 @@ ul.sections > li > div {
 	.annotation code {
 		background: $bgcolor;
 		border: 1px solid #dedede;
-		font-size: $font-size;
 		padding: /* 0 */ 0.2em;
 	}
 }
@@ -254,13 +251,6 @@ ul.sections > li > div {
 	}
 	body {
 		background-color: $bgcolor;
-		font-size: 15px;
-		line-height: 21px;
-	}
-	pre,
-	tt,
-	code {
-		line-height: 18px;
 	}
 	p,
 	ul,
@@ -275,8 +265,6 @@ ul.sections > li > div {
 	}
 	#jump_to,
 	#jump_page {
-		font: 10px sans-serif;
-		// text-transform: uppercase;
 	}
 	#jump_page .source {
 		padding: 5px 10px;
@@ -356,8 +344,6 @@ ul.sections > li > div {
 
 @media only screen and (min-width: 1025px) {
 	body {
-		font-size: $font-size;
-		line-height: 24px;
 	}
 	#background {
 		width: 525px;

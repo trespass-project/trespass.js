@@ -4,8 +4,8 @@ var util = require('./util.js');
 
 
 // ---
-// parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the
-// model jquery-style.
+// ## `parse()`
+// > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
 module.exports.parse =
 parse = function(
 	xml, /* String */
@@ -19,20 +19,33 @@ parse = function(
 
 
 // ---
-// transforms a `selection` to an `Object`
+// ## `empty`
+// > model default structure
+var empty =
+module.exports.empty = {
+	_meta: {
+		author: undefined,
+		date: undefined,
+		version: undefined
+	},
+	locations: [],
+	edges: [],
+	assets: [],
+	actors: [],
+	predicates: [],
+	processes: [],
+	policies: []
+};
+
+
+// ---
+// ## `prepare()`
+// > transforms a `selection` to an `Object`
 module.exports.prepare =
 prepare = function(
 	$system /* selection */
 ) {
-	var model = {
-		locations: [],
-		edges: [],
-		assets: [],
-		actors: [],
-		predicates: [],
-		processes: [],
-		policies: []
-	};
+	var model = _.extend({}, empty);
 
 	function process($selection, fn, destination) {
 		$selection.each(function(index, elem) {
@@ -86,7 +99,7 @@ prepare = function(
 		model.actors
 	);
 
-	// TODO:
+	// <todo>TODO:</todo>
 	// - processes
 	// - policies
 
