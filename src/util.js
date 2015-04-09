@@ -11,9 +11,59 @@ cheerio_opts = {
 
 
 // ---
-// return children nodes' text value as `Array`
+// ## `rename_tag()`
+// > renames selected tag to something else
+var rename_tag =
+module.exports.rename_tag =
+function(
+	$elem, /* selection */
+	new_name /* String */
+) {
+	var html = $elem.html();
+	var attrs = $elem.attr();
+	var $new_elem = $('<'+new_name+'>');
+	$new_elem.attr(attrs);
+	$new_elem.html(html);
+	$elem.replaceWith($new_elem);
+	return $new_elem;
+}
+
+
+// ---
+// ## `unwrap_rename()`
+// > unwraps (remove parent) selected elements, and optinally rename
+var unwrap_rename =
+module.exports.unwrap_rename =
+function(
+	selector, /* String */
+	new_name /* String */
+) {
+	var $selection = $(selector);
+	$selection
+		.each(function(index) {
+			var $this = $(this);
+			var $parent = $this.parent();
+			var $parentparent = $parent.parent();
+			$parentparent.append($this);
+
+			if (_.isString(new_name)) {
+				util.rename_tag($this, new_name);
+			}
+
+			var name = $this[0].name;
+			if ($parent.children(name).length === 0) {
+				$parent.remove();
+			}
+		});
+}
+
+
+// ---
+// ## `get_children_text()`
+// > return children nodes' text value as `Array`
+var get_children_text =
 module.exports.get_children_text =
-get_children_text = function(
+function(
 	$selection, /* selection */
 	selector /* String (optional) */
 ) {
@@ -27,9 +77,11 @@ get_children_text = function(
 
 
 // ---
-// return children as `Object`
+// ## `children_to_obj()`
+// > return children as `Object`
+var children_to_obj =
 module.exports.children_to_obj =
-children_to_obj = function(
+function(
 	$selection, /* selection */
 	selector /* String (optional) */
 ) {
