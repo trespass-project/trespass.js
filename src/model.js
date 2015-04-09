@@ -30,10 +30,10 @@ module.exports.empty = {
 		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-		'author': undefined,
-		'date': undefined,
-		'version': undefined,
-		'title': undefined,
+		'author': 'attack navigator map (trespass.js)',
+		'version': '0.0.0',
+		'title': 'ANM-generated TREsPASS model'
+		'date': undefined, // will be filled in on export
 
 		locations: [],
 		edges: [],
@@ -132,7 +132,6 @@ prepare = function(
 // ---
 // ## `xmlify()`
 // > takes a model `Object` and turns it into XML.
-// > optionally takes [`xmlbuilder.toString()` options](https://github.com/oozcitak/xmlbuilder-js/wiki#converting-to-string)
 var xmlify =
 module.exports.xmlify = function(
 	model /* Object */
@@ -141,10 +140,7 @@ module.exports.xmlify = function(
 	var model = _.merge({}, model);
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
-		'author': 'attack navigator map (trespass.js)',
-		'date': moment().format('DD-MM-YYYY'),
-		'version': '0.0.0',
-		'title': 'ANM-generated TREsPASS model'
+		'date': moment().format('DD-MM-YYYY')
 	});
 
 	function text_to_elem(item) {
