@@ -240,7 +240,8 @@ ul.sections > li > div {
 	.annotation code {
 		background: $bgcolor;
 		border: 1px solid #dedede;
-		padding: /* 0 */ 0.2em;
+		padding: 0.2em;
+		padding-bottom: 0.08em;
 	}
 }
 /*----------------------  (> 481px) ---------------------*/
