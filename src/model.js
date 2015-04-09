@@ -2,6 +2,7 @@ var _ = require('lodash');
 var cheerio = $ = require('cheerio');
 var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
+var pd = require('pretty-data').pd;
 
 var util = require('./util.js');
 
@@ -107,7 +108,8 @@ prepare = function(
 		model.system.actors
 	);
 
-	// <todo>TODO:</todo>
+	// <todo>
+	// TODO:
 	// - processes
 	// - policies
 
@@ -131,7 +133,7 @@ prepare = function(
 
 // ---
 // ## `xmlify()`
-// > takes a model `Object` and turns it into XML.
+// > takes a model `Object` and turns it back into XML.
 var xmlify =
 module.exports.xmlify = function(
 	model /* Object */
@@ -151,6 +153,22 @@ module.exports.xmlify = function(
 		return { '#list': list }
 	}
 
+	var attrib_names = [
+		'xmlns',
+		'xmlns:xsi',
+		'xsi:schemaLocation'
+		'author',
+		'date',
+		'version',
+		'title',
+		'id',
+		'domain',
+		'directed',
+		'name',
+		'value',
+		'arity'
+	];
+
 	function traverse(parent, path) {
 		path = path || '';
 		_.keys(parent)
@@ -162,14 +180,16 @@ module.exports.xmlify = function(
 					delete parent[key];
 				}
 
-				// child is either another object, an array, or a literal
+				// `child` is either another `Object`, an `Array`, or a `literal`
 				if (_.isArray(child)) {
 					if (child.length === 0) {
+						// delete empty arrays
 						delete parent[key];
 					} else {
 						parent[key] = array_to_elems(child)['#list']
 							.map(function(item) {
 								var obj = {};
+								// default name is singular of parent
 								obj[key.substr(0, key.length-1)] = item;
 								return obj;
 							});
@@ -180,21 +200,8 @@ module.exports.xmlify = function(
 					traverse(child, _path);
 				}
 				else {
-					if ([
-							'id',
-							'domain',
-							'directed',
-							'name',
-							'value',
-							'arity',
-							'author',
-							'date',
-							'version',
-							'title',
-							'xmlns',
-							'xmlns:xsi',
-							'xsi:schemaLocation'
-						].indexOf(key) > -1) {
+					// literals are either attributes or text nodes
+					if (attrib_names.indexOf(key) > -1) {
 						parent['@'+key] = parent[key];
 						delete parent[key];
 					} else {
@@ -205,12 +212,12 @@ module.exports.xmlify = function(
 	}
 
 	traverse(model);
+
 	var xml = xmlbuilder.create(model);
+	var xml_str = '<?xml version="1.0" encoding="UTF-8"?>\n' + xml.toString();
 
-	var xml_str = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-		xml.toString();
-
-	// post-processing
+	// post-processing:<br>
+	// since the model is not a 1:1 representation of the input XML, the exceptions from `prepare()` are reversed here.
 	var $ = cheerio.load(xml_str, util.cheerio_opts);
 	util.unwrap_rename('atLocations > atLocation', 'atLocations');
 	util.unwrap_rename('predicate > values > value');
@@ -222,10 +229,6 @@ module.exports.xmlify = function(
 			$this.remove();
 			util.rename_tag($parent, type);
 		});
-	xml_str = $.xml();
 
-	var pd = require('pretty-data').pd;
-	xml_str = pd.xml(xml_str).replace(/  /ig, '\t');
-
-	return xml_str; /* String */
+	return pd.xml($.xml()).replace(/  /ig, '\t'); /* String */
 };

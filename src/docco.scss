@@ -5,14 +5,24 @@ $monospaced: "Input Mono Condensed", Menlo, Monaco, Consolas, "Lucida Console", 
 $bgcolor: rgb(240, 240, 240);
 $textcolor: rgb(0, 0, 0);
 $linkcolor: blue;
+$panel-width: 350px;
 
 
 body {
 	tab-size: 4;
 }
 
-todo {
-	background-color: rgb(255, 128, 128);
+div.annotation {
+	position: relative;
+}
+
+todo::before {
+	background-color: #ff8080;
+	content: '\2003'; // em space
+	display: block;
+	width: 100%;
+	position: absolute;
+	z-index: -1;
 }
 
 * {
@@ -280,7 +290,7 @@ ul.sections > li > div {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 350px;
+		width: $panel-width;
 		background: #fff;
 		border-right: 1px solid #e5e5ee;
 		z-index: -1;
@@ -296,8 +306,8 @@ ul.sections > li > div {
 		display: inline-block;
 	}
 	ul.sections > li > div.annotation {
-		max-width: 350px;
-		min-width: 350px;
+		max-width: $panel-width;
+		min-width: $panel-width;
 		min-height: 5px;
 		padding: 13px;
 		overflow-x: hidden;
