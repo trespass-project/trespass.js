@@ -48,6 +48,40 @@ module.exports.empty = {
 
 
 // ---
+// ## `create`
+// > return a new, empty model object
+var create =
+module.exports.create = function() {
+	var model = _.merge({}, empty);
+
+
+	return model;
+};
+
+
+// ---
+// ## `addItem`
+var addItem =
+module.exports.addItem = function(model, dest, item) {
+	// TODO: sanity / validation
+	model.system[dest].push(item);
+	return model;
+};
+
+
+// ---
+// ## `addRoom`
+// > return a new, empty model object
+var addRoom =
+module.exports.addRoom = function(model, room) {
+	room = _.extend(room || {}, {
+		domain: 'physical'
+	});
+	return addItem(model, 'locations', room);
+};
+
+
+// ---
 // ## `prepare()`
 // > transforms a `selection` to an `Object`
 module.exports.prepare =

@@ -109,4 +109,31 @@ describe(f1('trespass.model'), function() {
 		});
 	});
 
+	describe(f2('.create()'), function() {
+		it(f3('should create a new model object'), function() {
+			var model = trespass.model.create();
+			assert(model.system.locations.length === 0);
+
+			var $system, xml_str;
+
+			model = trespass.model.addRoom(model, { id: 'test-room' });
+			xml_str = trespass.model.xmlify(model);
+			$system = trespass.model.parse(xml_str, 'system');
+			assert( $system.find('locations > location').length === 1 );
+
+			model = trespass.model.addRoom(model, {
+				id: 'test-room-2',
+				atLocations: ['at location']
+			});
+			xml_str = trespass.model.xmlify(model);
+			$system = trespass.model.parse(xml_str, 'system');
+			assert( $system.find('locations > location').length === 2 );
+			assert( $system.find('#test-room-2').text().trim() === 'at location' );
+			assert( $system.find('#test-room-2 > atLocations').children().length === 0 );
+
+			// var path = 'system.date'.split('.');
+			// assert(model.getIn(path) != undefined);
+		});
+	});
+
 });
