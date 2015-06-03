@@ -12,13 +12,9 @@ var util = require('./util.js');
 // > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
 module.exports.parse =
 parse = function(
-	xml_str, /* String */
-	selector /* String (optional) */
+	xml_str /* String */
 ) {
-	var $ = cheerio.load(xml_str, util.cheerio_opts);
-
-	// returns a `selection` — optionally pre-selecting `selector`
-	return (!selector) ? $ : $(selector);
+	return cheerio.load(xml_str, util.cheerio_opts);
 };
 
 

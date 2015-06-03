@@ -45,14 +45,14 @@ describe(f1('trespass.model'), function() {
 
 	describe(f2('.children_to_obj()'), function() {
 		it(f3('should be able to handle mixed case and hyphenated tag names'), function() {
-			var $xml = trespass.model.parse(
+			var $ = trespass.model.parse(
 				'<edge>'+
 					'<SOURCE>source</SOURCE>'+
 					'<tarGet>tarGet</tarGet>'+
 					'<un-related>un-related</un-related>'+
-				'</edge>',
-				'edge'
+				'</edge>'
 			);
+			var $xml = $('edge');
 			var result = trespass.util.children_to_obj($xml);
 			assert(result['source']);
 			assert(result['target']);
@@ -70,16 +70,8 @@ describe(f1('trespass.model'), function() {
 		).toString();
 
 	describe(f2('.parse()'), function() {
-		it(f3('should work with and without initial selector'), function() {
-			assert(
-				trespass.model.parse(model_xml, 'system').find('location').length
-				===
-				trespass.model.parse(model_xml)('system').find('location').length
-			);
-		});
-
 		it(f3('should load correctly'), function() {
-			var $system = trespass.model.parse(model_xml, 'system');
+			var $system = trespass.model.parse(model_xml)('system');
 			assert($system.attr().author === 'Christian W Probst');
 			assert($system.find('locations > location').length === 22);
 		});
@@ -87,7 +79,7 @@ describe(f1('trespass.model'), function() {
 
 	describe(f2('.prepare()'), function() {
 		it(f3('should properly transform xml selection to js object'), function() {
-			var $system = trespass.model.parse(model_xml, 'system');
+			var $system = trespass.model.parse(model_xml)('system');
 			var model = trespass.model.prepare($system);
 			assert(model.system.locations.length === 22);
 			assert(model.system.locations[15].atLocations.length > 0);
@@ -97,11 +89,11 @@ describe(f1('trespass.model'), function() {
 
 	describe(f2('.xmlify()'), function() {
 		it(f3('should properly transform object back to XML'), function() {
-			var $system = trespass.model.parse(model_xml, 'system');
+			var $system = trespass.model.parse(model_xml)('system');
 			var model = trespass.model.prepare($system);
 			var xml_str = trespass.model.xmlify(model);
 
-			var $system = trespass.model.parse(xml_str, 'system');
+			var $system = trespass.model.parse(xml_str)('system');
 			assert( $system.find('locations > location').length == 22 );
 			assert( $system.find('edge > source').length == 26 );
 			assert( $system.find('assets > item > atLocations').length == 7 );
@@ -118,7 +110,7 @@ describe(f1('trespass.model'), function() {
 
 			model = trespass.model.addRoom(model, { id: 'test-room' });
 			xml_str = trespass.model.xmlify(model);
-			$system = trespass.model.parse(xml_str, 'system');
+			$system = trespass.model.parse(xml_str)('system');
 			assert( $system.find('locations > location').length === 1 );
 
 			model = trespass.model.addRoom(model, {
@@ -126,7 +118,7 @@ describe(f1('trespass.model'), function() {
 				atLocations: ['at location']
 			});
 			xml_str = trespass.model.xmlify(model);
-			$system = trespass.model.parse(xml_str, 'system');
+			$system = trespass.model.parse(xml_str)('system');
 			assert( $system.find('locations > location').length === 2 );
 			assert( $system.find('#test-room-2').text().trim() === 'at location' );
 			assert( $system.find('#test-room-2 > atLocations').children().length === 0 );
