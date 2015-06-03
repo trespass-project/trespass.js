@@ -33,7 +33,7 @@ module.exports.empty = {
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
 		'author': 'attack navigator map (trespass.js)',
 		'version': '0.0.0',
-		'title': 'ANM-generated TREsPASS model'
+		'title': 'ANM-generated TREsPASS model',
 		'date': undefined, // will be filled in on export
 
 		locations: [],
@@ -156,7 +156,7 @@ module.exports.xmlify = function(
 	var attrib_names = [
 		'xmlns',
 		'xmlns:xsi',
-		'xsi:schemaLocation'
+		'xsi:schemaLocation',
 		'author',
 		'date',
 		'version',
