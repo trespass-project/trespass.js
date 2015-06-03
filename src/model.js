@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var cheerio = $ = require('cheerio');
+var cheerio = $ = require('cheerio'); $ = undefined;
 var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
 var pd = require('pretty-data').pd;
@@ -12,10 +12,10 @@ var util = require('./util.js');
 // > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
 module.exports.parse =
 parse = function(
-	xml, /* String */
+	xml_str, /* String */
 	selector /* String (optional) */
 ) {
-	var $ = cheerio.load(xml, util.cheerio_opts);
+	var $ = cheerio.load(xml_str, util.cheerio_opts);
 
 	// returns a `selection` — optionally pre-selecting `selector`
 	return (!selector) ? $ : $(selector);
@@ -58,7 +58,7 @@ prepare = function(
 
 	function process($selection, fn, destination) {
 		$selection.each(function(index, elem) {
-			var $item = $(elem, util.cheerio_opts);
+			var $item = $system.find(this);
 			var item = _.merge({}, $item.attr());
 			fn($item, item);
 			destination.push(item);
@@ -218,12 +218,13 @@ module.exports.xmlify = function(
 
 	// post-processing:<br>
 	// since the model is not a 1:1 representation of the input XML, the exceptions from `prepare()` are reversed here.
-	var $ = cheerio.load(xml_str, util.cheerio_opts);
-	util.unwrap_rename('atLocations > atLocation', 'atLocations');
-	util.unwrap_rename('predicate > values > value');
-	$('asset > type')
+	var $ = parse(xml_str);
+	var $system = $('system');
+	util.unwrap_rename($system.find('atLocations > atLocation'), 'atLocations');
+	util.unwrap_rename($system.find('predicate > values > value'));
+	$system.find('asset > type')
 		.each(function() {
-			var $this = $(this);
+			var $this = $system.find(this);
 			var $parent = $this.parent();
 			var type = $this.text();
 			$this.remove();
