@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var cheerio = $ = require('cheerio'); $ = undefined;
 var mout = require('mout');
+var schema = require('validate');
 var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
 var pd = require('pretty-data').pd;
@@ -56,11 +57,43 @@ module.exports.create = function() {
 };
 
 
+// element schema definitions for input validation
+var schemas = {};
+schemas.location = schema({
+	'id': {
+		type: 'string',
+		required: true
+	},
+	'domain': {
+		type: 'string',
+		match: /^physical$/i,
+		required: true
+	},
+	'atLocations': {
+		// type: 'array',
+		// required: false,
+		// each: _.isString
+
+		// while waiting for a reply to
+		// https://github.com/eivindfjeldstad/validate/issues/22
+		use: function(it) {
+			if (it === undefined) return true; // optional
+
+			if (!_.isArray(it)) return false;
+			var result = true;
+			result = it.reduce(function(prev, item) {
+				return prev && _.isString(item);
+			}, result);
+			return result;
+		}
+	}
+});
+
+
 // ---
 // ## `add_`
 var add_ =
 module.exports.add_ = function(model, dest, item) {
-	// TODO: sanity / validation
 	model.system[dest].push(item);
 	return model;
 };
@@ -74,8 +107,10 @@ module.exports.addLocation = function(model, location) {
 		domain: 'physical'
 	});
 
-	if (!mout.object.has(location, 'id')) {
-		throw new Error('locations require an `id` attribute');
+	var errors = schemas['location'].validate(location, { strip: false });
+	if (errors.length > 0) {
+		throw new Error(errors[0]);
+		return;
 	}
 
 	return add_(model, 'locations', location);

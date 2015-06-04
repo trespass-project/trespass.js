@@ -129,13 +129,16 @@ describe(f1('trespass.model'), function() {
 			// assert(model.getIn(path) != undefined);
 		});
 
-
-
 		it(f3('should validate input'), function() {
 			var label = 'at location';
 			assert.throws(function() {
 				model = trespass.model.addRoom(model, {
 					// missing `id`
+				});
+			});
+			assert.throws(function() {
+				model = trespass.model.addRoom(model, {
+					domain: '!@#$'
 				});
 			});
 		});
