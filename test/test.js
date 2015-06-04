@@ -129,6 +129,16 @@ describe(f1('trespass.model'), function() {
 			// assert(model.getIn(path) != undefined);
 		});
 
+		it(f3('should create actors'), function() {
+			model = trespass.model.addActor(model, {
+				id: 'an-actor',
+				atLocations: ['at location']
+			});
+			xml_str = trespass.model.xmlify(model);
+			$system = trespass.model.parse(xml_str)('system');
+			assert( $system.find('actors > actor').length === 1 );
+		});
+
 		it(f3('should validate input'), function() {
 			var label = 'at location';
 			assert.throws(function() {

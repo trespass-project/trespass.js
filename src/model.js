@@ -88,6 +88,17 @@ schemas.location = schema({
 		}
 	}
 });
+schemas.actor = schema({
+	'id': {
+		type: 'string',
+		required: true
+	},
+	'atLocations': {
+		type: 'array',
+		required: true,
+		each: _.isString
+	}
+});
 
 
 // ---
@@ -96,6 +107,22 @@ var add_ =
 module.exports.add_ = function(model, dest, item) {
 	model.system[dest].push(item);
 	return model;
+};
+
+
+// ---
+// ## `addActor`
+var addActor =
+module.exports.addActor = function(model, actor) {
+	actor = _.extend(actor || {}, {});
+
+	var errors = schemas['actor'].validate(actor, { strip: false });
+	if (errors.length > 0) {
+		throw new Error(errors[0]);
+		return;
+	}
+
+	return add_(model, 'actors', actor);
 };
 
 
@@ -282,7 +309,6 @@ module.exports.xmlify = function(
 					// literals are either attributes or text nodes
 					if (key[0] === '@') {
 						// has explicitely been marked as attribute
-						console.log(child);
 					} else if (attrib_names.indexOf(key) > -1) {
 						// has been listed as attribute
 						parent['@'+key] = parent[key];
