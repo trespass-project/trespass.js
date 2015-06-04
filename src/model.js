@@ -256,6 +256,7 @@ module.exports.xmlify = function(
 
 				if (key[0] === '_') {
 					delete parent[key];
+					return;
 				}
 
 				// `child` is either another `Object`, an `Array`, or a `literal`
@@ -279,10 +280,15 @@ module.exports.xmlify = function(
 				}
 				else {
 					// literals are either attributes or text nodes
-					if (attrib_names.indexOf(key) > -1) {
+					if (key[0] === '@') {
+						// has explicitely been marked as attribute
+						console.log(child);
+					} else if (attrib_names.indexOf(key) > -1) {
+						// has been listed as attribute
 						parent['@'+key] = parent[key];
 						delete parent[key];
 					} else {
+						// everything else is text
 						parent[key] = text_to_elem(parent[key]);
 					}
 				}
