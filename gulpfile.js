@@ -1,5 +1,5 @@
+var _ = require('lodash');
 var gulp = require('gulp');
-var webpack = require('gulp-webpack');
 var rename = require('gulp-rename');
 var mocha = require('gulp-mocha');
 var notifier = require('node-notifier');
@@ -9,6 +9,10 @@ var docco = require('gulp-docco');
 var sass = require('gulp-sass');
 var gulpSequence = require('gulp-sequence');
 var changed = require('gulp-changed');
+var watchify = require('watchify');
+var browserify = require('browserify');
+var gutil = require('gulp-util');
+var source = require('vinyl-source-stream');
 
 var name = 'trespass';
 var src_dir = './src';
@@ -70,18 +74,61 @@ gulp.task('mocha', function() {
 });
 
 
-gulp.task('webpack', function() {
-	return gulp.src(main_filepath)
-		.pipe(webpack({
-			watch: true,
-			output: {
-				// library: name // standalone
+var main_js = './src/trespass.js';
+var out_dir = './dist';
+var out_filename = 'trespass.js';
+// build scripts with browserify
+gulp.task('build:scripts', function() {
+	return browserify({
+			// standalone: standalone,
+			// transform: [reactify]
+		})
+		.add(main_js)
+		.bundle()
+		.on('error', function(e) {
+			gutil.log('Browserify Error', e);
+		})
+		.pipe(source(out_filename))
+		.pipe(gulp.dest(out_dir));
+});
+
+// watch scripts & build with debug features
+gulp.task('watch:scripts', function() {
+	var b = browserify(
+			_.defaults({
+				// standalone: standalone,
+				// transform: [reactify]
+			}, watchify.args)
+		)
+		.add(main_js);
+
+	var w = watchify(b)
+		.on('update', function(scriptIds) {
+			scriptIds = scriptIds
+				.filter(function(i) { return i.substr(0,2) !== './'; })
+				.map(function(i) { return chalk.blue(i.replace(__dirname, '')); });
+			if (scriptIds.length > 1) {
+				gutil.log(scriptIds.length + ' Scripts updated:\n* ' + scriptIds.join('\n* ') + '\nrebuilding...');
+			} else {
+				gutil.log(scriptIds[0] + ' updated, rebuilding...');
 			}
-		}))
-		.pipe(rename({
-			basename: name
-		}))
-		.pipe(gulp.dest(output_dir));
+
+			rebundle();
+		})
+		.on('time', function(time) {
+			gutil.log(chalk.green('Scripts built in ' + (Math.round(time / 10) / 100) + 's'));
+		});
+
+	function rebundle() {
+		w.bundle()
+			.on('error', function(e) {
+				gutil.log('Browserify Error', e);
+			})
+			.pipe(source(out_filename))
+			.pipe(gulp.dest(out_dir));
+	}
+
+	return rebundle();
 });
 
 
@@ -92,4 +139,4 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', ['watch', 'webpack', 'docco']);
+gulp.task('default', ['watch', 'watch:scripts', 'docco']);
