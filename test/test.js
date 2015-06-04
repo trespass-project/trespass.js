@@ -102,29 +102,42 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.create()'), function() {
+		var model = trespass.model.create();
+		assert(model.system.locations.length === 0);
+		var $system, xml_str;
+
 		it(f3('should create a new model object'), function() {
-			var model = trespass.model.create();
-			assert(model.system.locations.length === 0);
-
-			var $system, xml_str;
-
 			model = trespass.model.addRoom(model, { id: 'test-room' });
 			xml_str = trespass.model.xmlify(model);
 			$system = trespass.model.parse(xml_str)('system');
 			assert( $system.find('locations > location').length === 1 );
+		});
 
+		it(f3('should create rooms'), function() {
+			var label = 'at location';
 			model = trespass.model.addRoom(model, {
 				id: 'test-room-2',
-				atLocations: ['at location']
+				atLocations: [label]
 			});
 			xml_str = trespass.model.xmlify(model);
 			$system = trespass.model.parse(xml_str)('system');
 			assert( $system.find('locations > location').length === 2 );
-			assert( $system.find('#test-room-2').text().trim() === 'at location' );
+			assert( $system.find('#test-room-2').text().trim() === label );
 			assert( $system.find('#test-room-2 > atLocations').children().length === 0 );
 
 			// var path = 'system.date'.split('.');
 			// assert(model.getIn(path) != undefined);
+		});
+
+
+
+		it(f3('should validate input'), function() {
+			var label = 'at location';
+			assert.throws(function() {
+				model = trespass.model.addRoom(model, {
+					// missing `id`
+				});
+			});
 		});
 	});
 

@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var cheerio = $ = require('cheerio'); $ = undefined;
+var mout = require('mout');
 var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
 var pd = require('pretty-data').pd;
@@ -56,9 +57,9 @@ module.exports.create = function() {
 
 
 // ---
-// ## `addItem`
-var addItem =
-module.exports.addItem = function(model, dest, item) {
+// ## `add_`
+var add_ =
+module.exports.add_ = function(model, dest, item) {
 	// TODO: sanity / validation
 	model.system[dest].push(item);
 	return model;
@@ -66,14 +67,26 @@ module.exports.addItem = function(model, dest, item) {
 
 
 // ---
-// ## `addRoom`
-// > return a new, empty model object
-var addRoom =
-module.exports.addRoom = function(model, room) {
-	room = _.extend(room || {}, {
+// ## `addLocation`
+var addLocation =
+module.exports.addLocation = function(model, location) {
+	location = _.extend(location || {}, {
 		domain: 'physical'
 	});
-	return addItem(model, 'locations', room);
+
+	if (!mout.object.has(location, 'id')) {
+		throw new Error('locations require an `id` attribute');
+	}
+
+	return add_(model, 'locations', location);
+};
+
+
+// ---
+// ## `addRoom`
+var addRoom =
+module.exports.addRoom = function(model, room) {
+	return addLocation(model, room);
 };
 
 
