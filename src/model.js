@@ -66,7 +66,6 @@ schemas.location = schema({
 	},
 	'domain': {
 		type: 'string',
-		match: /^physical$/i,
 		required: true
 	},
 	'atLocations': {
@@ -123,6 +122,20 @@ schemas.data = schema({
 		required: true
 	}
 });
+schemas.edge = schema({
+	'source': {
+		type: 'string',
+		required: true
+	},
+	'target': {
+		type: 'string',
+		required: true
+	},
+	'directed': {
+		type: 'boolean',
+		// required: false
+	}
+});
 
 
 // ---
@@ -169,6 +182,26 @@ module.exports.addItem = function(model, item) {
 
 
 // ---
+// ## `addEdge`
+var addEdge =
+module.exports.addEdge = function(model, edge) {
+	edge = _.defaults(edge || {}, {
+		directed: false
+	});
+	edge = _.extend(edge || {}, {});
+	console.log(edge.directed);
+
+	var errors = schemas['edge'].validate(edge, { strip: false });
+	if (errors.length > 0) {
+		throw new Error(errors[0]);
+		return;
+	}
+
+	return add_(model, 'edges', edge);
+};
+
+
+// ---
 // ## `addData`
 var addData =
 module.exports.addData = function(model, data) {
@@ -190,9 +223,7 @@ module.exports.addData = function(model, data) {
 // ## `addLocation`
 var addLocation =
 module.exports.addLocation = function(model, location) {
-	location = _.extend(location || {}, {
-		domain: 'physical'
-	});
+	location = _.extend(location || {}, {});
 
 	var errors = schemas['location'].validate(location, { strip: false });
 	if (errors.length > 0) {
@@ -208,6 +239,9 @@ module.exports.addLocation = function(model, location) {
 // ## `addRoom`
 var addRoom =
 module.exports.addRoom = function(model, room) {
+	room = _.extend(room || {}, {
+		domain: 'physical'
+	});
 	return addLocation(model, room);
 };
 
