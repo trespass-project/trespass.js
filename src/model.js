@@ -99,6 +99,30 @@ schemas.actor = schema({
 		each: _.isString
 	}
 });
+schemas.item = schema({
+	'id': {
+		type: 'string',
+		required: true
+	},
+	'name': {
+		type: 'string',
+		required: true
+	}
+});
+schemas.data = schema({
+	'id': {
+		type: 'string',
+		required: true
+	},
+	'name': {
+		type: 'string',
+		required: true
+	},
+	'value': {
+		type: 'string',
+		required: true
+	}
+});
 
 
 // ---
@@ -123,6 +147,42 @@ module.exports.addActor = function(model, actor) {
 	}
 
 	return add_(model, 'actors', actor);
+};
+
+
+// ---
+// ## `addItem`
+var addItem =
+module.exports.addItem = function(model, item) {
+	item = _.extend(item || {}, {
+		type: 'item'
+	});
+
+	var errors = schemas['item'].validate(item, { strip: false });
+	if (errors.length > 0) {
+		throw new Error(errors[0]);
+		return;
+	}
+
+	return add_(model, 'assets', item);
+};
+
+
+// ---
+// ## `addData`
+var addData =
+module.exports.addData = function(model, data) {
+	data = _.extend(data || {}, {
+		type: 'data'
+	});
+
+	var errors = schemas['data'].validate(data, { strip: false });
+	if (errors.length > 0) {
+		throw new Error(errors[0]);
+		return;
+	}
+
+	return add_(model, 'assets', data);
 };
 
 
