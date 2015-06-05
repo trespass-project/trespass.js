@@ -189,7 +189,6 @@ module.exports.addEdge = function(model, edge) {
 		directed: false
 	});
 	edge = _.extend(edge || {}, {});
-	console.log(edge.directed);
 
 	var errors = schemas['edge'].validate(edge, { strip: false });
 	if (errors.length > 0) {
