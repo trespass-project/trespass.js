@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var cheerio = $ = require('cheerio'); $ = undefined;
 var mout = require('mout');
-var schema = require('validate');
+var Joi = require('joi');
 var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
 var pd = require('pretty-data').pd;
@@ -59,83 +59,38 @@ module.exports.create = function() {
 
 // element schema definitions for input validation
 var schemas = {};
-schemas.location = schema({
-	'id': {
-		type: 'string',
-		required: true
-	},
-	'domain': {
-		type: 'string',
-		required: true
-	},
-	'atLocations': {
-		// type: 'array',
-		// required: false,
-		// each: _.isString
+schemas.location = Joi.object().keys({
+	'id': Joi.string().required(),
+	'domain': Joi.string().required(),
+	'atLocations': Joi.array().items(Joi.string()).optional()
+});
+schemas.actor = Joi.object().keys({
+	'id': Joi.string().required(),
+	'atLocations': Joi.array().items(Joi.string()).required()
+});
+schemas.item = Joi.object().keys({
+	'id': Joi.string().required(),
+	'name': Joi.string().required()
+});
+schemas.data = Joi.object().keys({
+	'id': Joi.string().required(),
+	'name': Joi.string().required(),
+	'value': Joi.string().required()
+});
+schemas.edge = Joi.object().keys({
+	'source': Joi.string().required(),
+	'target': Joi.string().required(),
+	'directed': Joi.boolean().optional()
+});
 
-		// while waiting for a reply to
-		// https://github.com/eivindfjeldstad/validate/issues/22
-		use: function(it) {
-			if (it === undefined) return true; // optional
+var validation_options = {
+	allowUnknown: true,
+};
 
-			if (!_.isArray(it)) return false;
-			var result = true;
-			result = it.reduce(function(prev, item) {
-				return prev && _.isString(item);
-			}, result);
-			return result;
-		}
-	}
-});
-schemas.actor = schema({
-	'id': {
-		type: 'string',
-		required: true
-	},
-	'atLocations': {
-		type: 'array',
-		required: true,
-		each: _.isString
-	}
-});
-schemas.item = schema({
-	'id': {
-		type: 'string',
-		required: true
-	},
-	'name': {
-		type: 'string',
-		required: true
-	}
-});
-schemas.data = schema({
-	'id': {
-		type: 'string',
-		required: true
-	},
-	'name': {
-		type: 'string',
-		required: true
-	},
-	'value': {
-		type: 'string',
-		required: true
-	}
-});
-schemas.edge = schema({
-	'source': {
-		type: 'string',
-		required: true
-	},
-	'target': {
-		type: 'string',
-		required: true
-	},
-	'directed': {
-		type: 'boolean',
-		// required: false
-	}
-});
+function _validate(it, schema) {
+	var result = Joi.validate(it, schema, validation_options);
+	if (result.error) { throw result.error; }
+}
 
 
 // ---
@@ -153,12 +108,7 @@ var addActor =
 module.exports.addActor = function(model, actor) {
 	actor = _.extend(actor || {}, {});
 
-	var errors = schemas['actor'].validate(actor, { strip: false });
-	if (errors.length > 0) {
-		throw new Error(errors[0]);
-		return;
-	}
-
+	_validate(actor, schemas['actor']);
 	return add_(model, 'actors', actor);
 };
 
@@ -171,12 +121,7 @@ module.exports.addItem = function(model, item) {
 		type: 'item'
 	});
 
-	var errors = schemas['item'].validate(item, { strip: false });
-	if (errors.length > 0) {
-		throw new Error(errors[0]);
-		return;
-	}
-
+	_validate(item, schemas['item']);
 	return add_(model, 'assets', item);
 };
 
@@ -190,12 +135,7 @@ module.exports.addEdge = function(model, edge) {
 	});
 	edge = _.extend(edge || {}, {});
 
-	var errors = schemas['edge'].validate(edge, { strip: false });
-	if (errors.length > 0) {
-		throw new Error(errors[0]);
-		return;
-	}
-
+	_validate(edge, schemas['edge']);
 	return add_(model, 'edges', edge);
 };
 
@@ -208,12 +148,7 @@ module.exports.addData = function(model, data) {
 		type: 'data'
 	});
 
-	var errors = schemas['data'].validate(data, { strip: false });
-	if (errors.length > 0) {
-		throw new Error(errors[0]);
-		return;
-	}
-
+	_validate(data, schemas['data']);
 	return add_(model, 'assets', data);
 };
 
@@ -224,12 +159,7 @@ var addLocation =
 module.exports.addLocation = function(model, location) {
 	location = _.extend(location || {}, {});
 
-	var errors = schemas['location'].validate(location, { strip: false });
-	if (errors.length > 0) {
-		throw new Error(errors[0]);
-		return;
-	}
-
+	_validate(location, schemas['location']);
 	return add_(model, 'locations', location);
 };
 
