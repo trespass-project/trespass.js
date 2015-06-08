@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var gulp = require('gulp');
+var chalk = require('chalk');
 var rename = require('gulp-rename');
 var mocha = require('gulp-mocha');
 var notifier = require('node-notifier');
