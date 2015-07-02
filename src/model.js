@@ -367,6 +367,7 @@ module.exports.xmlify = function(
 	var $system = $('system');
 	util.unwrap_rename($system.find('atLocations > atLocation'), 'atLocations');
 	util.unwrap_rename($system.find('predicate > values > value'));
+	util.rename_tag($system.find('policie'), 'policy');
 	$system.find('asset > type')
 		.each(function() {
 			var $this = $system.find(this);
