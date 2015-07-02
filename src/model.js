@@ -38,6 +38,7 @@ module.exports.empty = {
 		edges: [],
 		assets: [],
 		actors: [],
+		roles: [],
 		predicates: [],
 		processes: [],
 		policies: []
