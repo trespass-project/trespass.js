@@ -142,6 +142,17 @@ module.exports.addEdge = function(model, edge) {
 
 
 // ---
+// ## `addPolicy`
+var addPolicy =
+module.exports.addPolicy = function(model, policy) {
+	// TODO
+
+	// _validate(edge, schemas['policy']);
+	return add_(model, 'policies', policy);
+};
+
+
+// ---
 // ## `addData`
 var addData =
 module.exports.addData = function(model, data) {
