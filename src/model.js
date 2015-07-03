@@ -293,6 +293,7 @@ module.exports.xmlify = function(
 		return { '#list': list }
 	}
 
+	// TODO: get rid of this — it's more confusing than helpful
 	var attrib_names = [
 		'xmlns',
 		'xmlns:xsi',
@@ -305,7 +306,7 @@ module.exports.xmlify = function(
 		'domain',
 		'directed',
 		'name',
-		'value',
+		// 'value',
 		'arity'
 	];
 
