@@ -5,6 +5,7 @@ var mout = require('mout');
 var Joi = require('joi');
 var moment = require('moment');
 var etree = require('elementtree');
+var pd = require('pretty-data').pd;
 
 var util = require('./util.js');
 
@@ -418,5 +419,5 @@ module.exports.xmlify = function(
 
 	var tree = new etree.ElementTree(system);
 	var xml = tree.write();
-	return xml;
+	return pd.xml(xml).replace('  ', '\t');
 };
