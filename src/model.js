@@ -159,7 +159,7 @@ module.exports.addPolicy = function(model, policy) {
 	// TODO
 
 	// _validate(edge, schemas['policy']);
-	return add_(model, 'policies', policy);
+	return add_(model, 'policies', { policy: policy });
 };
 
 
