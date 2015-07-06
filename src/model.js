@@ -1,10 +1,10 @@
 var _ = require('lodash');
+var R = require('ramda');
 var cheerio = $ = require('cheerio'); $ = undefined;
 var mout = require('mout');
 var Joi = require('joi');
-var xmlbuilder = require('xmlbuilder');
 var moment = require('moment');
-var pd = require('pretty-data').pd;
+var etree = require('elementtree');
 
 var util = require('./util.js');
 
@@ -52,8 +52,6 @@ module.exports.empty = {
 var create =
 module.exports.create = function() {
 	var model = _.merge({}, empty);
-
-
 	return model;
 };
 
@@ -110,7 +108,7 @@ module.exports.addActor = function(model, actor) {
 	actor = _.extend(actor || {}, {});
 
 	_validate(actor, schemas['actor']);
-	return add_(model, 'actors', actor);
+	return add_(model, 'actors', { actor: actor });
 };
 
 
@@ -119,11 +117,24 @@ module.exports.addActor = function(model, actor) {
 var addItem =
 module.exports.addItem = function(model, item) {
 	item = _.extend(item || {}, {
-		type: 'item'
+		'@_type': 'item'
 	});
 
 	_validate(item, schemas['item']);
-	return add_(model, 'assets', item);
+	return add_(model, 'assets', { item: item });
+};
+
+
+// ---
+// ## `addData`
+var addData =
+module.exports.addData = function(model, data) {
+	data = _.extend(data || {}, {
+		'@_type': 'data'
+	});
+
+	_validate(data, schemas['data']);
+	return add_(model, 'assets', { data: data });
 };
 
 
@@ -137,7 +148,7 @@ module.exports.addEdge = function(model, edge) {
 	edge = _.extend(edge || {}, {});
 
 	_validate(edge, schemas['edge']);
-	return add_(model, 'edges', edge);
+	return add_(model, 'edges', { edge: edge });
 };
 
 
@@ -153,15 +164,13 @@ module.exports.addPolicy = function(model, policy) {
 
 
 // ---
-// ## `addData`
-var addData =
-module.exports.addData = function(model, data) {
-	data = _.extend(data || {}, {
-		type: 'data'
-	});
+// ## `addPredicate`
+var addPredicate =
+module.exports.addPredicate = function(model, predicate) {
+	// TODO
 
-	_validate(data, schemas['data']);
-	return add_(model, 'assets', data);
+	// _validate(edge, schemas['predicate']);
+	return add_(model, 'predicates', { predicate: predicate });
 };
 
 
@@ -172,7 +181,7 @@ module.exports.addLocation = function(model, location) {
 	location = _.extend(location || {}, {});
 
 	_validate(location, schemas['location']);
-	return add_(model, 'locations', location);
+	return add_(model, 'locations', { location: location });
 };
 
 
@@ -187,6 +196,49 @@ module.exports.addRoom = function(model, room) {
 };
 
 
+
+var singular = {
+	'locations': 'location',
+	'actors': 'actor',
+	'edges': 'edge',
+	'predicates': 'predicate',
+};
+
+function get_(model, what) {
+	// TODO: error handling
+	return model.system[what].map( R.prop(singular[what]) );
+}
+
+var getLocations =
+module.exports.getLocations = function(model) {
+	return get_(model, 'locations');
+};
+
+var getPredicates =
+module.exports.getPredicates = function(model) {
+	return get_(model, 'predicates');
+};
+
+var getAssets =
+module.exports.getAssets = function(model) {
+	return model.system.assets;
+};
+var getData =
+module.exports.getData = function(model) {
+	return R.filter(
+		R.has('data'),
+		getAssets(model)
+	);
+};
+var getItems =
+module.exports.getItems = function(model) {
+	return R.filter(
+		R.has('item'),
+		getAssets(model)
+	);
+};
+
+
 // ---
 // ## `prepare()`
 // > transforms a `selection` to an `Object`
@@ -194,14 +246,14 @@ module.exports.prepare =
 prepare = function(
 	$system /* selection */
 ) {
-	var model = _.merge({}, empty);
+	var model = create();
 
-	function process($selection, fn, destination) {
+	function process($selection, fn, addFn) {
 		$selection.each(function(index, elem) {
 			var $item = $system.find(this);
 			var item = _.merge({}, $item.attr());
-			fn($item, item);
-			destination.push(item);
+			item = fn($item, item);
+			addFn(model, item);
 		});
 	}
 
@@ -209,43 +261,53 @@ prepare = function(
 	process(
 		$system.find('locations > location'),
 		function($item, item) {
-			_.merge(item, {
+			return _.merge(item, {
 				atLocations: util.get_children_text($item, 'atlocations')
 			});
 		},
-		model.system.locations
+		addLocation
 	);
 
 	/* edges */
 	process(
 		$system.find('edges > edge'),
 		function($item, item) {
-			_.merge(item, util.children_to_obj($item, 'source, target'));
+			return _.merge(item, util.children_to_obj($item, 'source, target'));
 		},
-		model.system.edges
+		addEdge
 	);
 
 	/* assets */
 	process(
-		$system.find('assets > item, assets > data'),
+		$system.find('assets > item'),
 		function($item, item) {
-			_.merge(item, {
-				type: $item[0].name,
+			return _.merge(item, {
+				'@_type': $item[0].name,
 				atLocations: util.get_children_text($item, 'atlocations')
 			});
 		},
-		model.system.assets
+		addItem
+	);
+	process(
+		$system.find('assets > data'),
+		function($item, item) {
+			return _.merge(item, {
+				'@_type': $item[0].name,
+				atLocations: util.get_children_text($item, 'atlocations')
+			});
+		},
+		addData
 	);
 
 	/* actors */
 	process(
 		$system.find('actors > actor'),
 		function($item, item) {
-			_.merge(item, {
+			return _.merge(item, {
 				atLocations: util.get_children_text($item, 'atlocations')
 			});
 		},
-		model.system.actors
+		addActor
 	);
 
 	// <todo>
@@ -257,14 +319,12 @@ prepare = function(
 	process(
 		$system.find('predicates > predicate'),
 		function($item, item) {
-			_.merge(item, {
-				values: util.get_children_text($item, 'value')
-					/*.map(function(vals) {
-						return vals.split(' ');
-					})*/
+			var values = util.get_children_text($item, 'value');
+			return _.merge(item, {
+				values: values.map(function(value) { return { value: value }; })
 			});
 		},
-		model.system.predicates
+		addPredicate
 	);
 
 	return model;
@@ -285,100 +345,78 @@ module.exports.xmlify = function(
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	function text_to_elem(item) {
-		return { '#text': item };
+	var knownAttributes = {
+		'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'title', 'date'],
+		'model.system.locations.location': ['domain', 'id'],
+		'model.system.actors.actor': ['id'],
+		'model.system.edges.edge': ['directed'],
+		'model.system.assets.item': ['id', 'name', 'value'],
+		'model.system.assets.data': ['id', 'name', 'value'],
+		'model.system.predicates.predicate': ['id', 'arity'],
+	};
+
+	function isAttribute(key, path, attributes) {
+		return mout.string.startsWith(key, '@') // you can explicitely use @ for unknown attribs
+			|| mout.array.contains(attributes[path], key);
 	}
 
-	function array_to_elems(list) {
-		return { '#list': list }
-	}
+	function recursivelyToXML(parent, parentElem, depth, path) {
+		depth = depth || 0;
 
-	// TODO: get rid of this — it's more confusing than helpful
-	var attrib_names = [
-		'xmlns',
-		'xmlns:xsi',
-		'xsi:schemaLocation',
-		'author',
-		'date',
-		'version',
-		'title',
-		'id',
-		'domain',
-		'directed',
-		'name',
-		// 'value',
-		'arity'
-	];
-
-	function traverse(parent, path) {
-		path = path || '';
 		_.keys(parent)
 			.forEach(function(key) {
+				// console.log(mout.string.repeat('\t', depth) + key);
 				var child = parent[key];
-				var _path = path + '/' + key;
 
-				if (key[0] === '_') {
-					delete parent[key];
-					return;
-				}
+				if (isAttribute(key, path, knownAttributes)) {
+					parentElem.set(key.replace('@', ''), child);
+				} else {
 
-				// `child` is either another `Object`, an `Array`, or a `literal`
-				if (_.isArray(child)) {
-					if (child.length === 0) {
-						// delete empty arrays
-						delete parent[key];
-					} else {
-						parent[key] = array_to_elems(child)['#list']
-							.map(function(item) {
-								var obj = {};
-								// default name is singular of parent
-								obj[key.substr(0, key.length-1)] = item;
-								return obj;
+
+					// `child` is either another `Object`, an `Array`, or a `literal`
+					if (_.isString(child) || _.isNumber(child)) {
+						if (!_.isEmpty(child)) {
+							var childElem = etree.SubElement(parentElem, key);
+							childElem.text = child;
+						}
+					}
+					else if (_.isArray(child)) {
+						var texts = [];
+
+						var childElem;
+						if (!_.isEmpty(child)) {
+							childElem = etree.SubElement(parentElem, key);
+							child.forEach(function(child) {
+								if (!_.isObject(child)) {
+									texts.push(''+child);
+								} else {
+									recursivelyToXML(child, childElem, depth+1, path+'.'+key);
+								}
 							});
+						}
+
+						if (!_.isEmpty(texts)) {
+							if (!childElem){
+								childElem = etree.SubElement(parentElem, key);
+							}
+							childElem.text = texts.join(' ');
+						}
 					}
-					traverse(child, _path);
-				}
-				else if (_.isObject(child)) {
-					traverse(child, _path);
-				}
-				else {
-					// literals are either attributes or text nodes
-					if (key[0] === '@') {
-						// has explicitely been marked as attribute
-					} else if (attrib_names.indexOf(key) > -1) {
-						// has been listed as attribute
-						parent['@'+key] = parent[key];
-						delete parent[key];
-					} else {
-						// everything else is text
-						parent[key] = text_to_elem(parent[key]);
+					else if (_.isObject(child)) {
+						if (!_.isEmpty(child)) {
+							var childElem = etree.SubElement(parentElem, key);
+							recursivelyToXML(child, childElem, depth+1, path+'.'+key);
+						}
 					}
+
 				}
 			});
 	}
 
-	traverse(model);
+	var system = etree.Element('system');
+	recursivelyToXML(model.system, system, 0, 'model.system');
 
-	var xml = xmlbuilder.create(model);
-	var xml_str = '<?xml version="1.0" encoding="UTF-8"?>\n' + xml.toString();
-
-	// post-processing:<br>
-	// since the model is not a 1:1 representation of the input XML, the exceptions from `prepare()` are reversed here.
-	var $ = parse(xml_str);
-	var $system = $('system');
-	util.unwrap_rename($system.find('atLocations > atLocation'), 'atLocations');
-	util.unwrap_rename($system.find('predicate > values > value'));
-	$system.find('policie').each(function(index) {
-		util.rename_tag($(this), 'policy');
-	});
-	$system.find('asset > type')
-		.each(function() {
-			var $this = $system.find(this);
-			var $parent = $this.parent();
-			var type = $this.text();
-			$this.remove();
-			util.rename_tag($parent, type);
-		});
-
-	return pd.xml($.xml()).replace(/  /ig, '\t'); /* String */
+	var tree = new etree.ElementTree(system);
+	var xml = tree.write();
+	return xml;
 };
