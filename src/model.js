@@ -419,5 +419,5 @@ module.exports.xmlify = function(
 
 	var tree = new etree.ElementTree(system);
 	var xml = tree.write();
-	return pd.xml(xml).replace('  ', '\t');
+	return pd.xml(xml).replace(/'  '/ig, '\t');
 };
