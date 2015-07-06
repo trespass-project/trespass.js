@@ -206,7 +206,12 @@ var singular = {
 };
 
 function get_(model, what) {
-	// TODO: error handling
+	if (!model.system[what]) {
+		throw new Error('model.system.'+what+' doesn\'t exist');
+	}
+	if (!singular[what]) {
+		throw new Error('unknown: '+what);
+	}
 	return model.system[what].map( R.prop(singular[what]) );
 }
 
@@ -311,11 +316,6 @@ prepare = function(
 		addActor
 	);
 
-	// <todo>
-	// TODO:
-	// - processes
-	// - policies
-
 	/* predicates */
 	process(
 		$system.find('predicates > predicate'),
@@ -327,6 +327,11 @@ prepare = function(
 		},
 		addPredicate
 	);
+
+	// <todo>
+	// TODO:
+	// - processes
+	// - policies
 
 	return model;
 };
