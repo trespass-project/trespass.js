@@ -176,6 +176,30 @@ module.exports.addPredicate = function(model, predicate) {
 
 
 // ---
+// ## `addProcess`
+var addProcess =
+module.exports.addProcess = function(model, process) {
+	// TODO
+
+	// _validate(edge, schemas['process']);
+	// return add_(model, 'processes', { process: process });
+	console.warn('addProcess() is not implemented yet'); // TODO
+};
+
+
+// ---
+// ## `addRole`
+var addRole =
+module.exports.addRole = function(model, role) {
+	// TODO
+
+	// _validate(edge, schemas['role']);
+	// return add_(model, 'roles', { role: role });
+	console.warn('addRole() is not implemented yet'); // TODO
+};
+
+
+// ---
 // ## `addLocation`
 var addLocation =
 module.exports.addLocation = function(model, location) {
