@@ -198,21 +198,32 @@ module.exports.addRoom = function(model, room) {
 
 
 
-var singular = {
-	'locations': 'location',
-	'actors': 'actor',
-	'edges': 'edge',
-	'predicates': 'predicate',
+// ---
+// ## `singular`
+var singular =
+module.exports.singular = function(plural) {
+	var snglr = {
+		'actors': 'actor',
+		'assets': 'asset',
+		'edges': 'edge',
+		'locations': 'location',
+		'policies': 'policy',
+		'predicates': 'predicate',
+		'processes': 'process',
+		'roles': 'role',
+	};
+	return snglr[plural] || plural;
 };
+
 
 function get_(model, what) {
 	if (!model.system[what]) {
 		throw new Error('model.system.'+what+' doesn\'t exist');
 	}
-	if (!singular[what]) {
+	if (!singular(what)) {
 		throw new Error('unknown: '+what);
 	}
-	return model.system[what].map( R.prop(singular[what]) );
+	return model.system[what].map( R.prop(singular(what)) );
 }
 
 var getLocations =

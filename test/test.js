@@ -60,11 +60,8 @@ describe(f1('trespass.model'), function() {
 		});
 	});
 
-})
 
-// ---
-describe(f1('trespass.model'), function() {
-
+	// ---
 	var model_xml = fs.readFileSync(
 			path.join(root_dir, 'test', 'data', 'model_cloud_review.xml')
 		).toString();
@@ -102,6 +99,18 @@ describe(f1('trespass.model'), function() {
 			assert( $system.find('edge > source').length == 26 );
 			assert( $system.find('assets > item > atLocations').length == 7 );
 			assert( $system.find('predicates > predicate').eq(1).find('value').length == 4 );
+		});
+	});
+
+	describe(f2('.singular()'), function() {
+		it(f3('should return known singular'), function() {
+			var s = trespass.model.singular('policies');
+			assert(s === 'policy');
+		});
+
+		it(f3('should return plural, if unknonw'), function() {
+			var s = trespass.model.singular('hamburgers');
+			assert(s === 'hamburgers');
 		});
 	});
 
