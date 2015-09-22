@@ -37,6 +37,7 @@ module.exports.empty = {
 
 		locations: [],
 		edges: [],
+		groups: [],
 		assets: [],
 		actors: [],
 		roles: [],
@@ -60,26 +61,26 @@ module.exports.create = function() {
 // element schema definitions for input validation
 var schemas = {};
 schemas.location = Joi.object().keys({
-	'id': Joi.string().required(),
-	'domain': Joi.string().required(),
+	'id': Joi.string()/*.required()*/,
+	'domain': Joi.string()/*.required()*/,
 	'atLocations': Joi.array().items(Joi.string()).optional()
 });
 schemas.actor = Joi.object().keys({
-	'id': Joi.string().required(),
-	'atLocations': Joi.array().items(Joi.string()).required()
+	'id': Joi.string()/*.required()*/,
+	'atLocations': Joi.array().items(Joi.string())/*.required()*/
 });
 schemas.item = Joi.object().keys({
-	'id': Joi.string().required(),
-	'name': Joi.string().required()
+	'id': Joi.string()/*.required()*/,
+	'name': Joi.string()/*.required()*/
 });
 schemas.data = Joi.object().keys({
-	'id': Joi.string().required(),
-	'name': Joi.string().required(),
-	'value': Joi.string().required()
+	'id': Joi.string()/*.required()*/,
+	'name': Joi.string()/*.required()*/,
+	'value': Joi.string()/*.required()*/
 });
 schemas.edge = Joi.object().keys({
-	'source': Joi.string().required(),
-	'target': Joi.string().required(),
+	'source': Joi.string()/*.required()*/,
+	'target': Joi.string()/*.required()*/,
 	'directed': Joi.boolean().optional()
 });
 
@@ -118,7 +119,7 @@ module.exports.addActor = function(model, actor) {
 var addItem =
 module.exports.addItem = function(model, item) {
 	item = _.extend(item || {}, {
-		'@_type': 'item'
+		// '@_type': 'item'
 	});
 
 	_validate(item, schemas['item']);
@@ -131,7 +132,7 @@ module.exports.addItem = function(model, item) {
 var addData =
 module.exports.addData = function(model, data) {
 	data = _.extend(data || {}, {
-		'@_type': 'data'
+		// '@_type': 'data'
 	});
 
 	_validate(data, schemas['data']);
@@ -200,6 +201,15 @@ module.exports.addRole = function(model, role) {
 
 
 // ---
+// ## `addGroup`
+var addGroup =
+module.exports.addGroup = function(model, group) {
+	// TODO
+	return add_(model, 'groups', { group: group });
+};
+
+
+// ---
 // ## `addLocation`
 var addLocation =
 module.exports.addLocation = function(model, location) {
@@ -215,7 +225,7 @@ module.exports.addLocation = function(model, location) {
 var addRoom =
 module.exports.addRoom = function(model, room) {
 	room = _.extend(room || {}, {
-		domain: 'physical'
+		// domain: 'physical'
 	});
 	return addLocation(model, room);
 };
@@ -323,7 +333,7 @@ prepare = function(
 		$system.find('assets > item'),
 		function($item, item) {
 			return _.merge(item, {
-				'@_type': $item[0].name,
+				// '@_type': $item[0].name,
 				atLocations: util.get_children_text($item, 'atlocations')
 			});
 		},
@@ -333,7 +343,7 @@ prepare = function(
 		$system.find('assets > data'),
 		function($item, item) {
 			return _.merge(item, {
-				'@_type': $item[0].name,
+				// '@_type': $item[0].name,
 				atLocations: util.get_children_text($item, 'atlocations')
 			});
 		},
@@ -387,7 +397,7 @@ module.exports.xmlify = function(
 	});
 
 	var knownAttributes = {
-		'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'title', 'date'],
+		'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', /*'title',*/ 'date'],
 		'model.system.locations.location': ['domain', 'id'],
 		'model.system.actors.actor': ['id'],
 		'model.system.edges.edge': ['directed'],
@@ -423,9 +433,16 @@ module.exports.xmlify = function(
 					}
 					else if (_.isArray(child)) {
 						var texts = [];
-
 						var childElem;
-						if (!_.isEmpty(child)) {
+
+						if (key === '__') {
+							console.log(parentElem);
+							child.forEach(function(child) {
+								var childElem = etree.SubElement(parentElem, 'value');
+								childElem.text = child.value;
+							});
+						}
+						else if (!_.isEmpty(child)) {
 							childElem = etree.SubElement(parentElem, key);
 							child.forEach(function(child) {
 								if (!_.isObject(child)) {
@@ -459,5 +476,8 @@ module.exports.xmlify = function(
 
 	var tree = new etree.ElementTree(system);
 	var xml = tree.write();
-	return pd.xml(xml).replace(/'  '/ig, '\t');
+	return pd.xml(xml)
+		.replace(/'  '/ig, '\t')
+		.replace(/http:\/\/zurich.ibm.com\/save\/ontology\/vmware\//ig, '')
+		;
 };
