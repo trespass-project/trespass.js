@@ -37,7 +37,6 @@ module.exports.empty = {
 
 		locations: [],
 		edges: [],
-		groups: [],
 		assets: [],
 		actors: [],
 		roles: [],
@@ -197,15 +196,6 @@ module.exports.addRole = function(model, role) {
 	// _validate(edge, schemas['role']);
 	// return add_(model, 'roles', { role: role });
 	console.warn('addRole() is not implemented yet'); // TODO
-};
-
-
-// ---
-// ## `addGroup`
-var addGroup =
-module.exports.addGroup = function(model, group) {
-	// TODO
-	return add_(model, 'groups', { group: group });
 };
 
 
