@@ -1,6 +1,9 @@
+'use strict';
+
 var _ = require('lodash');
 var R = require('ramda');
-var cheerio = $ = require('cheerio'); $ = undefined;
+var $ = undefined;
+var cheerio = $ = require('cheerio');
 var mout = require('mout');
 var Joi = require('joi');
 var moment = require('moment');
