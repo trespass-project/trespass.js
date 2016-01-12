@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var chalk = require('chalk');
 var fs = require('fs');
@@ -75,7 +77,7 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.prepare()'), function() {
-		it(f3('should properly transform xml selection to js object'), function() {
+		it(f3('should properly transform xml $selection to js object'), function() {
 			var $system = trespass.model.parse(modelXml)('system');
 			var model = trespass.model.prepare($system);
 
@@ -94,7 +96,7 @@ describe(f1('trespass.model'), function() {
 			var model = trespass.model.prepare($system);
 			var xmlStr = trespass.model.xmlify(model);
 
-			var $system = trespass.model.parse(xmlStr)('system');
+			$system = trespass.model.parse(xmlStr)('system');
 			assert( $system.find('locations > location').length == 22 );
 			assert( $system.find('edge > source').length == 26 );
 			assert( $system.find('assets > item > atLocations').length == 7 );
