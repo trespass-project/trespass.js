@@ -6,6 +6,7 @@
   "main": "src/trespass.js",
   "scripts": {
     "start": "gulp",
+    "lint": "eslint src/*.js",
     "test": "mocha",
     "test-watch": "mocha --watch"
   },
