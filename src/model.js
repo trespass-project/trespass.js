@@ -31,9 +31,9 @@ const empty = module.exports.empty = {
 		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-		'author': 'attack navigator map (trespass.js)',
+		'author': 'trespass.js',
 		'version': '0.0.0',
-		'title': 'ANM-generated TREsPASS model',
+		'title': 'Untitled',
 		'date': undefined, // will be filled in on export
 
 		locations: [],
@@ -53,8 +53,7 @@ const empty = module.exports.empty = {
 // > return a new, empty model object
 let create = module.exports.create =
 function create() {
-	const model = _.merge({}, empty);
-	return model;
+	return _.merge({}, empty);
 };
 
 
@@ -369,7 +368,9 @@ function prepare(
 		function($item, item) {
 			let values = util.get_children_text($item, 'value');
 			return _.merge(item, {
-				values: values.map(function(value) { return { value: value }; })
+				values: values.map(function(value) {
+					return { value: value };
+				})
 			});
 		},
 		addPredicate
@@ -384,6 +385,84 @@ function prepare(
 };
 
 
+const knownAttributes = {
+	'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
+	'model.system.locations.location': ['domain', 'id'],
+	'model.system.actors.actor': ['id'],
+	'model.system.edges.edge': ['directed'],
+	'model.system.assets.item': ['id', 'name', 'value', 'type', 'label'],
+	'model.system.assets.data': ['id', 'name', 'value', 'type', 'label'],
+	'model.system.predicates.predicate': ['id', 'arity', 'type', 'label', 'value'],
+};
+
+function isAttribute(key, path, attributes) {
+	return mout.string.startsWith(key, '@') // you can explicitely use @ for unknown attribs
+		|| mout.array.contains(attributes[path], key);
+}
+
+
+function recursivelyToXML(parent, parentElem, depth, path) {
+	depth = depth || 0;
+
+	delete parent.type; // TODO: predicates need `type`
+	if (parent._type) { parent.type = parent._type; }
+
+	_.keys(parent)
+		.forEach(function(key) {
+			// console.log(mout.string.repeat('\t', depth) + key);
+			let child = parent[key];
+
+			if (isAttribute(key, path, knownAttributes)) {
+				parentElem.set(key.replace('@', ''), child);
+			} else {
+				// `child` is either another `Object`, an `Array`, or a `literal`
+				if (_.isString(child) || _.isNumber(child)) {
+					if (!_.isEmpty(child)) {
+						let childElem = etree.SubElement(parentElem, key);
+						childElem.text = child;
+					}
+				}
+				else if (_.isArray(child)) {
+					let texts = [];
+					let childElem;
+
+					if (key === '__') {
+						console.log(parentElem);
+						child.forEach(function(child) {
+							let childElem = etree.SubElement(parentElem, 'value');
+							childElem.text = child.value;
+						});
+					}
+					else if (!_.isEmpty(child)) {
+						childElem = etree.SubElement(parentElem, key);
+						child.forEach(function(child) {
+							if (!_.isObject(child)) {
+								texts.push(''+child);
+							} else {
+								recursivelyToXML(child, childElem, depth+1, path+'.'+key);
+							}
+						});
+					}
+
+					if (!_.isEmpty(texts)) {
+						if (!childElem){
+							childElem = etree.SubElement(parentElem, key);
+						}
+						childElem.text = texts.join(' ');
+					}
+				}
+				else if (_.isObject(child)) {
+					if (!_.isEmpty(child)) {
+						let childElem = etree.SubElement(parentElem, key);
+						recursivelyToXML(child, childElem, depth+1, path+'.'+key);
+					}
+				}
+
+			}
+		});
+}
+
+
 // ---
 // ## `xmlify()`
 // > takes a model `Object` and turns it back into XML.
@@ -393,93 +472,16 @@ function xmlify(
 ) {
 	// duplicate model
 	let model = _.merge({}, _model);
+
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	let knownAttributes = {
-		'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', /*'title',*/ 'date'],
-		'model.system.locations.location': ['domain', 'id'],
-		'model.system.actors.actor': ['id'],
-		'model.system.edges.edge': ['directed'],
-		'model.system.assets.item': ['id', 'name', 'value', 'type', 'label'],
-		'model.system.assets.data': ['id', 'name', 'value', 'type', 'label'],
-		'model.system.predicates.predicate': ['id', 'arity', 'type', 'label', 'value'],
-	};
-
-	function isAttribute(key, path, attributes) {
-		return mout.string.startsWith(key, '@') // you can explicitely use @ for unknown attribs
-			|| mout.array.contains(attributes[path], key);
-	}
-
-	function recursivelyToXML(parent, parentElem, depth, path) {
-		depth = depth || 0;
-
-		delete parent.type; // TODO: predicates need `type`
-		if (parent._type) { parent.type = parent._type; }
-
-		_.keys(parent)
-			.forEach(function(key) {
-				// console.log(mout.string.repeat('\t', depth) + key);
-				let child = parent[key];
-
-				if (isAttribute(key, path, knownAttributes)) {
-					parentElem.set(key.replace('@', ''), child);
-				} else {
-					// `child` is either another `Object`, an `Array`, or a `literal`
-					if (_.isString(child) || _.isNumber(child)) {
-						if (!_.isEmpty(child)) {
-							let childElem = etree.SubElement(parentElem, key);
-							childElem.text = child;
-						}
-					}
-					else if (_.isArray(child)) {
-						let texts = [];
-						let childElem;
-
-						if (key === '__') {
-							console.log(parentElem);
-							child.forEach(function(child) {
-								let childElem = etree.SubElement(parentElem, 'value');
-								childElem.text = child.value;
-							});
-						}
-						else if (!_.isEmpty(child)) {
-							childElem = etree.SubElement(parentElem, key);
-							child.forEach(function(child) {
-								if (!_.isObject(child)) {
-									texts.push(''+child);
-								} else {
-									recursivelyToXML(child, childElem, depth+1, path+'.'+key);
-								}
-							});
-						}
-
-						if (!_.isEmpty(texts)) {
-							if (!childElem){
-								childElem = etree.SubElement(parentElem, key);
-							}
-							childElem.text = texts.join(' ');
-						}
-					}
-					else if (_.isObject(child)) {
-						if (!_.isEmpty(child)) {
-							let childElem = etree.SubElement(parentElem, key);
-							recursivelyToXML(child, childElem, depth+1, path+'.'+key);
-						}
-					}
-
-				}
-			});
-	}
-
 	let system = etree.Element('system');
 	recursivelyToXML(model.system, system, 0, 'model.system');
 
-	let tree = new etree.ElementTree(system);
-	let xml = tree.write();
-	return pd.xml(xml)
-		.replace(/' {2}'/ig, '\t')
-		.replace(/http:\/\/zurich.ibm.com\/save\/ontology\/vmware\//ig, ''); // TODO:
+	const tree = new etree.ElementTree(system);
+	const xml = tree.write();
+	return pd.xml(xml).replace(/' {2}'/ig, '\t') // spaces to tabs
 };
