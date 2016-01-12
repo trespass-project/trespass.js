@@ -106,6 +106,17 @@ module.exports.add_ = function(model, dest, item) {
 
 
 // ---
+// ## `addAsset`
+var addAsset =
+module.exports.addAsset = function(model, asset) {
+	asset = _.extend(asset || {}, {});
+
+	// _validate(asset, schemas['asset']);
+	return add_(model, 'assets', { item: asset });
+};
+
+
+// ---
 // ## `addActor`
 var addActor =
 module.exports.addActor = function(model, actor) {
@@ -394,9 +405,9 @@ module.exports.xmlify = function(
 		'model.system.locations.location': ['domain', 'id'],
 		'model.system.actors.actor': ['id'],
 		'model.system.edges.edge': ['directed'],
-		'model.system.assets.item': ['id', 'name', 'value'],
-		'model.system.assets.data': ['id', 'name', 'value'],
-		'model.system.predicates.predicate': ['id', 'arity'],
+		'model.system.assets.item': ['id', 'name', 'value', 'type', 'label'],
+		'model.system.assets.data': ['id', 'name', 'value', 'type', 'label'],
+		'model.system.predicates.predicate': ['id', 'arity', 'type', 'label', 'value'],
 	};
 
 	function isAttribute(key, path, attributes) {
@@ -407,6 +418,9 @@ module.exports.xmlify = function(
 	function recursivelyToXML(parent, parentElem, depth, path) {
 		depth = depth || 0;
 
+		delete parent.type; // TODO: predicates need `type`
+		if (parent._type) { parent.type = parent._type; }
+
 		_.keys(parent)
 			.forEach(function(key) {
 				// console.log(mout.string.repeat('\t', depth) + key);
@@ -415,8 +429,6 @@ module.exports.xmlify = function(
 				if (isAttribute(key, path, knownAttributes)) {
 					parentElem.set(key.replace('@', ''), child);
 				} else {
-
-
 					// `child` is either another `Object`, an `Array`, or a `literal`
 					if (_.isString(child) || _.isNumber(child)) {
 						if (!_.isEmpty(child)) {
@@ -471,6 +483,5 @@ module.exports.xmlify = function(
 	var xml = tree.write();
 	return pd.xml(xml)
 		.replace(/'  '/ig, '\t')
-		.replace(/http:\/\/zurich.ibm.com\/save\/ontology\/vmware\//ig, '')
-		;
+		.replace(/http:\/\/zurich.ibm.com\/save\/ontology\/vmware\//ig, ''); // TODO:
 };
