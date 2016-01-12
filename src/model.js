@@ -6,10 +6,15 @@ const cheerio = require('cheerio');
 const mout = require('mout');
 const Joi = require('joi');
 const moment = require('moment');
+const xml2js = require('xml2js');
 const etree = require('elementtree');
 const pd = require('pretty-data').pd;
 
 const util = require('./util.js');
+
+
+const attrKey = '@';
+const charKey = '#';
 
 
 // ---
@@ -385,81 +390,57 @@ function prepare(
 };
 
 
-const knownAttributes = {
-	'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
-	'model.system.locations.location': ['domain', 'id'],
-	'model.system.actors.actor': ['id'],
-	'model.system.edges.edge': ['directed'],
-	'model.system.assets.item': ['id', 'name', 'value', 'type', 'label'],
-	'model.system.assets.data': ['id', 'name', 'value', 'type', 'label'],
-	'model.system.predicates.predicate': ['id', 'arity', 'type', 'label', 'value'],
-};
+let makeAttributes = module.exports.makeAttributes =
+function makeAttributes(attrNames, obj) {
+	if (!attrNames.length) { return obj; }
 
-function isAttribute(key, path, attributes) {
-	return mout.string.startsWith(key, '@') // you can explicitely use @ for unknown attribs
-		|| mout.array.contains(attributes[path], key);
+	let attrs = {};
+	attrNames.forEach(function(name) {
+		attrs[name] = obj[name];
+		delete obj[name];
+	});
+	obj[attrKey] = attrs;
+	return obj;
 }
 
 
-function recursivelyToXML(parent, parentElem, depth, path) {
-	depth = depth || 0;
+let prepareForXml = module.exports.prepareForXml =
+function prepareForXml(obj) {
+	const keys = R.keys(obj);
+	if (keys.length === 1) {
+		const elemName = keys[0];
 
-	delete parent.type; // TODO: predicates need `type`
-	if (parent._type) { parent.type = parent._type; }
+		let knownAttributes = [];
+		if (elemName === 'system') {
+			knownAttributes = ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'];
+		} else if (elemName === 'location') {
+			knownAttributes = ['id'];
+		} else if (elemName === 'actor') {
+			knownAttributes = ['id'];
+		} else if (elemName === 'edge') {
+			knownAttributes = ['directed'];
+		} else if (elemName === 'item') {
+			knownAttributes = ['id', 'name'];
+		} else if (elemName === 'data') {
+			knownAttributes = ['id', 'name', 'value'];
+		} else if (elemName === 'predicate') {
+			knownAttributes = ['id', 'arity'];
+		}
 
-	_.keys(parent)
-		.forEach(function(key) {
-			// console.log(mout.string.repeat('\t', depth) + key);
-			let child = parent[key];
+		obj[elemName] = makeAttributes(knownAttributes, obj[elemName]);
 
-			if (isAttribute(key, path, knownAttributes)) {
-				parentElem.set(key.replace('@', ''), child);
-			} else {
-				// `child` is either another `Object`, an `Array`, or a `literal`
-				if (_.isString(child) || _.isNumber(child)) {
-					if (!_.isEmpty(child)) {
-						let childElem = etree.SubElement(parentElem, key);
-						childElem.text = child;
-					}
+		R.without([attrKey, charKey], R.keys(obj[elemName]))
+			.forEach(function(key) {
+				const child = obj[elemName][key];
+				let items = [];
+				if (_.isArray(child)) {
+					items = child;
+				} else if (_.isObject(child)) {
+					items = [child];
 				}
-				else if (_.isArray(child)) {
-					let texts = [];
-					let childElem;
-
-					if (key === '__') {
-						console.log(parentElem);
-						child.forEach(function(child) {
-							let childElem = etree.SubElement(parentElem, 'value');
-							childElem.text = child.value;
-						});
-					}
-					else if (!_.isEmpty(child)) {
-						childElem = etree.SubElement(parentElem, key);
-						child.forEach(function(child) {
-							if (!_.isObject(child)) {
-								texts.push(''+child);
-							} else {
-								recursivelyToXML(child, childElem, depth+1, path+'.'+key);
-							}
-						});
-					}
-
-					if (!_.isEmpty(texts)) {
-						if (!childElem){
-							childElem = etree.SubElement(parentElem, key);
-						}
-						childElem.text = texts.join(' ');
-					}
-				}
-				else if (_.isObject(child)) {
-					if (!_.isEmpty(child)) {
-						let childElem = etree.SubElement(parentElem, key);
-						recursivelyToXML(child, childElem, depth+1, path+'.'+key);
-					}
-				}
-
-			}
-		});
+				items.forEach(prepareForXml);
+			});
+	}
 }
 
 
@@ -478,10 +459,14 @@ function xmlify(
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	let system = etree.Element('system');
-	recursivelyToXML(model.system, system, 0, 'model.system');
+	prepareForXml(model);
+	// console.log( JSON.stringify(model) );
 
-	const tree = new etree.ElementTree(system);
-	const xml = tree.write();
-	return pd.xml(xml).replace(/' {2}'/ig, '\t') // spaces to tabs
+	const builder = new xml2js.Builder({
+		attrkey: attrKey,
+		charKey: charKey,
+	});
+	const xml = builder.buildObject(model);
+	return pd.xml(xml)
+		.replace(/' {2}'/ig, '\t') // spaces to tabs
 };

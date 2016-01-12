@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var R = require('ramda');
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
@@ -87,6 +88,43 @@ describe(f1('trespass.model'), function() {
 
 			var data = trespass.model.getData(model);
 			assert(data.length == 12);
+		});
+	});
+
+	describe(f2('.makeAttributes()'), function() {
+		it(f3('should create a new attribute field'), function() {
+			let obj = {
+				'attr1': 'attr1',
+				'attr2': 'attr2',
+				'test': 'test'
+			};
+			const newObj = trespass.model.makeAttributes(['attr1', 'attr2'], obj);
+			assert(obj.test === 'test');
+			assert(R.keys(obj['@']).length === 2);
+			assert(obj['@'].attr1 === 'attr1');
+			assert(obj['@'].attr2 === 'attr2');
+		});
+
+		it(f3('should work with empty list'), function() {
+			let obj = {
+				'attr1': 'attr1',
+				'test': 'test'
+			};
+			const newObj = trespass.model.makeAttributes([], obj);
+			assert(obj.test === 'test');
+			assert(obj.attr1 === 'attr1');
+		});
+	});
+
+	describe(f2('.prepareForXml()'), function() {
+		it(f3('should work'), function() {
+			let system = {
+				assets: [
+					{ item: { id: 'id', name: 'name' } }
+				]
+			};
+			trespass.model.prepareForXml(system);
+			// TODO: test
 		});
 	});
 
