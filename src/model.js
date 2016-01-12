@@ -1,23 +1,23 @@
-// 'use strict';
+'use strict';
 
-var _ = require('lodash');
-var R = require('ramda');
-var $ = undefined;
-var cheerio = $ = require('cheerio');
-var mout = require('mout');
-var Joi = require('joi');
-var moment = require('moment');
-var etree = require('elementtree');
-var pd = require('pretty-data').pd;
+const _ = require('lodash');
+const R = require('ramda');
+const cheerio = require('cheerio');
+const mout = require('mout');
+const Joi = require('joi');
+const moment = require('moment');
+const etree = require('elementtree');
+const pd = require('pretty-data').pd;
 
-var util = require('./util.js');
+const util = require('./util.js');
 
 
 // ---
 // ## `parse()`
 // > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
+let parse =
 module.exports.parse =
-parse = function(
+function parse(
 	xml_str /* String */
 ) {
 	return cheerio.load(xml_str, util.cheerio_opts);
@@ -27,7 +27,7 @@ parse = function(
 // ---
 // ## `empty`
 // > model default structure
-var empty =
+const empty =
 module.exports.empty = {
 	system: {
 		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
@@ -53,15 +53,16 @@ module.exports.empty = {
 // ---
 // ## `create`
 // > return a new, empty model object
-var create =
-module.exports.create = function() {
-	var model = _.merge({}, empty);
+let create =
+module.exports.create =
+function create() {
+	const model = _.merge({}, empty);
 	return model;
 };
 
 
 // element schema definitions for input validation
-var schemas = {};
+let schemas = {};
 schemas.location = Joi.object().keys({
 	'id': Joi.string()/*.required()*/,
 	'domain': Joi.string()/*.required()*/,
@@ -86,20 +87,21 @@ schemas.edge = Joi.object().keys({
 	'directed': Joi.boolean().optional()
 });
 
-var validation_options = {
+const validation_options = {
 	allowUnknown: true,
 };
 
 function _validate(it, schema) {
-	var result = Joi.validate(it, schema, validation_options);
+	const result = Joi.validate(it, schema, validation_options);
 	if (result.error) { throw result.error; }
 }
 
 
 // ---
 // ## `add_`
-var add_ =
-module.exports.add_ = function(model, dest, item) {
+let add_ =
+module.exports.add_ =
+function add_(model, dest, item) {
 	model.system[dest].push(item);
 	return model;
 };
@@ -107,8 +109,9 @@ module.exports.add_ = function(model, dest, item) {
 
 // ---
 // ## `addAsset`
-var addAsset =
-module.exports.addAsset = function(model, asset) {
+let addAsset =
+module.exports.addAsset =
+function addAsset(model, asset) {
 	asset = _.extend(asset || {}, {});
 
 	// _validate(asset, schemas['asset']);
@@ -118,8 +121,9 @@ module.exports.addAsset = function(model, asset) {
 
 // ---
 // ## `addActor`
-var addActor =
-module.exports.addActor = function(model, actor) {
+let addActor =
+module.exports.addActor =
+function addActor(model, actor) {
 	actor = _.extend(actor || {}, {});
 
 	_validate(actor, schemas['actor']);
@@ -129,8 +133,9 @@ module.exports.addActor = function(model, actor) {
 
 // ---
 // ## `addItem`
-var addItem =
-module.exports.addItem = function(model, item) {
+let addItem =
+module.exports.addItem =
+function addItem(model, item) {
 	item = _.extend(item || {}, {
 		// '@_type': 'item'
 	});
@@ -142,8 +147,9 @@ module.exports.addItem = function(model, item) {
 
 // ---
 // ## `addData`
-var addData =
-module.exports.addData = function(model, data) {
+let addData =
+module.exports.addData =
+function addData(model, data) {
 	data = _.extend(data || {}, {
 		// '@_type': 'data'
 	});
@@ -155,8 +161,9 @@ module.exports.addData = function(model, data) {
 
 // ---
 // ## `addEdge`
-var addEdge =
-module.exports.addEdge = function(model, edge) {
+let addEdge =
+module.exports.addEdge =
+function addEdge(model, edge) {
 	edge = _.defaults(edge || {}, {
 		directed: false
 	});
@@ -169,8 +176,9 @@ module.exports.addEdge = function(model, edge) {
 
 // ---
 // ## `addPolicy`
-var addPolicy =
-module.exports.addPolicy = function(model, policy) {
+let addPolicy =
+module.exports.addPolicy =
+function addPolicy(model, policy) {
 	// TODO
 
 	// _validate(edge, schemas['policy']);
@@ -180,8 +188,9 @@ module.exports.addPolicy = function(model, policy) {
 
 // ---
 // ## `addPredicate`
-var addPredicate =
-module.exports.addPredicate = function(model, predicate) {
+let addPredicate =
+module.exports.addPredicate =
+function addPredicate(model, predicate) {
 	// TODO
 
 	// _validate(edge, schemas['predicate']);
@@ -191,8 +200,9 @@ module.exports.addPredicate = function(model, predicate) {
 
 // ---
 // ## `addProcess`
-var addProcess =
-module.exports.addProcess = function(model, process) {
+let addProcess =
+module.exports.addProcess =
+function addProcess(model, process) {
 	// TODO
 
 	// _validate(edge, schemas['process']);
@@ -203,8 +213,9 @@ module.exports.addProcess = function(model, process) {
 
 // ---
 // ## `addRole`
-var addRole =
-module.exports.addRole = function(model, role) {
+let addRole =
+module.exports.addRole =
+function addRole(model, role) {
 	// TODO
 
 	// _validate(edge, schemas['role']);
@@ -215,8 +226,9 @@ module.exports.addRole = function(model, role) {
 
 // ---
 // ## `addLocation`
-var addLocation =
-module.exports.addLocation = function(model, location) {
+let addLocation =
+module.exports.addLocation =
+function addLocation(model, location) {
 	location = _.extend(location || {}, {});
 
 	_validate(location, schemas['location']);
@@ -226,8 +238,9 @@ module.exports.addLocation = function(model, location) {
 
 // ---
 // ## `addRoom`
-var addRoom =
-module.exports.addRoom = function(model, room) {
+let addRoom =
+module.exports.addRoom =
+function addRoom(model, room) {
 	room = _.extend(room || {}, {
 		// domain: 'physical'
 	});
@@ -238,9 +251,10 @@ module.exports.addRoom = function(model, room) {
 
 // ---
 // ## `singular`
-var singular =
-module.exports.singular = function(plural) {
-	var snglr = {
+let singular =
+module.exports.singular =
+function singular(plural) {
+	const snglr = {
 		'actors': 'actor',
 		'assets': 'asset',
 		'edges': 'edge',
@@ -264,29 +278,34 @@ function get_(model, what) {
 	return model.system[what].map( R.prop(singular(what)) );
 }
 
-var getLocations =
-module.exports.getLocations = function(model) {
+let getLocations =
+module.exports.getLocations =
+function getLocations(model) {
 	return get_(model, 'locations');
 };
 
-var getPredicates =
-module.exports.getPredicates = function(model) {
+let getPredicates =
+module.exports.getPredicates =
+function getPredicates(model) {
 	return get_(model, 'predicates');
 };
 
-var getAssets =
-module.exports.getAssets = function(model) {
+let getAssets =
+module.exports.getAssets =
+function getAssets(model) {
 	return model.system.assets;
 };
-var getData =
-module.exports.getData = function(model) {
+let getData =
+module.exports.getData =
+function getData(model) {
 	return R.filter(
 		R.has('data'),
 		getAssets(model)
 	);
 };
-var getItems =
-module.exports.getItems = function(model) {
+let getItems =
+module.exports.getItems =
+function getItems(model) {
 	return R.filter(
 		R.has('item'),
 		getAssets(model)
@@ -297,16 +316,17 @@ module.exports.getItems = function(model) {
 // ---
 // ## `prepare()`
 // > transforms a `selection` to an `Object`
+let prepare =
 module.exports.prepare =
-prepare = function(
+function prepare(
 	$system /* selection */
 ) {
-	var model = create();
+	let model = create();
 
 	function process($selection, fn, addFn) {
 		$selection.each(function(index, elem) {
-			var $item = $system.find(this);
-			var item = _.merge({}, $item.attr());
+			let $item = $system.find(this);
+			let item = _.merge({}, $item.attr());
 			item = fn($item, item);
 			addFn(model, item);
 		});
@@ -369,7 +389,7 @@ prepare = function(
 	process(
 		$system.find('predicates > predicate'),
 		function($item, item) {
-			var values = util.get_children_text($item, 'value');
+			let values = util.get_children_text($item, 'value');
 			return _.merge(item, {
 				values: values.map(function(value) { return { value: value }; })
 			});
@@ -389,18 +409,19 @@ prepare = function(
 // ---
 // ## `xmlify()`
 // > takes a model `Object` and turns it back into XML.
-var xmlify =
-module.exports.xmlify = function(
-	model /* Object */
+let xmlify =
+module.exports.xmlify =
+function xmlify(
+	_model /* Object */
 ) {
 	// duplicate model
-	var model = _.merge({}, model);
+	let model = _.merge({}, _model);
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	var knownAttributes = {
+	let knownAttributes = {
 		'model.system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', /*'title',*/ 'date'],
 		'model.system.locations.location': ['domain', 'id'],
 		'model.system.actors.actor': ['id'],
@@ -424,7 +445,7 @@ module.exports.xmlify = function(
 		_.keys(parent)
 			.forEach(function(key) {
 				// console.log(mout.string.repeat('\t', depth) + key);
-				var child = parent[key];
+				let child = parent[key];
 
 				if (isAttribute(key, path, knownAttributes)) {
 					parentElem.set(key.replace('@', ''), child);
@@ -432,18 +453,18 @@ module.exports.xmlify = function(
 					// `child` is either another `Object`, an `Array`, or a `literal`
 					if (_.isString(child) || _.isNumber(child)) {
 						if (!_.isEmpty(child)) {
-							var childElem = etree.SubElement(parentElem, key);
+							let childElem = etree.SubElement(parentElem, key);
 							childElem.text = child;
 						}
 					}
 					else if (_.isArray(child)) {
-						var texts = [];
-						var childElem;
+						let texts = [];
+						let childElem;
 
 						if (key === '__') {
 							console.log(parentElem);
 							child.forEach(function(child) {
-								var childElem = etree.SubElement(parentElem, 'value');
+								let childElem = etree.SubElement(parentElem, 'value');
 								childElem.text = child.value;
 							});
 						}
@@ -467,7 +488,7 @@ module.exports.xmlify = function(
 					}
 					else if (_.isObject(child)) {
 						if (!_.isEmpty(child)) {
-							var childElem = etree.SubElement(parentElem, key);
+							let childElem = etree.SubElement(parentElem, key);
 							recursivelyToXML(child, childElem, depth+1, path+'.'+key);
 						}
 					}
@@ -476,12 +497,12 @@ module.exports.xmlify = function(
 			});
 	}
 
-	var system = etree.Element('system');
+	let system = etree.Element('system');
 	recursivelyToXML(model.system, system, 0, 'model.system');
 
-	var tree = new etree.ElementTree(system);
-	var xml = tree.write();
+	let tree = new etree.ElementTree(system);
+	let xml = tree.write();
 	return pd.xml(xml)
-		.replace(/'  '/ig, '\t')
+		.replace(/' {2}'/ig, '\t')
 		.replace(/http:\/\/zurich.ibm.com\/save\/ontology\/vmware\//ig, ''); // TODO:
 };
