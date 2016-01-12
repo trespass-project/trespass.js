@@ -24,7 +24,7 @@ let parse = module.exports.parse =
 function parse(
 	xmlStr /* String */
 ) {
-	return cheerio.load(xmlStr, util.cheerio_opts);
+	return cheerio.load(xmlStr, util.cheerioOpts);
 };
 
 
@@ -88,12 +88,12 @@ schemas.edge = Joi.object().keys({
 	'directed': Joi.boolean().optional()
 });
 
-const validation_options = {
+const validationOptions = {
 	allowUnknown: true,
 };
 
 function _validate(it, schema) {
-	const result = Joi.validate(it, schema, validation_options);
+	const result = Joi.validate(it, schema, validationOptions);
 	if (result.error) { throw result.error; }
 }
 
@@ -319,7 +319,7 @@ function prepare(
 		$system.find('locations > location'),
 		function($item, item) {
 			return _.merge(item, {
-				atLocations: util.get_children_text($item, 'atlocations')
+				atLocations: util.getChildrenText($item, 'atlocations')
 			});
 		},
 		addLocation
@@ -329,7 +329,7 @@ function prepare(
 	process(
 		$system.find('edges > edge'),
 		function($item, item) {
-			return _.merge(item, util.children_to_obj($item, 'source, target'));
+			return _.merge(item, util.childrenToObj($item, 'source, target'));
 		},
 		addEdge
 	);
@@ -339,8 +339,8 @@ function prepare(
 		$system.find('assets > item'),
 		function($item, item) {
 			return _.merge(item, {
-				// '@_type': $item[0].name,
-				atLocations: util.get_children_text($item, 'atlocations')
+				'_assetType': $item[0].name,
+				atLocations: util.getChildrenText($item, 'atlocations')
 			});
 		},
 		addItem
@@ -349,8 +349,8 @@ function prepare(
 		$system.find('assets > data'),
 		function($item, item) {
 			return _.merge(item, {
-				// '@_type': $item[0].name,
-				atLocations: util.get_children_text($item, 'atlocations')
+				'_assetType': $item[0].name,
+				atLocations: util.getChildrenText($item, 'atlocations')
 			});
 		},
 		addData
@@ -361,7 +361,7 @@ function prepare(
 		$system.find('actors > actor'),
 		function($item, item) {
 			return _.merge(item, {
-				atLocations: util.get_children_text($item, 'atlocations')
+				atLocations: util.getChildrenText($item, 'atlocations')
 			});
 		},
 		addActor
@@ -371,7 +371,7 @@ function prepare(
 	process(
 		$system.find('predicates > predicate'),
 		function($item, item) {
-			let values = util.get_children_text($item, 'value');
+			let values = util.getChildrenText($item, 'value');
 			return _.merge(item, {
 				values: values.map(function(value) {
 					return { value: value };

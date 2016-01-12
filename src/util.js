@@ -2,8 +2,8 @@ var cheerio = $ = require('cheerio'); $ = undefined;
 var _ = require('lodash');
 
 
-module.exports.cheerio_opts =
-cheerio_opts = {
+module.exports.cheerioOpts =
+cheerioOpts = {
 	xmlMode: true,
 	normalizeWhitespace: false,
 	lowerCaseTags: true,
@@ -12,10 +12,10 @@ cheerio_opts = {
 
 
 // ---
-// ## `rename_tag()`
+// ## `renameTag()`
 // > renames selected tag to something else
-var rename_tag =
-module.exports.rename_tag =
+var renameTag =
+module.exports.renameTag =
 function(
 	$elem, /* selection */
 	new_name /* String */
@@ -31,10 +31,10 @@ function(
 
 
 // ---
-// ## `unwrap_rename()`
+// ## `unwrapRename()`
 // > unwraps (remove parent) selected elements, and optinally rename
-var unwrap_rename =
-module.exports.unwrap_rename =
+var unwrapRename =
+module.exports.unwrapRename =
 function(
 	$selection, /* selection */
 	new_name /* String */
@@ -47,7 +47,7 @@ function(
 			$parentparent.append($this);
 
 			if (_.isString(new_name)) {
-				rename_tag($this, new_name);
+				renameTag($this, new_name);
 			}
 
 			var name = $this[0].name;
@@ -59,10 +59,10 @@ function(
 
 
 // ---
-// ## `get_children_text()`
+// ## `getChildrenText()`
 // > return children nodes' text value as `Array`
-var get_children_text =
-module.exports.get_children_text =
+var getChildrenText =
+module.exports.getChildrenText =
 function(
 	$selection, /* selection */
 	selector /* String (optional) */
@@ -78,10 +78,10 @@ function(
 
 
 // ---
-// ## `children_to_obj()`
+// ## `childrenToObj()`
 // > return children as `Object`
-var children_to_obj =
-module.exports.children_to_obj =
+var childrenToObj =
+module.exports.childrenToObj =
 function(
 	$selection, /* selection */
 	selector /* String (optional) */

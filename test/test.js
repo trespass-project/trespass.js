@@ -46,7 +46,7 @@ var f3 = function(s) {
 // ---
 describe(f1('trespass.model'), function() {
 
-	describe(f2('.children_to_obj()'), function() {
+	describe(f2('.childrenToObj()'), function() {
 		it(f3('should be able to handle mixed case and hyphenated tag names'), function() {
 			var $ = trespass.model.parse(
 				'<edge>'+
@@ -56,7 +56,7 @@ describe(f1('trespass.model'), function() {
 				'</edge>'
 			);
 			var $xml = $('edge');
-			var result = trespass.util.children_to_obj($xml);
+			var result = trespass.util.childrenToObj($xml);
 			assert(result['source']);
 			assert(result['target']);
 			assert(result['un-related']);
