@@ -15,20 +15,18 @@ const util = require('./util.js');
 // ---
 // ## `parse()`
 // > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
-let parse =
-module.exports.parse =
+let parse = module.exports.parse =
 function parse(
-	xml_str /* String */
+	xmlStr /* String */
 ) {
-	return cheerio.load(xml_str, util.cheerio_opts);
+	return cheerio.load(xmlStr, util.cheerio_opts);
 };
 
 
 // ---
 // ## `empty`
 // > model default structure
-const empty =
-module.exports.empty = {
+const empty = module.exports.empty = {
 	system: {
 		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -53,8 +51,7 @@ module.exports.empty = {
 // ---
 // ## `create`
 // > return a new, empty model object
-let create =
-module.exports.create =
+let create = module.exports.create =
 function create() {
 	const model = _.merge({}, empty);
 	return model;
@@ -99,8 +96,7 @@ function _validate(it, schema) {
 
 // ---
 // ## `add_`
-let add_ =
-module.exports.add_ =
+let add_ = module.exports.add_ =
 function add_(model, dest, item) {
 	model.system[dest].push(item);
 	return model;
@@ -109,8 +105,7 @@ function add_(model, dest, item) {
 
 // ---
 // ## `addAsset`
-let addAsset =
-module.exports.addAsset =
+let addAsset = module.exports.addAsset =
 function addAsset(model, asset) {
 	asset = _.extend(asset || {}, {});
 
@@ -121,8 +116,7 @@ function addAsset(model, asset) {
 
 // ---
 // ## `addActor`
-let addActor =
-module.exports.addActor =
+let addActor = module.exports.addActor =
 function addActor(model, actor) {
 	actor = _.extend(actor || {}, {});
 
@@ -133,8 +127,7 @@ function addActor(model, actor) {
 
 // ---
 // ## `addItem`
-let addItem =
-module.exports.addItem =
+let addItem = module.exports.addItem =
 function addItem(model, item) {
 	item = _.extend(item || {}, {
 		// '@_type': 'item'
@@ -147,8 +140,7 @@ function addItem(model, item) {
 
 // ---
 // ## `addData`
-let addData =
-module.exports.addData =
+let addData = module.exports.addData =
 function addData(model, data) {
 	data = _.extend(data || {}, {
 		// '@_type': 'data'
@@ -161,8 +153,7 @@ function addData(model, data) {
 
 // ---
 // ## `addEdge`
-let addEdge =
-module.exports.addEdge =
+let addEdge = module.exports.addEdge =
 function addEdge(model, edge) {
 	edge = _.defaults(edge || {}, {
 		directed: false
@@ -176,8 +167,7 @@ function addEdge(model, edge) {
 
 // ---
 // ## `addPolicy`
-let addPolicy =
-module.exports.addPolicy =
+let addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
 	// TODO
 
@@ -188,8 +178,7 @@ function addPolicy(model, policy) {
 
 // ---
 // ## `addPredicate`
-let addPredicate =
-module.exports.addPredicate =
+let addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
 	// TODO
 
@@ -200,8 +189,7 @@ function addPredicate(model, predicate) {
 
 // ---
 // ## `addProcess`
-let addProcess =
-module.exports.addProcess =
+let addProcess = module.exports.addProcess =
 function addProcess(model, process) {
 	// TODO
 
@@ -213,8 +201,7 @@ function addProcess(model, process) {
 
 // ---
 // ## `addRole`
-let addRole =
-module.exports.addRole =
+let addRole = module.exports.addRole =
 function addRole(model, role) {
 	// TODO
 
@@ -226,8 +213,7 @@ function addRole(model, role) {
 
 // ---
 // ## `addLocation`
-let addLocation =
-module.exports.addLocation =
+let addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	location = _.extend(location || {}, {});
 
@@ -238,8 +224,7 @@ function addLocation(model, location) {
 
 // ---
 // ## `addRoom`
-let addRoom =
-module.exports.addRoom =
+let addRoom = module.exports.addRoom =
 function addRoom(model, room) {
 	room = _.extend(room || {}, {
 		// domain: 'physical'
@@ -251,8 +236,7 @@ function addRoom(model, room) {
 
 // ---
 // ## `singular`
-let singular =
-module.exports.singular =
+let singular = module.exports.singular =
 function singular(plural) {
 	const snglr = {
 		'actors': 'actor',
@@ -278,33 +262,28 @@ function get_(model, what) {
 	return model.system[what].map( R.prop(singular(what)) );
 }
 
-let getLocations =
-module.exports.getLocations =
+let getLocations = module.exports.getLocations =
 function getLocations(model) {
 	return get_(model, 'locations');
 };
 
-let getPredicates =
-module.exports.getPredicates =
+let getPredicates = module.exports.getPredicates =
 function getPredicates(model) {
 	return get_(model, 'predicates');
 };
 
-let getAssets =
-module.exports.getAssets =
+let getAssets = module.exports.getAssets =
 function getAssets(model) {
 	return model.system.assets;
 };
-let getData =
-module.exports.getData =
+let getData = module.exports.getData =
 function getData(model) {
 	return R.filter(
 		R.has('data'),
 		getAssets(model)
 	);
 };
-let getItems =
-module.exports.getItems =
+let getItems = module.exports.getItems =
 function getItems(model) {
 	return R.filter(
 		R.has('item'),
@@ -316,8 +295,7 @@ function getItems(model) {
 // ---
 // ## `prepare()`
 // > transforms a `selection` to an `Object`
-let prepare =
-module.exports.prepare =
+let prepare = module.exports.prepare =
 function prepare(
 	$system /* selection */
 ) {
@@ -409,8 +387,7 @@ function prepare(
 // ---
 // ## `xmlify()`
 // > takes a model `Object` and turns it back into XML.
-let xmlify =
-module.exports.xmlify =
+let xmlify = module.exports.xmlify =
 function xmlify(
 	_model /* Object */
 ) {
