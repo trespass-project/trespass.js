@@ -22,22 +22,21 @@
     "gulp-sequence": "^0.3.2",
     "gulp-util": "^3.0.5",
     "gulp-watch": "^4.1.1",
-    "lodash": "^3.3.1",
-    "mocha": "^2.1.0",
+    "mocha": "^2.3.4",
     "node-notifier": "^4.1.2",
-    "request": "^2.54.0",
     "rimraf": "^2.3.2",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1",
-    "xml2js": "^0.4.5"
+    "xml2js": "^0.4.15"
   },
   "dependencies": {
     "cheerio": "^0.19.0",
     "elementtree": "^0.1.6",
-    "joi": "^6.4.3",
-    "moment": "^2.10.0",
-    "mout": "^0.11.0",
+    "joi": "^7.1.0",
+    "lodash": "^3.10.1",
+    "moment": "^2.11.1",
+    "mout": "^0.11.1",
     "pretty-data": "^0.40.0",
-    "ramda": "^0.15.1"
+    "ramda": "^0.19.1"
   }
 }
