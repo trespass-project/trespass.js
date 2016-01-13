@@ -398,12 +398,14 @@ function prepare(
 
 let makeAttributes = module.exports.makeAttributes =
 function makeAttributes(attrNames, obj) {
-	if (!attrNames.length) { return obj; }
+	if (!attrNames || !attrNames.length) { return obj; }
 
 	let attrs = {};
 	attrNames.forEach(function(name) {
-		attrs[name] = obj[name];
-		delete obj[name];
+		if (obj[name] !== undefined) { // TODO: test this
+			attrs[name] = obj[name];
+			delete obj[name];
+		}
 	});
 	obj[attrKey] = attrs;
 	return obj;
