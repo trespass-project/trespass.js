@@ -6,15 +6,13 @@ const cheerio = require('cheerio');
 const mout = require('mout');
 const Joi = require('joi');
 const moment = require('moment');
-const xml2js = require('xml2js');
-const etree = require('elementtree');
+const xml = require('xml');
 const pd = require('pretty-data').pd;
 
 const util = require('./util.js');
 
 
-const attrKey = '@';
-const charKey = '#';
+const attrKey = '_attr';
 
 
 // ---
@@ -94,7 +92,9 @@ const validationOptions = {
 
 function _validate(it, schema) {
 	const result = Joi.validate(it, schema, validationOptions);
-	if (result.error) { throw result.error; }
+	if (result.error) {
+		console.error(result.error);
+	}
 }
 
 
@@ -102,6 +102,9 @@ function _validate(it, schema) {
 // ## `add_`
 let add_ = module.exports.add_ =
 function add_(model, dest, item) {
+	if (!model.system[dest]) {
+		model.system[dest] = [];
+	}
 	model.system[dest].push(item);
 	return model;
 };
@@ -242,7 +245,7 @@ function addRoom(model, room) {
 // ## `singular`
 let singular = module.exports.singular =
 function singular(plural) {
-	const snglr = {
+	const pluralToSingular = {
 		'actors': 'actor',
 		'assets': 'asset',
 		'edges': 'edge',
@@ -252,7 +255,7 @@ function singular(plural) {
 		'processes': 'process',
 		'roles': 'role',
 	};
-	return snglr[plural] || plural;
+	return pluralToSingular[plural] || plural;
 };
 
 

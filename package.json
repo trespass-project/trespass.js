@@ -27,17 +27,16 @@
     "node-notifier": "^4.1.2",
     "rimraf": "^2.3.2",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.2.1",
-    "xml2js": "^0.4.15"
+    "watchify": "^3.2.1"
   },
   "dependencies": {
     "cheerio": "^0.19.0",
-    "elementtree": "^0.1.6",
     "joi": "^7.1.0",
     "lodash": "^3.10.1",
     "moment": "^2.11.1",
     "mout": "^0.11.1",
     "pretty-data": "^0.40.0",
-    "ramda": "^0.19.1"
+    "ramda": "^0.19.1",
+    "xml": "^1.0.0"
   }
 }
