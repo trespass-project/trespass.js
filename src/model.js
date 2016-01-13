@@ -41,7 +41,9 @@ const empty = module.exports.empty = {
 
 		locations: [],
 		edges: [],
-		assets: [],
+		// assets: [],
+		items: [],
+		data: [],
 		actors: [],
 		roles: [],
 		predicates: [],
@@ -111,24 +113,12 @@ function add_(model, dest, item) {
 
 
 // ---
-// ## `addAsset`
-let addAsset = module.exports.addAsset =
-function addAsset(model, asset) {
-	asset = _.extend(asset || {}, {});
-
-	// _validate(asset, schemas['asset']);
-	return add_(model, 'assets', { item: asset });
-};
-
-
-// ---
 // ## `addActor`
 let addActor = module.exports.addActor =
 function addActor(model, actor) {
 	actor = _.extend(actor || {}, {});
-
 	_validate(actor, schemas['actor']);
-	return add_(model, 'actors', { actor: actor });
+	return add_(model, 'actors', actor);
 };
 
 
@@ -139,9 +129,8 @@ function addItem(model, item) {
 	item = _.extend(item || {}, {
 		// '@_type': 'item'
 	});
-
 	_validate(item, schemas['item']);
-	return add_(model, 'assets', { item: item });
+	return add_(model, 'items', item);
 };
 
 
@@ -152,9 +141,8 @@ function addData(model, data) {
 	data = _.extend(data || {}, {
 		// '@_type': 'data'
 	});
-
 	_validate(data, schemas['data']);
-	return add_(model, 'assets', { data: data });
+	return add_(model, 'data', data);
 };
 
 
@@ -166,9 +154,8 @@ function addEdge(model, edge) {
 		directed: false
 	});
 	edge = _.extend(edge || {}, {});
-
 	_validate(edge, schemas['edge']);
-	return add_(model, 'edges', { edge: edge });
+	return add_(model, 'edges', edge);
 };
 
 
@@ -179,7 +166,7 @@ function addPolicy(model, policy) {
 	// TODO
 
 	// _validate(edge, schemas['policy']);
-	return add_(model, 'policies', { policy: policy });
+	return add_(model, 'policies', policy);
 };
 
 
@@ -190,7 +177,7 @@ function addPredicate(model, predicate) {
 	// TODO
 
 	// _validate(edge, schemas['predicate']);
-	return add_(model, 'predicates', { predicate: predicate });
+	return add_(model, 'predicates', predicate);
 };
 
 
@@ -201,7 +188,7 @@ function addProcess(model, process) {
 	// TODO
 
 	// _validate(edge, schemas['process']);
-	// return add_(model, 'processes', { process: process });
+	// return add_(model, 'processes', process);
 	console.warn('addProcess() is not implemented yet'); // TODO
 };
 
@@ -213,7 +200,7 @@ function addRole(model, role) {
 	// TODO
 
 	// _validate(edge, schemas['role']);
-	// return add_(model, 'roles', { role: role });
+	// return add_(model, 'roles', role);
 	console.warn('addRole() is not implemented yet'); // TODO
 };
 
@@ -223,9 +210,8 @@ function addRole(model, role) {
 let addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	location = _.extend(location || {}, {});
-
 	_validate(location, schemas['location']);
-	return add_(model, 'locations', { location: location });
+	return add_(model, 'locations', location);
 };
 
 
@@ -247,7 +233,9 @@ let singular = module.exports.singular =
 function singular(plural) {
 	const pluralToSingular = {
 		'actors': 'actor',
-		'assets': 'asset',
+		// 'assets': 'asset',
+		'items': 'item',
+		'data': 'data',
 		'edges': 'edge',
 		'locations': 'location',
 		'policies': 'policy',
@@ -321,8 +309,12 @@ function prepare(
 	process(
 		$system.find('locations > location'),
 		function($item, item) {
+			let atLocations = util.getChildrenText($item, 'atlocations');
+			if (atLocations.length) {
+				atLocations = atLocations[0].split(/\s+/i);
+			}
 			return _.merge(item, {
-				atLocations: util.getChildrenText($item, 'atlocations')
+				atLocations: atLocations
 			});
 		},
 		addLocation
@@ -341,9 +333,12 @@ function prepare(
 	process(
 		$system.find('assets > item'),
 		function($item, item) {
+			let atLocations = util.getChildrenText($item, 'atlocations');
+			if (atLocations.length) {
+				atLocations = atLocations[0].split(/\s+/i);
+			}
 			return _.merge(item, {
-				'_assetType': $item[0].name,
-				atLocations: util.getChildrenText($item, 'atlocations')
+				atLocations: atLocations
 			});
 		},
 		addItem
@@ -351,9 +346,12 @@ function prepare(
 	process(
 		$system.find('assets > data'),
 		function($item, item) {
+			let atLocations = util.getChildrenText($item, 'atlocations');
+			if (atLocations.length) {
+				atLocations = atLocations[0].split(/\s+/i);
+			}
 			return _.merge(item, {
-				'_assetType': $item[0].name,
-				atLocations: util.getChildrenText($item, 'atlocations')
+				atLocations: atLocations
 			});
 		},
 		addData
@@ -363,8 +361,12 @@ function prepare(
 	process(
 		$system.find('actors > actor'),
 		function($item, item) {
+			let atLocations = util.getChildrenText($item, 'atlocations');
+			if (atLocations.length) {
+				atLocations = atLocations[0].split(/\s+/i);
+			}
 			return _.merge(item, {
-				atLocations: util.getChildrenText($item, 'atlocations')
+				atLocations: atLocations
 			});
 		},
 		addActor
@@ -376,9 +378,10 @@ function prepare(
 		function($item, item) {
 			let values = util.getChildrenText($item, 'value');
 			return _.merge(item, {
-				values: values.map(function(value) {
-					return { value: value };
-				})
+				// values: values.map(function(value) {
+				// 	return { value: value };
+				// })
+				value: values
 			});
 		},
 		addPredicate
