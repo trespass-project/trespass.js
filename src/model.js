@@ -404,11 +404,9 @@ function prepareForXml(o) {;
 
 			let attrObject;
 			if (knownAttributes[key]) {
-				// console.log(key, knownAttributes[key], item[key]);
 				let sep = separateAttributeFromObject(knownAttributes[key], item[key], attrKey);
 				let newObject = sep.newObject;
 				attrObject = sep.attrObject;
-				// console.log(newObject, attrObject);
 				item[key] = newObject;
 			}
 
@@ -418,7 +416,6 @@ function prepareForXml(o) {;
 
 			item[key] = prepareForXml(item[key]);
 			if (attrObject) {
-				// console.log(item[key]);
 				item[key] = [attrObject].concat(item[key]);
 			}
 
@@ -452,11 +449,13 @@ function prepareModelForXml(model) {
 			}
 		});
 
-	// separated at birth
-	// but now reunited again
-	system.assets = system.data.concat(system.items);
+	// separated at birth, but now reunited again
+	system.assets = (system.data || []).concat(system.items || []);
 	delete system.data;
 	delete system.items;
+	if (!system.assets.length) {
+		delete system.assets;
+	}
 
 	return model;
 };

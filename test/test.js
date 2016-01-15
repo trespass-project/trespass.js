@@ -190,6 +190,52 @@ describe(f1('trespass.model'), function() {
 		});
 	});
 
+
+
+	describe(f2('.prepareModelForXml()'), function() {
+		it(f3('should prefix all the elements of the root-level collections'), function() {
+			let system = {
+				locations: [
+					{ id: 'location-id-1' },
+					{ id: 'location-id-2' },
+				],
+				actors: [
+					{ id: 'actor-id-1' },
+					{ id: 'actor-id-2' },
+				],
+				unknowns: [
+					{ id: 'unknown-id-1' },
+					{ id: 'unknown-id-2' },
+				]
+			};
+			let model = { system };
+			model = trespass.model.prepareModelForXml(model);
+
+			assert(model.system.locations.length === 2);
+			assert(model.system.actors.length === 2);
+			assert(model.system.unknowns.length === 2);
+
+			model.system.locations
+				.forEach(function(item) {
+					const keys = R.keys(item);
+					assert(keys.length === 1);
+					assert(keys[0] === 'location');
+				});
+			model.system.actors
+				.forEach(function(item) {
+					const keys = R.keys(item);
+					assert(keys.length === 1);
+					assert(keys[0] === 'actor');
+				});
+			model.system.unknowns
+				.forEach(function(item) {
+					const keys = R.keys(item);
+					assert(keys.length === 1);
+					assert(keys[0] === 'id');
+				});
+		});
+	});
+
 	describe(f2('.prepareForXml()'), function() {
 		it(f3('should work'), function() {
 			let system = {
