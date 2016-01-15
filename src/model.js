@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const R = require('ramda');
 const cheerio = require('cheerio');
-const mout = require('mout');
 const Joi = require('joi');
 const moment = require('moment');
 const xml = require('xml');
@@ -390,7 +389,7 @@ function toPrefixedObject(prefix, it) {
 
 
 let prepareForXml = module.exports.prepareForXml =
-function prepareForXml(o) {;
+function prepareForXml(o) {
 	if (_.isArray(o)) {
 		return o.map(prepareForXml);
 	}
@@ -482,5 +481,5 @@ function toXML(
 
 	// return xmlStr;
 	return pd.xml(xmlStr)
-		.replace(/' {2}'/ig, '\t') // spaces to tabs
+		.replace(/' {2}'/ig, '\t'); // spaces to tabs
 };
