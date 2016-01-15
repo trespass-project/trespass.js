@@ -275,7 +275,7 @@ describe(f1('trespass.model'), function() {
 		// TODO: what else?
 	});
 
-	describe(f2('.xmlify()'), function() {
+	describe(f2('.toXML()'), function() {
 		it(f3('should properly transform model object to XML'), function() {
 			const model = {
 				system: {
@@ -285,7 +285,7 @@ describe(f1('trespass.model'), function() {
 					]
 				}
 			};
-			const xmlStr = trespass.model.xmlify(model);
+			const xmlStr = trespass.model.toXML(model);
 			let $system = trespass.model.parse(xmlStr)('system');
 
 			assert( $system.find('locations > location').length === model.system.locations.length );

@@ -462,10 +462,10 @@ function prepareModelForXml(model) {
 
 
 // ---
-// ## `xmlify()`
+// ## `toXML()`
 // > takes a model `Object` and turns it back into XML.
-let xmlify = module.exports.xmlify =
-function xmlify(
+let toXML = module.exports.toXML =
+function toXML(
 	_model /* Object */
 ) {
 	// duplicate model
