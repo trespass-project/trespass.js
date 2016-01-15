@@ -9,6 +9,7 @@ var path = require('path');
 // var libxml = require('libxmljs');
 
 var rootDir = path.join(__dirname, '..');
+const testModelFilePath = path.join(rootDir, /*'test',*/ 'data', 'vsphere_export.xml');
 
 var trespass = require('../');
 
@@ -66,31 +67,32 @@ describe(f1('trespass.model'), function() {
 
 
 	// ---
-	var modelXml = fs.readFileSync(
-			path.join(rootDir, 'test', 'data', 'model_cloud_review.xml')
-		).toString();
+	var testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 	describe(f2('.parse()'), function() {
 		it(f3('should load correctly'), function() {
-			var $system = trespass.model.parse(modelXml)('system');
-			assert($system.attr().author === 'Christian W Probst');
-			assert($system.find('locations > location').length === 22);
+			var $system = trespass.model.parse(testModelXML)('system');
+			assert($system.attr().author === 'ciab-exportAsTML.py');
+			assert($system.find('locations > location').length === 0);
+			assert($system.find('assets > data').length === 1);
+			assert($system.find('assets > item').length === 18);
+			assert($system.find('#isUidOf').find('value').length === 6);
 		});
 	});
 
 	describe(f2('.prepare()'), function() {
-		var $system = trespass.model.parse(modelXml)('system');
+		var $system = trespass.model.parse(testModelXML)('system');
 		var model = trespass.model.prepare($system);
 
 		it(f3('should properly transform xml $selection to js object'), function() {
-			var locations = model.system.locations;
-			assert(locations.length === 22);
-			assert(locations[15].atLocations.length > 0);
+			var predicates = model.system.predicates;
+			assert(predicates.length === 3);
+			assert(predicates[0].value.length === 155);
 		});
 
 		it(f3('should properly transform xml $selection to js object'), function() {
 			var data = model.system.data;
-			assert(data.length == 12);
+			assert(data.length == 1);
 		});
 	});
 
