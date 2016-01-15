@@ -70,7 +70,7 @@ function getChildrenText(
 	$selection.children(selector || undefined)
 		.each(function(index, elem) {
 			var $this = $selection.find(this);
-			texts.push($this.text());
+			texts.push($this.text().trim());
 		});
 	return texts;
 }
@@ -88,7 +88,7 @@ function childrenToObj(
 	$selection.children(selector || undefined)
 		.each(function(index, elem) {
 			var $this = $selection.find(this)
-			obj[elem.name] = $this.text();
+			obj[elem.name] = $this.text().trim();
 		});
 	return obj;
 }
