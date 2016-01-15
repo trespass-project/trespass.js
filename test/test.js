@@ -276,16 +276,23 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.xmlify()'), function() {
-		it(f3('should properly transform object back to XML'), function() {
-			var $system = trespass.model.parse(modelXml)('system');
-			var model = trespass.model.prepare($system);
-			var xmlStr = trespass.model.xmlify(model);
+		it(f3('should properly transform model object to XML'), function() {
+			const model = {
+				system: {
+					locations: [
+						{ id: 'location-1' },
+						{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
+					]
+				}
+			};
+			const xmlStr = trespass.model.xmlify(model);
+			let $system = trespass.model.parse(xmlStr)('system');
 
-			$system = trespass.model.parse(xmlStr)('system');
-			assert( $system.find('locations > location').length == 22 );
-			assert( $system.find('edge > source').length == 26 );
-			assert( $system.find('assets > item > atLocations').length == 7 );
-			assert( $system.find('predicates > predicate').eq(1).find('value').length == 4 );
+			assert( $system.find('locations > location').length === model.system.locations.length );
+			assert( $system.find('locations > location').eq(1).attr('id') === 'location-2' );
+			assert( $system.find('locations > location').eq(1).find('atLocations').text() === 'loc-1 loc-2' );
+
+			// TODO: more
 		});
 	});
 
