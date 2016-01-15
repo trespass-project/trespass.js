@@ -66,7 +66,6 @@ function create() {
 let schemas = {};
 schemas.location = Joi.object().keys({
 	'id': Joi.string()/*.required()*/,
-	'domain': Joi.string()/*.required()*/,
 	'atLocations': Joi.array().items(Joi.string()).optional()
 });
 schemas.actor = Joi.object().keys({
@@ -243,47 +242,7 @@ function singular(plural) {
 		'processes': 'process',
 		'roles': 'role',
 	};
-	return pluralToSingular[plural] || plural;
-};
-
-
-function get_(model, what) {
-	if (!model.system[what]) {
-		throw new Error('model.system.'+what+' doesn\'t exist');
-	}
-	if (!singular(what)) {
-		throw new Error('unknown: '+what);
-	}
-	return model.system[what].map( R.prop(singular(what)) );
-}
-
-let getLocations = module.exports.getLocations =
-function getLocations(model) {
-	return get_(model, 'locations');
-};
-
-let getPredicates = module.exports.getPredicates =
-function getPredicates(model) {
-	return get_(model, 'predicates');
-};
-
-let getAssets = module.exports.getAssets =
-function getAssets(model) {
-	return model.system.assets;
-};
-let getData = module.exports.getData =
-function getData(model) {
-	return R.filter(
-		R.has('data'),
-		getAssets(model)
-	);
-};
-let getItems = module.exports.getItems =
-function getItems(model) {
-	return R.filter(
-		R.has('item'),
-		getAssets(model)
-	);
+	return pluralToSingular[plural] /*|| plural*/;
 };
 
 
@@ -396,60 +355,89 @@ function prepare(
 };
 
 
-let makeAttributes = module.exports.makeAttributes =
-function makeAttributes(attrNames, obj) {
-	if (!attrNames || !attrNames.length) { return obj; }
+let separateAttributeFromObject = module.exports.separateAttributeFromObject =
+function separateAttributeFromObject(attrNames, obj, attrKey) {
+	attrNames = attrNames || [];
+	let attrObject = { [attrKey]: R.pick(attrNames, obj) };
+	let newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
+	return { newObject, attrObject };
+};
 
-	let attrs = {};
-	attrNames.forEach(function(name) {
-		if (obj[name] !== undefined) { // TODO: test this
-			attrs[name] = obj[name];
-			delete obj[name];
-		}
-	});
-	obj[attrKey] = attrs;
-	return obj;
-}
+
+const knownAttributes = {
+	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
+	'location': ['id'],
+	'actor': ['id'],
+	'edge': ['directed'],
+	'item': ['id', 'name'],
+	'data': ['id', 'name', 'value'],
+	'predicate': ['id', 'arity']
+};
+
+
+let objectToArrayOfPrefixedObjects = module.exports.objectToArrayOfPrefixedObjects =
+function objectToArrayOfPrefixedObjects(o) {
+	return R.keys(o)
+		.map(function(prefix) {
+			return toPrefixedObject(prefix, o[prefix]);
+		});
+};
+
+
+let toPrefixedObject = module.exports.toPrefixedObject =
+function toPrefixedObject(prefix, it) {
+	return { [prefix]: it };
+};
 
 
 let prepareForXml = module.exports.prepareForXml =
-function prepareForXml(obj) {
-	const keys = R.keys(obj);
-	if (keys.length === 1) {
-		const elemName = keys[0];
-
-		let knownAttributes = [];
-		if (elemName === 'system') {
-			knownAttributes = ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'];
-		} else if (elemName === 'location') {
-			knownAttributes = ['id'];
-		} else if (elemName === 'actor') {
-			knownAttributes = ['id'];
-		} else if (elemName === 'edge') {
-			knownAttributes = ['directed'];
-		} else if (elemName === 'item') {
-			knownAttributes = ['id', 'name'];
-		} else if (elemName === 'data') {
-			knownAttributes = ['id', 'name', 'value'];
-		} else if (elemName === 'predicate') {
-			knownAttributes = ['id', 'arity'];
-		}
-
-		obj[elemName] = makeAttributes(knownAttributes, obj[elemName]);
-
-		R.without([attrKey, charKey], R.keys(obj[elemName]))
-			.forEach(function(key) {
-				const child = obj[elemName][key];
-				let items = [];
-				if (_.isArray(child)) {
-					items = child;
-				} else if (_.isObject(child)) {
-					items = [child];
-				}
-				items.forEach(prepareForXml);
-			});
+function prepareForXml(o) {
+	if (_.isArray(o)) {
+		return o.map(prepareForXml);
 	}
-}
+	else if (_.isString(o) || _.isNumber(o)) {
+		return o;
+	}
+	else if (_.isObject(o)) {
+		let a = objectToArrayOfPrefixedObjects(o);
+		a = a.map(function(item) {
+			let key = R.keys(item)[0];
+
+			let attrObject;
+			if (knownAttributes[key]) {
+				// console.log(key, knownAttributes[key], item[key]);
+				let sep = separateAttributeFromObject(knownAttributes[key], item[key], attrKey);
+				let newObject = sep.newObject;
+				attrObject = sep.attrObject;
+				// console.log(newObject, attrObject);
+				item[key] = newObject;
+			}
+
+			if (key === 'atLocations') {
+				item[key] = item[key].join(' ');
+			}
+
+			item[key] = prepareForXml(item[key]);
+			if (attrObject) {
+				// console.log(item[key]);
+				item[key] = [attrObject].concat(item[key]);
+			}
+
+			// TODO: is there a better solution to this?
+			if (item[key][0] && _.isArray(item[key][0]) && item[key][0].length) {
+				item[key] = item[key].map(function(e) {
+					return e[0];
+				});
+			}
+
+			return item;
+		});
+		return a;
+	}
+	else {
+		console.log('not supposed to be here', o);
+	}
+};
 
 
 // ---
@@ -467,14 +455,9 @@ function xmlify(
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	prepareForXml(model);
-	// console.log( JSON.stringify(model) );
+	let xmlStr = xml( prepareForXml(model) );
 
-	const builder = new xml2js.Builder({
-		attrkey: attrKey,
-		charKey: charKey,
-	});
-	const xml = builder.buildObject(model);
-	return pd.xml(xml)
-		.replace(/' {2}'/ig, '\t') // spaces to tabs
+	// return pd.xml(xml)
+	// 	.replace(/' {2}'/ig, '\t') // spaces to tabs
+	return xmlStr;
 };
