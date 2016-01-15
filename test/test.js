@@ -5,6 +5,7 @@ var R = require('ramda');
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
+// var xml = require('xml');
 // var libxml = require('libxmljs');
 
 var rootDir = path.join(__dirname, '..');
@@ -237,18 +238,41 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.prepareForXml()'), function() {
-		it(f3('should work'), function() {
-			let system = {
-				assets: [
-					{ item: { id: 'id', name: 'name' } }
-				]
+		it(f3('should leave literals as they are'), function() {
+			let data = {
+				version: 0.1,
+				author: 'author name',
 			};
-			trespass.model.prepareForXml(system);
-
-			// TODO: test
-
-			assert(false);
+			data = trespass.model.prepareForXml(data);
+			assert(data[0].version === 0.1);
+			assert(data[1].author === 'author name');
 		});
+
+		it(f3('should work with arbitrarily nested elements'), function() {
+			let data = {
+				one: {
+					two: {
+						three: 'value'
+					}
+				}
+			};
+			data = trespass.model.prepareForXml(data);
+			// console.log(JSON.stringify(data, null, '  '));
+			assert(data.length === 1);
+			assert(data[0]['one'].length === 1);
+			assert(data[0]['one'][0]['two'].length === 1);
+			assert(data[0]['one'][0]['two'][0]['three'] === 'value');
+		});
+
+		it(f3('should join atLocations'), function() {
+			let data = {
+				atLocations: ['atLocation-1', 'atLocation-2']
+			};
+			data = trespass.model.prepareForXml(data);
+			assert(data[0].atLocations === 'atLocation-1 atLocation-2');
+		});
+
+		// TODO: what else?
 	});
 
 	describe(f2('.xmlify()'), function() {
