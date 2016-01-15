@@ -480,7 +480,7 @@ function toXML(
 	model = prepareForXml(model);
 	let xmlStr = xml(model);
 
-	// return pd.xml(xml)
-	// 	.replace(/' {2}'/ig, '\t') // spaces to tabs
-	return xmlStr;
+	// return xmlStr;
+	return pd.xml(xmlStr)
+		.replace(/' {2}'/ig, '\t') // spaces to tabs
 };
