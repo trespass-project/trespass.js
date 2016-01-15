@@ -225,24 +225,23 @@ function addRoom(model, room) {
 };
 
 
-
+const pluralToSingular = {
+	'actors': 'actor',
+	// 'assets': 'asset',
+	'items': 'item',
+	'data': 'data',
+	'edges': 'edge',
+	'locations': 'location',
+	'policies': 'policy',
+	'predicates': 'predicate',
+	'processes': 'process',
+	'roles': 'role',
+};
 // ---
 // ## `singular`
 let singular = module.exports.singular =
 function singular(plural) {
-	const pluralToSingular = {
-		'actors': 'actor',
-		// 'assets': 'asset',
-		'items': 'item',
-		'data': 'data',
-		'edges': 'edge',
-		'locations': 'location',
-		'policies': 'policy',
-		'predicates': 'predicate',
-		'processes': 'process',
-		'roles': 'role',
-	};
-	return pluralToSingular[plural] /*|| plural*/;
+	return pluralToSingular[plural];
 };
 
 
@@ -391,7 +390,7 @@ function toPrefixedObject(prefix, it) {
 
 
 let prepareForXml = module.exports.prepareForXml =
-function prepareForXml(o) {
+function prepareForXml(o) {;
 	if (_.isArray(o)) {
 		return o.map(prepareForXml);
 	}
@@ -440,6 +439,29 @@ function prepareForXml(o) {
 };
 
 
+let prepareModelForXml = module.exports.prepareModelForXml =
+function prepareModelForXml(model) {
+	let system = model.system;
+
+	R.keys(pluralToSingular)
+		.forEach(function(collectionName) {
+			const prefixFn = R.partial(toPrefixedObject, [singular(collectionName)]);
+			if (system[collectionName]) {
+				system[collectionName] = system[collectionName]
+					.map(prefixFn);
+			}
+		});
+
+	// separated at birth
+	// but now reunited again
+	system.assets = system.data.concat(system.items);
+	delete system.data;
+	delete system.items;
+
+	return model;
+};
+
+
 // ---
 // ## `xmlify()`
 // > takes a model `Object` and turns it back into XML.
@@ -455,7 +477,9 @@ function xmlify(
 		'date': moment().format('DD-MM-YYYY')
 	});
 
-	let xmlStr = xml( prepareForXml(model) );
+	model = prepareModelForXml(model);
+	model = prepareForXml(model);
+	let xmlStr = xml(model);
 
 	// return pd.xml(xml)
 	// 	.replace(/' {2}'/ig, '\t') // spaces to tabs

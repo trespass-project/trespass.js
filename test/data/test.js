@@ -32,21 +32,9 @@ var data = {
 	],
 };
 
-data.locations = data.locations
-	.map( R.partial(trespass.model.toPrefixedObject, ['location']) );
-data.actors = data.actors
-	.map( R.partial(trespass.model.toPrefixedObject, ['actor']) );
-data.data = data.data
-	.map( R.partial(trespass.model.toPrefixedObject, ['data']) );
-data.items = data.items
-	.map( R.partial(trespass.model.toPrefixedObject, ['item']) );
-data.predicates = data.predicates
-	.map( R.partial(trespass.model.toPrefixedObject, ['predicate']) );
-data.assets = data.data.concat(data.items);
-delete data.data;
-delete data.items;
-
-var newData = trespass.model.prepareForXml({ system: data });
+var model = { system: data };
+model = trespass.model.prepareModelForXml(model);
+var newData = trespass.model.prepareForXml(model);
 // var newData = trespass.model.prepareForXml(data);
 console.log( JSON.stringify(newData, null, '   ') );
 
