@@ -363,7 +363,7 @@ const knownAttributes = {
 	'location': ['id'],
 	'actor': ['id'],
 	'edge': ['directed'],
-	'item': ['id', 'name'],
+	'item': ['id', 'name', 'type'],
 	'data': ['id', 'name', 'value'],
 	'predicate': ['id', 'arity']
 };
@@ -410,6 +410,30 @@ function prepareForXml(o) {
 			}
 
 			item[key] = prepareForXml(item[key]);
+
+
+			// this makes things like
+			/*
+			<predicate id="isUserIdAt" arity="2">
+				<value>big entity_vim.VirtualMachine_vm-47</value>
+				<value>big entity_vim.VirtualMachine_vm-55</value>
+				<value>big entity_vim.VirtualMachine_vm-102</value>
+			</predicate>
+			*/
+			// happen. (multiple text-only children)
+			var firstKey = R.keys(item[key][0])[0];
+			if (firstKey) {
+				var listOfLiterals =
+					item[key][0] // first elem
+					[firstKey];
+				if (_.isArray(listOfLiterals) && listOfLiterals.length && (_.isString(listOfLiterals[0]) || _.isNumber(listOfLiterals[0]))) {
+					item[key] = listOfLiterals.map(function(item) {
+						return toPrefixedObject(firstKey, item);
+					})
+				}
+			}
+
+
 			if (attrObject) {
 				item[key] = [attrObject].concat(item[key]);
 			}

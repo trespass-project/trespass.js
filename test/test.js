@@ -274,6 +274,29 @@ describe(f1('trespass.model'), function() {
 			assert(data[0].atLocations === 'atLocation-1 atLocation-2');
 		});
 
+		it(f3('should work'), function() {
+			let model = {
+				system: {
+					predicates: [
+						{ arity: 2, id: 'isUserId', value: [
+							'user1 userId1',
+							'user2 userId2',
+							'user3 userId3'
+						]}
+					]
+				}
+			};
+			// console.log( trespass.model.toXML(model) );
+			model = trespass.model.prepareModelForXml(model);
+			model = trespass.model.prepareForXml(model);
+			// console.log(model[0].system[1].predicates[0]);
+			assert(
+				model[0].system[1].predicates[0].predicate[1].value === 'user1 userId1' &&
+				model[0].system[1].predicates[0].predicate[2].value === 'user2 userId2' &&
+				model[0].system[1].predicates[0].predicate[3].value === 'user3 userId3'
+			);
+		});
+
 		// TODO: what else?
 	});
 
@@ -284,6 +307,13 @@ describe(f1('trespass.model'), function() {
 					locations: [
 						{ id: 'location-1' },
 						{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
+					],
+					predicates: [
+						{ arity: 2, id: 'isPasswordOf', value: [
+							'pred1 user1',
+							'pred2 user2',
+							'pred3 user3'
+						]}
 					]
 				}
 			};
@@ -294,7 +324,28 @@ describe(f1('trespass.model'), function() {
 			assert( $system.find('locations > location').eq(1).attr('id') === 'location-2' );
 			assert( $system.find('locations > location').eq(1).find('atLocations').text() === 'loc-1 loc-2' );
 
+			assert( $system.find('predicates > predicate').length === model.system.predicates.length );
+			assert( $system.find('predicates > predicate').first().find('value').length === 3 );
+
 			// TODO: more
+		});
+
+		it(f3('test file model should be equal to export-imported model'), function() {
+			// import test file
+			// export it as xml
+			// import exported xml
+			// then compare both imported models
+
+			const xmlStr = fs.readFileSync(testModelFilePath).toString();
+			const $system = trespass.model.parse(xmlStr)('system');
+			const model = trespass.model.prepare($system);
+
+			const xmlStr2 = trespass.model.toXML(model);
+			const $system2 = trespass.model.parse(xmlStr2)('system');
+			const model2 = trespass.model.prepare($system2);
+			// console.log(xmlStr2);
+
+			assert( R.equals(model, model2) );
 		});
 	});
 
