@@ -124,9 +124,7 @@ function addActor(model, actor) {
 // ## `addItem`
 let addItem = module.exports.addItem =
 function addItem(model, item) {
-	item = _.extend(item || {}, {
-		// '@_type': 'item'
-	});
+	item = _.extend(item || {}, {});
 	_validate(item, schemas['item']);
 	return add_(model, 'items', item);
 };
@@ -136,9 +134,7 @@ function addItem(model, item) {
 // ## `addData`
 let addData = module.exports.addData =
 function addData(model, data) {
-	data = _.extend(data || {}, {
-		// '@_type': 'data'
-	});
+	data = _.extend(data || {}, {});
 	_validate(data, schemas['data']);
 	return add_(model, 'data', data);
 };
