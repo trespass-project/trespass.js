@@ -249,6 +249,16 @@ function prepare(
 ) {
 	let model = create();
 
+	// import metadata
+	let metadata = {};
+	knownAttributes.system
+		.forEach(function(attrName) {
+			metadata[attrName] = $system.attr(attrName);
+		});
+	model.system = _.merge(model.system, metadata);
+	model.system.title = $system.find('title').text().trim();
+
+
 	function process($selection, fn, addFn) {
 		$selection.each(function(index, elem) {
 			let $item = $system.find(this);
@@ -331,9 +341,6 @@ function prepare(
 		function($item, item) {
 			let values = util.getChildrenText($item, 'value');
 			return _.merge(item, {
-				// values: values.map(function(value) {
-				// 	return { value: value };
-				// })
 				value: values
 			});
 		},
@@ -492,7 +499,7 @@ function toXML(
 
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
-		'date': moment().format('DD-MM-YYYY')
+		'date': moment().format('YYYY-MM-DD HH:mm:ss')
 	});
 
 	model = prepareModelForXml(model);

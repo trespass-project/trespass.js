@@ -84,6 +84,14 @@ describe(f1('trespass.model'), function() {
 		var $system = trespass.model.parse(testModelXML)('system');
 		var model = trespass.model.prepare($system);
 
+		it(f3('should copy all existing metadata'), function() {
+			console.log(model.system);
+			assert(model.system.title === 'CIAB-created TREsPASS XML model');
+			assert(model.system.author === 'ciab-exportAsTML.py');
+			assert(model.system.version === '0.5');
+			assert(model.system.date === '2016-01-14T00:07:51.181056');
+		});
+
 		it(f3('should properly transform xml $selection to js object'), function() {
 			var predicates = model.system.predicates;
 			assert(predicates.length === 3);
