@@ -4,8 +4,8 @@ var cheerio = require('cheerio');
 var _ = require('lodash');
 
 
-module.exports.cheerioOpts =
-cheerioOpts = {
+const cheerioOpts =
+module.exports.cheerioOpts = {
 	xmlMode: true,
 	normalizeWhitespace: false,
 	lowerCaseTags: true,
