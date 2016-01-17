@@ -85,7 +85,7 @@ describe(f1('trespass.model'), function() {
 		var model = trespass.model.prepare($system);
 
 		it(f3('should copy all existing metadata'), function() {
-			console.log(model.system);
+			// console.log(model.system);
 			assert(model.system.title === 'CIAB-created TREsPASS XML model');
 			assert(model.system.author === 'ciab-exportAsTML.py');
 			assert(model.system.version === '0.5');
