@@ -161,6 +161,7 @@ function addPolicy(model, policy) {
 
 	// _validate(edge, schemas['policy']);
 	return add_(model, 'policies', policy);
+	console.warn('addPolicy() is not implemented yet'); // TODO
 };
 
 
@@ -182,7 +183,7 @@ function addProcess(model, process) {
 	// TODO
 
 	// _validate(edge, schemas['process']);
-	// return add_(model, 'processes', process);
+	return add_(model, 'processes', process);
 	console.warn('addProcess() is not implemented yet'); // TODO
 };
 
@@ -194,7 +195,7 @@ function addRole(model, role) {
 	// TODO
 
 	// _validate(edge, schemas['role']);
-	// return add_(model, 'roles', role);
+	return add_(model, 'roles', role);
 	console.warn('addRole() is not implemented yet'); // TODO
 };
 
@@ -351,6 +352,31 @@ function prepare(
 	// TODO:
 	// - processes
 	// - policies
+	// - roles
+
+	process(
+		$system.find('processes > process'),
+		function($item, item) {
+			return item;
+		},
+		addProcess
+	);
+
+	process(
+		$system.find('policies > policy'),
+		function($item, item) {
+			return item;
+		},
+		addPolicy
+	);
+
+	process(
+		$system.find('roles > role'),
+		function($item, item) {
+			return item;
+		},
+		addRole
+	);
 
 	return model;
 };
