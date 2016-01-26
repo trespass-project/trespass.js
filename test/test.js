@@ -340,24 +340,28 @@ describe(f1('trespass.model'), function() {
 			});
 		});
 
-		// it(f3('test file model should be equal to export-imported model'), function() {
+		// it(f3('test file model should be equal to export-imported model'), function(done) {
 		// 	// import test file
 		// 	// export it as xml
 		// 	// import exported xml
 		// 	// then compare both imported models
 
 		// 	const xmlStr = fs.readFileSync(testModelFilePath).toString();
-		// 	const $system = trespass.model.parse(xmlStr)('system');
-		// 	const model = trespass.model.prepare($system);
+		// 	trespass.model.parse(xmlStr, function(err, model) {
+		// 		// console.log(model);
 
-		// 	const xmlStr2 = trespass.model.toXML(model);
-		// 	const $system2 = trespass.model.parse(xmlStr2)('system');
-		// 	const model2 = trespass.model.prepare($system2);
-		// 	// console.log(xmlStr2);
+		// 		const xmlStr2 = trespass.model.toXML(model);
+		// 		trespass.model.parse(xmlStr2, function(err, model2) {
+		// 			// console.log(xmlStr2);
 
-		// 	const differences = diff(model, model2);
-		// 	// TODO: do s.th. with this
-		// 	// assert(!differences);
+		// 			const differences = diff(model, model2);
+		// 			console.log(differences);
+		// 			// TODO: do s.th. with this
+		// 			// assert(!differences);
+
+		// 			done();
+		// 		});
+		// 	});
 		// });
 	});
 
