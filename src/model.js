@@ -115,7 +115,7 @@ function add_(model, dest, item) {
 let addActor = module.exports.addActor =
 function addActor(model, actor) {
 	actor = _.extend(actor || {}, {});
-	_validate(actor, schemas['actor']);
+	// _validate(actor, schemas['actor']);
 	return add_(model, 'actors', actor);
 };
 
@@ -125,7 +125,7 @@ function addActor(model, actor) {
 let addItem = module.exports.addItem =
 function addItem(model, item) {
 	item = _.extend(item || {}, {});
-	_validate(item, schemas['item']);
+	// _validate(item, schemas['item']);
 	return add_(model, 'items', item);
 };
 
@@ -135,7 +135,7 @@ function addItem(model, item) {
 let addData = module.exports.addData =
 function addData(model, data) {
 	data = _.extend(data || {}, {});
-	_validate(data, schemas['data']);
+	// _validate(data, schemas['data']);
 	return add_(model, 'data', data);
 };
 
@@ -148,7 +148,7 @@ function addEdge(model, edge) {
 		directed: false
 	});
 	edge = _.extend(edge || {}, {});
-	_validate(edge, schemas['edge']);
+	// _validate(edge, schemas['edge']);
 	return add_(model, 'edges', edge);
 };
 
@@ -161,6 +161,7 @@ function addPolicy(model, policy) {
 
 	// _validate(edge, schemas['policy']);
 	return add_(model, 'policies', policy);
+	console.warn('addPolicy() is not implemented yet'); // TODO
 };
 
 
@@ -182,7 +183,7 @@ function addProcess(model, process) {
 	// TODO
 
 	// _validate(edge, schemas['process']);
-	// return add_(model, 'processes', process);
+	return add_(model, 'processes', process);
 	console.warn('addProcess() is not implemented yet'); // TODO
 };
 
@@ -194,7 +195,7 @@ function addRole(model, role) {
 	// TODO
 
 	// _validate(edge, schemas['role']);
-	// return add_(model, 'roles', role);
+	return add_(model, 'roles', role);
 	console.warn('addRole() is not implemented yet'); // TODO
 };
 
@@ -204,7 +205,7 @@ function addRole(model, role) {
 let addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	location = _.extend(location || {}, {});
-	_validate(location, schemas['location']);
+	// _validate(location, schemas['location']);
 	return add_(model, 'locations', location);
 };
 
@@ -365,6 +366,31 @@ function prepare(
 	// TODO:
 	// - processes
 	// - policies
+	// - roles
+
+	process(
+		$system.find('processes > process'),
+		function($item, item) {
+			return item;
+		},
+		addProcess
+	);
+
+	process(
+		$system.find('policies > policy'),
+		function($item, item) {
+			return item;
+		},
+		addPolicy
+	);
+
+	process(
+		$system.find('roles > role'),
+		function($item, item) {
+			return item;
+		},
+		addRole
+	);
 
 	return model;
 };
