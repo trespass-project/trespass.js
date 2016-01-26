@@ -323,8 +323,8 @@ function addPolicy(model, policy) {
 	// TODO
 
 	// _validate(edge, schemas['policy']);
-	return add_(model, 'policies', policy);
 	console.warn('addPolicy() is not implemented yet'); // TODO
+	return add_(model, 'policies', policy);
 };
 
 
@@ -346,8 +346,8 @@ function addProcess(model, process) {
 	// TODO
 
 	// _validate(edge, schemas['process']);
-	return add_(model, 'processes', process);
 	console.warn('addProcess() is not implemented yet'); // TODO
+	return add_(model, 'processes', process);
 };
 
 
@@ -358,8 +358,8 @@ function addRole(model, role) {
 	// TODO
 
 	// _validate(edge, schemas['role']);
-	return add_(model, 'roles', role);
 	console.warn('addRole() is not implemented yet'); // TODO
+	return add_(model, 'roles', role);
 };
 
 
@@ -464,7 +464,7 @@ function prepareForXml(o) {
 				if (_.isArray(listOfLiterals) && listOfLiterals.length && (_.isString(listOfLiterals[0]) || _.isNumber(listOfLiterals[0]))) {
 					item[key] = listOfLiterals.map(function(item) {
 						return toPrefixedObject(firstKey, item);
-					})
+					});
 				}
 			}
 
