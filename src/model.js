@@ -400,7 +400,13 @@ const knownAttributes = {
 	'edge': ['directed'],
 	'item': ['id', 'name', 'type'],
 	'data': ['id', 'name', 'value'],
-	'predicate': ['id', 'arity']
+	'predicate': ['id', 'arity'],
+
+	'in': ['loc'],
+	'out': ['loc'],
+	'credPredicate': ['name'],
+	'policy': ['id'],
+	'process': ['id'],
 };
 
 
