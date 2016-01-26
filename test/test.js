@@ -6,6 +6,9 @@ var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
 // var xml = require('xml');
+
+// TODO: use `xmllint` instead
+// http://stackoverflow.com/questions/4092812/tool-to-validate-an-xsd-on-ubuntu-linux
 // var libxml = require('libxmljs');
 
 var rootDir = path.join(__dirname, '..');
@@ -70,13 +73,18 @@ describe(f1('trespass.model'), function() {
 	var testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 	describe(f2('.parse()'), function() {
-		it(f3('should load correctly'), function() {
-			var $system = trespass.model.parse(testModelXML)('system');
+		var $system = trespass.model.parse(testModelXML)('system');
+
+		it(f3('should load metadata correctly'), function() {
 			assert($system.attr().author === 'ciab-exportAsTML.py');
-			assert($system.find('locations > location').length === 0);
+			assert($system.attr().date === '2016-01-17T23:20:21.866232');
+		});
+
+		it(f3('should load data correctly'), function() {
+			assert($system.find('locations > location').length === 2);
 			assert($system.find('assets > data').length === 1);
-			assert($system.find('assets > item').length === 18);
-			assert($system.find('#isUidOf').find('value').length === 6);
+			assert($system.find('assets > item').length === 14);
+			assert($system.find('#isUidOf').find('value').length === 5);
 		});
 	});
 
@@ -89,13 +97,13 @@ describe(f1('trespass.model'), function() {
 			assert(model.system.title === 'CIAB-created TREsPASS XML model');
 			assert(model.system.author === 'ciab-exportAsTML.py');
 			assert(model.system.version === '0.5');
-			assert(model.system.date === '2016-01-14T00:07:51.181056');
+			assert(model.system.date === '2016-01-17T23:20:21.866232');
 		});
 
 		it(f3('should properly transform xml $selection to js object'), function() {
 			var predicates = model.system.predicates;
 			assert(predicates.length === 3);
-			assert(predicates[0].value.length === 155);
+			assert(predicates[0].value.length === 90);
 		});
 
 		it(f3('should properly transform xml $selection to js object'), function() {
