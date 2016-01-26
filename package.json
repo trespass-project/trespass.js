@@ -12,6 +12,8 @@
   },
   "author": "",
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-register": "^6.4.3",
     "browserify": "^10.2.3",
     "chalk": "^1.0.0",
     "gulp": "^3.8.11",
