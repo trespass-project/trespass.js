@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var R = require('ramda');
+var _ = require('lodash');
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
@@ -51,65 +52,38 @@ var f3 = function(s) {
 
 // ---
 describe(f1('trespass.model'), function() {
-
-	describe(f2('.childrenToObj()'), function() {
-		it(f3('should be able to handle mixed case and hyphenated tag names'), function() {
-			var $ = trespass.model.parse(
-				'<edge>'+
-					'<SOURCE>source</SOURCE>'+
-					'<tarGet>tarGet</tarGet>'+
-					'<un-related>un-related</un-related>'+
-				'</edge>'
-			);
-			var $xml = $('edge');
-			var result = trespass.util.childrenToObj($xml);
-			assert(result['source']);
-			assert(result['target']);
-			assert(result['un-related']);
-		});
-	});
-
-
-	// ---
 	var testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 	describe(f2('.parse()'), function() {
-		var $system = trespass.model.parse(testModelXML)('system');
+		trespass.model.parse(testModelXML, function(err, model) {
+			it(f3('should import metadata'), function(done) {
+				assert(model.system.author === 'ciab-exportAsTML.py');
+				assert(model.system.version === '0.5');
+				assert(model.system.date === '2016-01-17T23:20:21.866232');
+				done();
+			});
 
-		it(f3('should load metadata correctly'), function() {
-			assert($system.attr().author === 'ciab-exportAsTML.py');
-			assert($system.attr().date === '2016-01-17T23:20:21.866232');
-		});
+			it(f3('should import title'), function(done) {
+				assert(model.system.title === 'CIAB-created TREsPASS XML model');
+				done();
+			});
 
-		it(f3('should load data correctly'), function() {
-			assert($system.find('locations > location').length === 2);
-			assert($system.find('assets > data').length === 1);
-			assert($system.find('assets > item').length === 14);
-			assert($system.find('#isUidOf').find('value').length === 5);
-		});
-	});
+			it(f3('should import rest of model'), function(done) {
+				var predicates = model.system.predicates;
+				assert(predicates.length === 3);
+				assert(predicates[0].value.length === 90);
 
-	describe(f2('.prepare()'), function() {
-		var $system = trespass.model.parse(testModelXML)('system');
-		var model = trespass.model.prepare($system);
+				var data = model.system.data;
+				assert(data.length === 1);
 
-		it(f3('should copy all existing metadata'), function() {
-			// console.log(model.system);
-			assert(model.system.title === 'CIAB-created TREsPASS XML model');
-			assert(model.system.author === 'ciab-exportAsTML.py');
-			assert(model.system.version === '0.5');
-			assert(model.system.date === '2016-01-17T23:20:21.866232');
-		});
+				done();
+			});
 
-		it(f3('should properly transform xml $selection to js object'), function() {
-			var predicates = model.system.predicates;
-			assert(predicates.length === 3);
-			assert(predicates[0].value.length === 90);
-		});
-
-		it(f3('should properly transform xml $selection to js object'), function() {
-			var data = model.system.data;
-			assert(data.length == 1);
+			it(f3('atLocations should always be an Array'), function(done) {
+				var data = model.system.data;
+				assert(_.isArray(data[0].atLocations));
+				done();
+			});
 		});
 	});
 
@@ -209,8 +183,6 @@ describe(f1('trespass.model'), function() {
 			);
 		});
 	});
-
-
 
 	describe(f2('.prepareModelForXml()'), function() {
 		it(f3('should prefix all the elements of the root-level collections'), function() {
@@ -318,9 +290,10 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.toXML()'), function() {
-		it(f3('should properly transform model object to XML'), function() {
-			const model = {
+		it(f3('should properly transform model object to XML'), function(done) {
+			const origModel = {
 				system: {
+					title: 'title',
 					locations: [
 						{ id: 'location-1' },
 						{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
@@ -334,38 +307,44 @@ describe(f1('trespass.model'), function() {
 					]
 				}
 			};
-			const xmlStr = trespass.model.toXML(model);
-			let $system = trespass.model.parse(xmlStr)('system');
+			const xmlStr = trespass.model.toXML(origModel);
 
-			assert( $system.find('locations > location').length === model.system.locations.length );
-			assert( $system.find('locations > location').eq(1).attr('id') === 'location-2' );
-			assert( $system.find('locations > location').eq(1).find('atLocations').text() === 'loc-1 loc-2' );
+			trespass.model.parse(xmlStr, function(err, model) {
+				assert(model.system.locations.length === origModel.system.locations.length );
+				assert(model.system.locations[1].id === 'location-2');
+				assert(model.system.locations[1].atLocations.length === 2);
+				assert(model.system.locations[1].atLocations[0] === 'loc-1');
+				assert(model.system.locations[1].atLocations[1] === 'loc-2');
 
-			assert( $system.find('predicates > predicate').length === model.system.predicates.length );
-			assert( $system.find('predicates > predicate').first().find('value').length === 3 );
+				assert(model.system.predicates.length === origModel.system.predicates.length);
+				assert(model.system.predicates[0].value.length === 3);
 
-			// TODO: more
+				// TODO: more
+
+				done();
+			});
+
 		});
 
-		it(f3('test file model should be equal to export-imported model'), function() {
-			// import test file
-			// export it as xml
-			// import exported xml
-			// then compare both imported models
+		// it(f3('test file model should be equal to export-imported model'), function() {
+		// 	// import test file
+		// 	// export it as xml
+		// 	// import exported xml
+		// 	// then compare both imported models
 
-			const xmlStr = fs.readFileSync(testModelFilePath).toString();
-			const $system = trespass.model.parse(xmlStr)('system');
-			const model = trespass.model.prepare($system);
+		// 	const xmlStr = fs.readFileSync(testModelFilePath).toString();
+		// 	const $system = trespass.model.parse(xmlStr)('system');
+		// 	const model = trespass.model.prepare($system);
 
-			const xmlStr2 = trespass.model.toXML(model);
-			const $system2 = trespass.model.parse(xmlStr2)('system');
-			const model2 = trespass.model.prepare($system2);
-			// console.log(xmlStr2);
+		// 	const xmlStr2 = trespass.model.toXML(model);
+		// 	const $system2 = trespass.model.parse(xmlStr2)('system');
+		// 	const model2 = trespass.model.prepare($system2);
+		// 	// console.log(xmlStr2);
 
-			const differences = diff(model, model2);
-			// TODO: do s.th. with this
-			// assert(!differences);
-		});
+		// 	const differences = diff(model, model2);
+		// 	// TODO: do s.th. with this
+		// 	// assert(!differences);
+		// });
 	});
 
 });

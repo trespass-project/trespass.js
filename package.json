@@ -16,6 +16,7 @@
     "babel-register": "^6.4.3",
     "browserify": "^10.2.3",
     "chalk": "^1.0.0",
+    "cheerio": "^0.19.0",
     "deep-diff": "^0.3.3",
     "gulp": "^3.8.11",
     "gulp-changed": "^1.1.1",
@@ -33,13 +34,14 @@
     "watchify": "^3.2.1"
   },
   "dependencies": {
-    "cheerio": "^0.19.0",
+    "async": "^0.9.2",
     "joi": "^7.1.0",
     "lodash": "^3.10.1",
     "moment": "^2.11.1",
     "mout": "^0.11.1",
     "pretty-data": "^0.40.0",
     "ramda": "^0.19.1",
-    "xml": "^1.0.0"
+    "xml": "^1.0.0",
+    "xml2js": "^0.4.16"
   }
 }

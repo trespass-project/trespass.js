@@ -2,9 +2,10 @@
 
 const _ = require('lodash');
 const R = require('ramda');
-const cheerio = require('cheerio');
 const Joi = require('joi');
+const async = require('async');
 const moment = require('moment');
+const parseString = require('xml2js').parseString;
 const xml = require('xml');
 const pd = require('pretty-data').pd;
 
@@ -12,16 +13,12 @@ const util = require('./util.js');
 
 
 const attrKey = '_attr';
-
-
-// ---
-// ## `parse()`
-// > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
-let parse = module.exports.parse =
-function parse(
-	xmlStr /* String */
-) {
-	return cheerio.load(xmlStr, util.cheerioOpts);
+const charKey = '_text';
+const xml2jsOptions = {
+	attrkey: attrKey,
+	charkey: charKey,
+	trim: true,
+	explicitArray: /*true*/ false,
 };
 
 
@@ -58,6 +55,172 @@ const empty = module.exports.empty = {
 let create = module.exports.create =
 function create() {
 	return _.merge({}, empty);
+};
+
+
+const pluralToSingular = {
+	'actors': 'actor',
+	// 'assets': 'asset',
+	'items': 'item',
+	'data': 'data',
+	'edges': 'edge',
+	'locations': 'location',
+	'policies': 'policy',
+	'predicates': 'predicate',
+	'processes': 'process',
+	'roles': 'role',
+};
+// ---
+// ## `singular`
+let singular = module.exports.singular =
+function singular(plural) {
+	return pluralToSingular[plural];
+};
+
+
+// ---
+// ## `parse()`
+// > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
+let parse = module.exports.parse =
+function parse(
+	xmlStr, /* String */
+	done /* Function */
+) {
+	function mergeAttributes(obj) {
+		const attributes = obj[attrKey];
+		const withoutAttributes = R.omit([attrKey], obj);
+		return _.merge({}, withoutAttributes, attributes);
+	}
+
+	function recurse(item, key) {
+		if (_.isArray(item)) {
+			return item
+				.map(function(arrItem) {
+					return recurse(arrItem);
+				});
+		}
+		else if (_.isString(item)) {
+			item = item
+				.replace(/[\r\n\t]/ig, ' ')
+				.replace(/ +/ig, ' ');
+
+			if (key === 'atLocations') {
+				item = item.split(' ');
+			}
+
+			return item;
+		}
+		else if (_.isNumber(item)) {
+			return item;
+		}
+		else if (_.isObject(item)) {
+			item = mergeAttributes(item);
+			R.keys(item)
+				.forEach(function(key) {
+					item[key] = recurse(item[key], key);
+				});
+			return item;
+		}
+	}
+
+	let model = create();
+	let parsed;
+
+	async.series(
+		[
+			function(cb) { // parse
+				parseString(xmlStr, xml2jsOptions, function(err, _parsed) {
+					if (err) {
+						return cb(err);
+					}
+					parsed = _parsed;
+					cb(null);
+				});
+			},
+
+			function(cb) { // metadata
+				const metadata = parsed.system[attrKey];
+				model.system = _.merge(model.system, metadata);
+				cb(null);
+			},
+
+			function(cb) { // title
+				model.system = _.merge(model.system, { title: parsed.system.title });
+				cb(null, model);
+			},
+
+			function(cb) { // all the rest
+				const mapping = [
+					{
+						singular: 'actor',
+						plural: 'actors',
+						collection: 'actors'
+					},
+					{
+						singular: 'edge',
+						plural: 'edges',
+						collection: 'edges'
+					},
+					{
+						singular: 'location',
+						plural: 'locations',
+						collection: 'locations'
+					},
+					{
+						singular: 'policy',
+						plural: 'policies',
+						collection: 'policies'
+					},
+					{
+						singular: 'predicate',
+						plural: 'predicates',
+						collection: 'predicates'
+					},
+					{
+						singular: 'process',
+						plural: 'processes',
+						collection: 'processes'
+					},
+					{
+						singular: 'role',
+						plural: 'roles',
+						collection: 'roles'
+					},
+
+					{
+						singular: 'item',
+						plural: 'assets',
+						collection: 'items'
+					},
+					{
+						singular: 'data',
+						plural: 'assets',
+						collection: 'data'
+					}
+				];
+
+				mapping.forEach(function(item) {
+					if (parsed.system[item.plural]) {
+						if (!_.isArray(parsed.system[item.plural][item.singular])) {
+							parsed.system[item.plural][item.singular] =
+								[ parsed.system[item.plural][item.singular] ];
+						}
+						model.system[item.collection] =
+							recurse(parsed.system[item.plural][item.singular]);
+					}
+				});
+
+				cb(null, model);
+			},
+		],
+
+		function(err) {
+			if (err) {
+				console.error(err);
+			}
+			done(err, model);
+		}
+	);
 };
 
 
@@ -218,181 +381,6 @@ function addRoom(model, room) {
 		// domain: 'physical'
 	});
 	return addLocation(model, room);
-};
-
-
-const pluralToSingular = {
-	'actors': 'actor',
-	// 'assets': 'asset',
-	'items': 'item',
-	'data': 'data',
-	'edges': 'edge',
-	'locations': 'location',
-	'policies': 'policy',
-	'predicates': 'predicate',
-	'processes': 'process',
-	'roles': 'role',
-};
-// ---
-// ## `singular`
-let singular = module.exports.singular =
-function singular(plural) {
-	return pluralToSingular[plural];
-};
-
-
-// ---
-// ## `prepare()`
-// > transforms a `selection` to an `Object`
-let prepare = module.exports.prepare =
-function prepare(
-	$system /* selection */
-) {
-	let model = create();
-
-	// import metadata
-	let metadata = {};
-	knownAttributes.system
-		.forEach(function(attrName) {
-			metadata[attrName] = $system.attr(attrName);
-		});
-	model.system = _.merge(model.system, metadata);
-	model.system.title = $system.find('title').text().trim();
-
-
-	function process($selection, fn, addFn) {
-		$selection.each(function(index, elem) {
-			let $item = $system.find(this);
-			let item = _.merge({}, $item.attr());
-			item = fn($item, item);
-			addFn(model, item);
-		});
-	}
-
-	/* locations */
-	process(
-		$system.find('locations > location'),
-		function($item, item) {
-			let atLocations = util.getChildrenText($item, 'atlocations');
-			if (atLocations.length) {
-				atLocations = atLocations[0].split(/\s+/i);
-			}
-			return _.merge(item, {
-				atLocations: atLocations
-			});
-		},
-		addLocation
-	);
-
-	/* edges */
-	process(
-		$system.find('edges > edge'),
-		function($item, item) {
-			return _.merge(item, util.childrenToObj($item, 'source, target'));
-		},
-		addEdge
-	);
-
-	/* assets */
-	process(
-		$system.find('assets > item'),
-		function($item, item) {
-			let atLocations = util.getChildrenText($item, 'atlocations');
-			if (atLocations.length) {
-				atLocations = atLocations[0].split(/\s+/i);
-			}
-			return _.merge(item, {
-				atLocations: atLocations
-			});
-		},
-		addItem
-	);
-	process(
-		$system.find('assets > data'),
-		function($item, item) {
-			let atLocations = util.getChildrenText($item, 'atlocations');
-			if (atLocations.length) {
-				atLocations = atLocations[0].split(/\s+/i);
-			}
-			return _.merge(item, {
-				atLocations: atLocations
-			});
-		},
-		addData
-	);
-
-	/* actors */
-	process(
-		$system.find('actors > actor'),
-		function($item, item) {
-			let atLocations = util.getChildrenText($item, 'atlocations');
-			if (atLocations.length) {
-				atLocations = atLocations[0].split(/\s+/i);
-			}
-			return _.merge(item, {
-				atLocations: atLocations
-			});
-		},
-		addActor
-	);
-
-	/* predicates */
-	process(
-		$system.find('predicates > predicate'),
-		function($item, item) {
-			let values = util.getChildrenText($item, 'value');
-			return _.merge(item, {
-				value: values
-			});
-		},
-		addPredicate
-	);
-
-	/* processes */
-	process(
-		$system.find('processes > process'),
-		function($item, item) {
-			// console.log( xml($item.html()) );
-			let atLocations = util.getChildrenText($item, 'atlocations');
-			if (atLocations.length) {
-				atLocations = atLocations[0].split(/\s+/i);
-			}
-			return _.merge(item, util.childrenToObj($item, 'in, out'), { atLocations: atLocations });
-		},
-		addProcess
-	);
-
-	// <todo>
-	// TODO:
-	// - processes
-	// - policies
-	// - roles
-
-	process(
-		$system.find('processes > process'),
-		function($item, item) {
-			return item;
-		},
-		addProcess
-	);
-
-	process(
-		$system.find('policies > policy'),
-		function($item, item) {
-			return item;
-		},
-		addPolicy
-	);
-
-	process(
-		$system.find('roles > role'),
-		function($item, item) {
-			return item;
-		},
-		addRole
-	);
-
-	return model;
 };
 
 
