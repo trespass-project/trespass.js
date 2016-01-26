@@ -6,6 +6,7 @@ var _ = require('lodash');
 var chalk = require('chalk');
 var fs = require('fs');
 var path = require('path');
+var cheerio = require('cheerio');
 var diff = require('deep-diff').diff;
 // var xml = require('xml');
 
@@ -290,25 +291,38 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.toXML()'), function() {
-		it(f3('should properly transform model object to XML'), function(done) {
-			const origModel = {
-				system: {
-					title: 'title',
-					locations: [
-						{ id: 'location-1' },
-						{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
-					],
-					predicates: [
-						{ arity: 2, id: 'isPasswordOf', value: [
-							'pred1 user1',
-							'pred2 user2',
-							'pred3 user3'
-						]}
-					]
-				}
-			};
-			const xmlStr = trespass.model.toXML(origModel);
+		const origModel = {
+			system: {
+				title: 'title',
+				locations: [
+					{ id: 'location-1' },
+					{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
+				],
+				predicates: [
+					{ arity: 2, id: 'isPasswordOf', value: [
+						'pred1 user1',
+						'pred2 user2',
+						'pred3 user3'
+					]}
+				]
+			}
+		};
+		const xmlStr = trespass.model.toXML(origModel);
+		const $system = cheerio.load(xmlStr, trespass.util.cheerioOpts)('system');
 
+		it(f3('should properly transform model object to XML'), function() {
+			assert( $system.find('locations > location').length === 2 );
+			assert( $system.find('predicates > predicate').length === 1 );
+			assert( $system.find('atLocations').length === 1 );
+		});
+
+		it(f3('should remove empty collections'), function() {
+			assert( $system.find('actors').length === 0 );
+			assert( $system.find('assets').length === 0 );
+		});
+
+		// TODO: rename this
+		it(f3('should re-import model successfully'), function(done) {
 			trespass.model.parse(xmlStr, function(err, model) {
 				assert(model.system.locations.length === origModel.system.locations.length );
 				assert(model.system.locations[1].id === 'location-2');
@@ -319,11 +333,11 @@ describe(f1('trespass.model'), function() {
 				assert(model.system.predicates.length === origModel.system.predicates.length);
 				assert(model.system.predicates[0].value.length === 3);
 
+				assert(model.system.actors.length === 0);
 				// TODO: more
 
 				done();
 			});
-
 		});
 
 		// it(f3('test file model should be equal to export-imported model'), function() {

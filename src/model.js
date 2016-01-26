@@ -500,6 +500,11 @@ function prepareModelForXml(model) {
 			if (system[collectionName]) {
 				system[collectionName] = system[collectionName]
 					.map(prefixFn);
+
+				// remove empty ones
+				if (!system[collectionName].length) {
+					delete system[collectionName];
+				}
 			}
 		});
 
