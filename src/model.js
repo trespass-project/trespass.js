@@ -347,6 +347,20 @@ function prepare(
 		addPredicate
 	);
 
+	/* processes */
+	process(
+		$system.find('processes > process'),
+		function($item, item) {
+			// console.log( xml($item.html()) );
+			let atLocations = util.getChildrenText($item, 'atlocations');
+			if (atLocations.length) {
+				atLocations = atLocations[0].split(/\s+/i);
+			}
+			return _.merge(item, util.childrenToObj($item, 'in, out'), { atLocations: atLocations });
+		},
+		addProcess
+	);
+
 	// <todo>
 	// TODO:
 	// - processes
