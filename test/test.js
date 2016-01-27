@@ -334,7 +334,6 @@ describe(f1('trespass.model'), function() {
 			}
 		};
 		const xmlStr = trespass.model.toXML(origModel);
-		console.log(xmlStr);
 		const $system = cheerio.load(xmlStr, trespass.util.cheerioOpts)('system');
 
 		it(f3('should properly transform model object to XML'), function() {

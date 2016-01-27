@@ -397,16 +397,19 @@ const knownAttributes = {
 	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
 	'location': ['id'],
 	'actor': ['id'],
-	'edge': ['directed'],
+	'edge': ['directed', 'kind'],
 	'item': ['id', 'name', 'type'],
 	'data': ['id', 'name', 'value'],
-	'predicate': ['id', 'arity'],
-
+	'credLocation': ['id'],
+	'credData': ['name'],
+	'credItem': ['name'],
+	'credPredicate': ['name'],
+	'process': ['id'],
 	'in': ['loc'],
 	'out': ['loc'],
-	'credPredicate': ['name'],
+	'predicate': ['id', 'arity'],
 	'policy': ['id'],
-	'process': ['id'],
+	'metric': ['namespace', 'name', 'value'],
 };
 
 
