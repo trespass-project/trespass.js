@@ -56,7 +56,7 @@ function create() {
 };
 
 
-const pluralToSingular = {
+const collectionNameSingular = module.exports.collectionNameSingular = {
 	'actors': 'actor',
 	// 'assets': 'asset',
 	'items': 'item',
@@ -68,11 +68,17 @@ const pluralToSingular = {
 	'processes': 'process',
 	'roles': 'role',
 };
+
+
+const collectionNames = module.exports.collectionNames =
+R.keys(collectionNameSingular);
+
+
 // ---
 // ## `singular`
 let singular = module.exports.singular =
 function singular(plural) {
-	return pluralToSingular[plural];
+	return collectionNameSingular[plural];
 };
 
 
@@ -487,7 +493,7 @@ function prepareModelForXml(model) {
 	delete system.items;
 	delete system.data;
 
-	R.keys(pluralToSingular)
+	collectionNames
 		.forEach(function(collectionName) {
 			if (system[collectionName]) {
 				system[collectionName] = toPrefixedObject(
