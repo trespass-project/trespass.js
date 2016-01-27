@@ -6,7 +6,7 @@ const Joi = require('joi');
 const async = require('async');
 const moment = require('moment');
 const parseString = require('xml2js').parseString;
-const xml = require('xml');
+const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
 
 const util = require('./util.js');
@@ -385,9 +385,9 @@ function addRoom(model, room) {
 
 
 let separateAttributeFromObject = module.exports.separateAttributeFromObject =
-function separateAttributeFromObject(attrNames, obj, attrKey) {
+function separateAttributeFromObject(attrNames, obj) {
 	attrNames = attrNames || [];
-	let attrObject = { [attrKey]: R.pick(attrNames, obj) };
+	let attrObject = R.pick(attrNames, obj);
 	let newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
 	return { newObject, attrObject };
 };
@@ -410,15 +410,6 @@ const knownAttributes = {
 };
 
 
-let objectToArrayOfPrefixedObjects = module.exports.objectToArrayOfPrefixedObjects =
-function objectToArrayOfPrefixedObjects(o) {
-	return R.keys(o)
-		.map(function(prefix) {
-			return toPrefixedObject(prefix, o[prefix]);
-		});
-};
-
-
 let toPrefixedObject = module.exports.toPrefixedObject =
 function toPrefixedObject(prefix, it) {
 	return { [prefix]: it };
@@ -426,75 +417,38 @@ function toPrefixedObject(prefix, it) {
 
 
 let prepareForXml = module.exports.prepareForXml =
-function prepareForXml(o) {
+function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
-		return o.map(prepareForXml);
+		return o.map(function(item) {
+			return prepareForXml(item, parentKey);
+		});
 	}
 	else if (_.isString(o) || _.isNumber(o)) {
 		return o;
 	}
 	else if (_.isObject(o)) {
-		let a = objectToArrayOfPrefixedObjects(o);
-		a = a.map(function(item) {
-			const keys = R.keys(item);
-			const key = keys[0];
+		// handle attributes
+		if (parentKey && knownAttributes[parentKey]) {
+			const {newObject, attrObject} =
+				separateAttributeFromObject(knownAttributes[parentKey], o);
+			o = _.merge(newObject, { [attrKey]: attrObject });
+		}
 
-			let attrObject;
-			if (knownAttributes[key]) {
-				let sep = separateAttributeFromObject(knownAttributes[key], item[key], attrKey);
-				let newObject = sep.newObject;
-				attrObject = sep.attrObject;
-				item[key] = newObject;
-			}
-
-			if (key === 'atLocations') {
-				item[key] = item[key].join(' ');
-			}
-
-			item[key] = prepareForXml(item[key]);
-
-
-			// this makes things like
-			/*
-			<predicate id="isUserIdAt" arity="2">
-				<value>big entity_vim.VirtualMachine_vm-47</value>
-				<value>big entity_vim.VirtualMachine_vm-55</value>
-				<value>big entity_vim.VirtualMachine_vm-102</value>
-			</predicate>
-			*/
-			// happen. (multiple text-only children)
-			var firstKey = R.keys(item[key][0])[0];
-			if (firstKey) {
-				var listOfLiterals =
-					item[key][0] // first elem
-					[firstKey];
-				if (_.isArray(listOfLiterals) &&
-					listOfLiterals.length &&
-					(_.isString(listOfLiterals[0]) || _.isNumber(listOfLiterals[0]))) {
-					item[key] = listOfLiterals.map(function(item) {
-						return toPrefixedObject(firstKey, item);
-					});
+		return R.keys(o)
+			.reduce(function(result, key) {
+				if (key === attrKey) {
+					result[key] = o[key];
+					return result;
 				}
-			}
 
+				result[key] = prepareForXml(o[key], key);
 
-			if (attrObject) {
-				item[key] = [attrObject].concat(item[key]);
-			}
+				if (key === 'atLocations') {
+					result[key] = result[key].join(' ');
+				}
 
-			// TODO: is there a better solution to this?
-			if (item[key][0] && _.isArray(item[key][0]) && item[key][0].length) {
-				item[key] = item[key].map(function(e) {
-					return e[0];
-				});
-			}
-
-			return item;
-		});
-		return a;
-	}
-	else {
-		console.log('not supposed to be here', o);
+				return result;
+			}, {});
 	}
 };
 
@@ -503,25 +457,37 @@ let prepareModelForXml = module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	let system = model.system;
 
+	const items = system.items || [];
+	const data = system.data || [];
+	delete system.items;
+	delete system.data;
+
 	R.keys(pluralToSingular)
 		.forEach(function(collectionName) {
-			const prefixFn = R.partial(toPrefixedObject, [singular(collectionName)]);
 			if (system[collectionName]) {
-				system[collectionName] = system[collectionName]
-					.map(prefixFn);
+				system[collectionName] = toPrefixedObject(
+					singular(collectionName),
+					system[collectionName]
+				);
 
 				// remove empty ones
-				if (!system[collectionName].length) {
+				if (!system[collectionName][singular(collectionName)].length) {
 					delete system[collectionName];
 				}
 			}
 		});
 
-	// separated at birth, but now reunited again
-	system.assets = (system.data || []).concat(system.items || []);
-	delete system.data;
-	delete system.items;
-	if (!system.assets.length) {
+	system.assets = {
+		item: items,
+		data: data,
+	};
+	if (!system.assets.item.length) {
+		delete system.assets.item;
+	}
+	if (!system.assets.data.length) {
+		delete system.assets.data;
+	}
+	if (R.keys(system.assets).length === 0) {
 		delete system.assets;
 	}
 
@@ -546,7 +512,9 @@ function toXML(
 
 	model = prepareModelForXml(model);
 	model = prepareForXml(model);
-	let xmlStr = xml(model);
+
+	var builder = new xml2js.Builder(xml2jsOptions);
+	const xmlStr = builder.buildObject(model);
 
 	// return xmlStr;
 	return pd.xml(xmlStr)

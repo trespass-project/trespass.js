@@ -8,7 +8,6 @@ var fs = require('fs');
 var path = require('path');
 var cheerio = require('cheerio');
 var diff = require('deep-diff').diff;
-// var xml = require('xml');
 
 // TODO: use `xmllint` instead
 // http://stackoverflow.com/questions/4092812/tool-to-validate-an-xsd-on-ubuntu-linux
@@ -16,6 +15,10 @@ var diff = require('deep-diff').diff;
 
 var rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, /*'test',*/ 'data', 'vsphere_export.xml');
+const testModelXML = fs.readFileSync(testModelFilePath).toString();
+
+const attrKey = '_attr';
+
 
 var trespass = require('../');
 
@@ -53,8 +56,6 @@ var f3 = function(s) {
 
 // ---
 describe(f1('trespass.model'), function() {
-	var testModelXML = fs.readFileSync(testModelFilePath).toString();
-
 	describe(f2('.parse()'), function() {
 		trespass.model.parse(testModelXML, function(err, model) {
 			it(f3('should import metadata'), function(done) {
@@ -150,43 +151,25 @@ describe(f1('trespass.model'), function() {
 			'attr2': 'attr2',
 			'test': 'test'
 		};
-		const attrKey = '_attr';
-		const separated = trespass.model.separateAttributeFromObject(attributes, obj, attrKey);
+		const separated = trespass.model.separateAttributeFromObject(attributes, obj);
 		const newObject = separated.newObject;
 		const attrObject = separated.attrObject;
 
 		it(f3('should return 2 objects'), function() {
 			assert(!!newObject && !!attrObject);
-			assert(attrObject[attrKey] !== undefined);
 		});
 
 		it(f3('should sort field correctly'), function() {
 			assert(R.keys(newObject).length === 1);
-			assert(R.keys(attrObject[attrKey]).length === 2);
-			assert(R.equals(attributes, R.keys(attrObject[attrKey])));
-			assert(attrObject[attrKey].attr2 === 'attr2');
+			assert(R.keys(attrObject).length === 2);
+			assert(R.equals(attributes, R.keys(attrObject)));
+			assert(attrObject.attr2 === 'attr2');
 			assert(newObject.test === 'test');
 		});
 	});
 
-	describe(f2('.objectToArrayOfPrefixedObjects()'), function() {
-		it(f3('should work'), function() {
-			const obj = {
-				id: 'id-value',
-				name: 'name-value'
-			};
-			const a = trespass.model.objectToArrayOfPrefixedObjects(obj);
-			assert(a.length === 2);
-			assert(
-				a.filter(function(item) {
-					return item.id === 'id-value';
-				}).length === 1
-			);
-		});
-	});
-
 	describe(f2('.prepareModelForXml()'), function() {
-		it(f3('should prefix all the elements of the root-level collections'), function() {
+		it(f3('should prefix all the elements of known root-level collections'), function() {
 			let system = {
 				locations: [
 					{ id: 'location-id-1' },
@@ -204,21 +187,21 @@ describe(f1('trespass.model'), function() {
 			let model = { system };
 			model = trespass.model.prepareModelForXml(model);
 
-			assert(model.system.locations.length === 2);
-			assert(model.system.actors.length === 2);
+			assert(model.system.locations.location.length === 2);
+			assert(model.system.actors.actor.length === 2);
 			assert(model.system.unknowns.length === 2);
 
-			model.system.locations
+			model.system.locations.location
 				.forEach(function(item) {
 					const keys = R.keys(item);
 					assert(keys.length === 1);
-					assert(keys[0] === 'location');
+					assert(keys[0] === 'id');
 				});
-			model.system.actors
+			model.system.actors.actor
 				.forEach(function(item) {
 					const keys = R.keys(item);
 					assert(keys.length === 1);
-					assert(keys[0] === 'actor');
+					assert(keys[0] === 'id');
 				});
 			model.system.unknowns
 				.forEach(function(item) {
@@ -227,45 +210,91 @@ describe(f1('trespass.model'), function() {
 					assert(keys[0] === 'id');
 				});
 		});
+
+		it(f3('should join items and data in assets'), function() {
+			const system = {
+				items: [
+					{ id: 'item-id-1' },
+					{ id: 'item-id-2' },
+				],
+				data: [
+					{ id: 'data-id-1' },
+					{ id: 'data-id-2' },
+				]
+			};
+			const model = trespass.model.prepareModelForXml({ system });
+
+			assert(model.system.assets.item.length === 2);
+			assert(model.system.assets.item[0].id === 'item-id-1');
+			assert(model.system.assets.item[1].id === 'item-id-2');
+
+			assert(model.system.assets.data.length === 2);
+			assert(model.system.assets.data[0].id === 'data-id-1');
+			assert(model.system.assets.data[1].id === 'data-id-2');
+		});
 	});
 
 	describe(f2('.prepareForXml()'), function() {
 		it(f3('should leave literals as they are'), function() {
-			let data = {
+			const data = {
 				version: 0.1,
 				author: 'author name',
 			};
-			data = trespass.model.prepareForXml(data);
-			assert(data[0].version === 0.1);
-			assert(data[1].author === 'author name');
+			const preparedData = trespass.model.prepareForXml(data);
+
+			assert(preparedData.version === 0.1);
+			assert(preparedData.author === 'author name');
 		});
 
-		it(f3('should work with arbitrarily nested elements'), function() {
-			let data = {
-				one: {
-					two: {
-						three: 'value'
+		// it(f3('should work with arbitrarily nested elements'), function() {
+		// 	let data = {
+		// 		one: {
+		// 			two: {
+		// 				three: 'value'
+		// 			}
+		// 		}
+		// 	};
+		// 	data = trespass.model.prepareForXml(data);
+		// 	// console.log(JSON.stringify(data, null, '  '));
+		// 	assert(data.length === 1);
+		// 	assert(data[0]['one'].length === 1);
+		// 	assert(data[0]['one'][0]['two'].length === 1);
+		// 	assert(data[0]['one'][0]['two'][0]['three'] === 'value');
+		// });
+
+		it(f3('should join atLocations'), function() {
+			const data = {
+				atLocations: ['atLocation-1', 'atLocation-2']
+			};
+			const preparedData = trespass.model.prepareForXml(data);
+			assert(preparedData.atLocations === 'atLocation-1 atLocation-2');
+		});
+
+		it(f3('should create attributes'), function() {
+			const data = {
+				system: {
+					date: 'date',
+					title: 'title',
+					author: 'author',
+					locations: {
+						location: [
+							{ id: 'location' }
+						]
 					}
 				}
 			};
-			data = trespass.model.prepareForXml(data);
-			// console.log(JSON.stringify(data, null, '  '));
-			assert(data.length === 1);
-			assert(data[0]['one'].length === 1);
-			assert(data[0]['one'][0]['two'].length === 1);
-			assert(data[0]['one'][0]['two'][0]['three'] === 'value');
-		});
+			const preparedData = trespass.model.prepareForXml(data);
 
-		it(f3('should join atLocations'), function() {
-			let data = {
-				atLocations: ['atLocation-1', 'atLocation-2']
-			};
-			data = trespass.model.prepareForXml(data);
-			assert(data[0].atLocations === 'atLocation-1 atLocation-2');
+			assert(!!preparedData.system[attrKey]);
+			assert(R.keys(preparedData.system[attrKey]).length === 2);
+			assert(preparedData.system[attrKey].date === 'date');
+			assert(preparedData.system[attrKey].author === 'author');
+			assert(preparedData.system.title === 'title');
+			assert(preparedData.system.locations.location[0][attrKey].id === 'location');
 		});
 
 		it(f3('should work'), function() {
-			let model = {
+			const model = {
 				system: {
 					predicates: [
 						{ arity: 2, id: 'isUserId', value: [
@@ -276,15 +305,12 @@ describe(f1('trespass.model'), function() {
 					]
 				}
 			};
-			// console.log( trespass.model.toXML(model) );
-			model = trespass.model.prepareModelForXml(model);
-			model = trespass.model.prepareForXml(model);
-			// console.log(model[0].system[1].predicates[0]);
-			assert(
-				model[0].system[1].predicates[0].predicate[1].value === 'user1 userId1' &&
-				model[0].system[1].predicates[0].predicate[2].value === 'user2 userId2' &&
-				model[0].system[1].predicates[0].predicate[3].value === 'user3 userId3'
-			);
+			let preparedModel = trespass.model.prepareModelForXml(model);
+			preparedModel = trespass.model.prepareForXml(preparedModel);
+
+			assert(preparedModel.system.predicates.predicate.length === 1);
+			assert(preparedModel.system.predicates.predicate[0].value.length === 3);
+			assert(preparedModel.system.predicates.predicate[0][attrKey].arity === 2);
 		});
 
 		// TODO: what else?
@@ -308,6 +334,7 @@ describe(f1('trespass.model'), function() {
 			}
 		};
 		const xmlStr = trespass.model.toXML(origModel);
+		console.log(xmlStr);
 		const $system = cheerio.load(xmlStr, trespass.util.cheerioOpts)('system');
 
 		it(f3('should properly transform model object to XML'), function() {
@@ -321,7 +348,10 @@ describe(f1('trespass.model'), function() {
 			assert( $system.find('assets').length === 0 );
 		});
 
-		// TODO: rename this
+		it(f3('should not make elements from array items'), function() {
+			assert( xmlStr.indexOf('<0>') === -1 );
+		});
+
 		it(f3('should re-import model successfully'), function(done) {
 			trespass.model.parse(xmlStr, function(err, model) {
 				assert(model.system.locations.length === origModel.system.locations.length );
@@ -340,29 +370,36 @@ describe(f1('trespass.model'), function() {
 			});
 		});
 
-		// it(f3('test file model should be equal to export-imported model'), function(done) {
-		// 	// import test file
-		// 	// export it as xml
-		// 	// import exported xml
-		// 	// then compare both imported models
+		it(f3('test file model should be equal to export-imported model'), function(done) {
+			// import test file
+			// export it as xml
+			// import exported xml
+			// then compare both imported models
 
-		// 	const xmlStr = fs.readFileSync(testModelFilePath).toString();
-		// 	trespass.model.parse(xmlStr, function(err, model) {
-		// 		// console.log(model);
+			trespass.model.parse(testModelXML, function(err, model) {
+				// console.log( JSON.stringify(model) );
 
-		// 		const xmlStr2 = trespass.model.toXML(model);
-		// 		trespass.model.parse(xmlStr2, function(err, model2) {
-		// 			// console.log(xmlStr2);
+				const xmlStr2 = trespass.model.toXML(model);
+				// console.log(xmlStr2);
+				// console.log(xmlStr2.indexOf('<0>'));
+				// assert( xmlStr2.indexOf('<0>') === -1 );
 
-		// 			const differences = diff(model, model2);
-		// 			console.log(differences);
-		// 			// TODO: do s.th. with this
-		// 			// assert(!differences);
+				trespass.model.parse(xmlStr2, function(err, model2) {
+					// console.log(xmlStr2);
 
-		// 			done();
-		// 		});
-		// 	});
-		// });
+					const differences = diff(model, model2);
+
+					// console.log(differences);
+					if (differences) {
+						console.log(differences.length);
+					}
+
+					assert(!differences);
+
+					done();
+				});
+			});
+		});
 	});
 
 });
