@@ -436,7 +436,8 @@ function prepareForXml(o) {
 	else if (_.isObject(o)) {
 		let a = objectToArrayOfPrefixedObjects(o);
 		a = a.map(function(item) {
-			let key = R.keys(item)[0];
+			const keys = R.keys(item);
+			const key = keys[0];
 
 			let attrObject;
 			if (knownAttributes[key]) {
@@ -467,7 +468,9 @@ function prepareForXml(o) {
 				var listOfLiterals =
 					item[key][0] // first elem
 					[firstKey];
-				if (_.isArray(listOfLiterals) && listOfLiterals.length && (_.isString(listOfLiterals[0]) || _.isNumber(listOfLiterals[0]))) {
+				if (_.isArray(listOfLiterals) &&
+					listOfLiterals.length &&
+					(_.isString(listOfLiterals[0]) || _.isNumber(listOfLiterals[0]))) {
 					item[key] = listOfLiterals.map(function(item) {
 						return toPrefixedObject(firstKey, item);
 					});
