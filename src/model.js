@@ -9,8 +9,6 @@ const parseString = require('xml2js').parseString;
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
 
-const util = require('./util.js');
-
 
 const attrKey = '_attr';
 const charKey = '_text';
