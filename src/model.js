@@ -227,36 +227,62 @@ function parse(
 // element schema definitions for input validation
 let schemas = {};
 schemas.location = Joi.object().keys({
-	'id': Joi.string()/*.required()*/,
-	'atLocations': Joi.array().items(Joi.string()).optional()
-});
-schemas.actor = Joi.object().keys({
-	'id': Joi.string()/*.required()*/,
-	'atLocations': Joi.array().items(Joi.string())/*.required()*/
-});
-schemas.item = Joi.object().keys({
-	'id': Joi.string()/*.required()*/,
-	'name': Joi.string()/*.required()*/
-});
-schemas.data = Joi.object().keys({
-	'id': Joi.string()/*.required()*/,
-	'name': Joi.string()/*.required()*/,
-	'value': Joi.string()/*.required()*/
+	'id': Joi.string().required(),
+	'atLocations': Joi.array().items(Joi.string()),
 });
 schemas.edge = Joi.object().keys({
-	'source': Joi.string()/*.required()*/,
-	'target': Joi.string()/*.required()*/,
-	'directed': Joi.boolean().optional()
+	'source': Joi.string().required(),
+	'target': Joi.string().required(),
+	'kind': Joi.string(),
+	'directed': Joi.boolean(),
 });
+schemas.item = Joi.object().keys({
+	'id': Joi.string().required(),
+	'name': Joi.string().required(),
+	'type': Joi.string(),
+	'atLocations': Joi.array().items(Joi.string()).required(),
+});
+schemas.data = Joi.object().keys({
+	'id': Joi.string().required(),
+	'name': Joi.string().required(),
+	'value': Joi.string().required(),
+	'atLocations': Joi.array().items(Joi.string()).required()
+});
+schemas.actor = Joi.object().keys({
+	'id': Joi.string().required(),
+	'atLocations': Joi.array().items(Joi.string()).required()
+});
+schemas.policy = Joi.object().keys({
+	'id': Joi.string().required(),
+	'enabled': Joi.object().required(), // TODO: refine
+	'credentials': Joi.object().required(), // TODO: refine
+	'atLocations': Joi.array().items(Joi.string()).required(),
+});
+schemas.process = Joi.object().keys({
+	'id': Joi.string().required(),
+	'actions': Joi.object().required(), // TODO: refine
+	'atLocations': Joi.array().items(Joi.string()).required(),
+});
+schemas.predicate = Joi.object().keys({
+	'id': Joi.string().required(),
+	'arity': Joi.string().required(),
+	'value': Joi.array().items(Joi.string()).required(),
+});
+schemas.metric = Joi.object().keys({
+	'name': Joi.string().required(),
+	'value': Joi.string().required(),
+	'namespace': Joi.string(),
+});
+// TODO: roles?
 
 const validationOptions = {
 	allowUnknown: true,
 };
 
-function _validate(it, schema) {
-	const result = Joi.validate(it, schema, validationOptions);
+function validate(it, schemaName) {
+	const result = Joi.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
-		console.error(result.error);
+		console.warn(schemaName, '→', result.error);
 	}
 }
 
@@ -277,8 +303,8 @@ function add_(model, dest, item) {
 // ## `addActor`
 let addActor = module.exports.addActor =
 function addActor(model, actor) {
-	actor = _.extend(actor || {}, {});
-	// _validate(actor, schemas['actor']);
+	// actor = _.extend(actor || {}, {});
+	validate(actor, 'actor');
 	return add_(model, 'actors', actor);
 };
 
@@ -287,8 +313,11 @@ function addActor(model, actor) {
 // ## `addItem`
 let addItem = module.exports.addItem =
 function addItem(model, item) {
-	item = _.extend(item || {}, {});
-	// _validate(item, schemas['item']);
+	// item = _.extend(item || {}, {});
+	if (!item.name) {
+		item.name = item.id;
+	}
+	validate(item, 'item');
 	return add_(model, 'items', item);
 };
 
@@ -297,8 +326,11 @@ function addItem(model, item) {
 // ## `addData`
 let addData = module.exports.addData =
 function addData(model, data) {
-	data = _.extend(data || {}, {});
-	// _validate(data, schemas['data']);
+	// data = _.extend(data || {}, {});
+	if (!data.name) {
+		data.name = data.id;
+	}
+	validate(data, 'data');
 	return add_(model, 'data', data);
 };
 
@@ -308,10 +340,10 @@ function addData(model, data) {
 let addEdge = module.exports.addEdge =
 function addEdge(model, edge) {
 	edge = _.defaults(edge || {}, {
-		directed: false
+		directed: true
 	});
-	edge = _.extend(edge || {}, {});
-	// _validate(edge, schemas['edge']);
+	// edge = _.extend(edge || {}, {});
+	validate(edge, 'edge');
 	return add_(model, 'edges', edge);
 };
 
@@ -320,10 +352,8 @@ function addEdge(model, edge) {
 // ## `addPolicy`
 let addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
-	// TODO
-
-	// _validate(edge, schemas['policy']);
-	console.warn('addPolicy() is not implemented yet'); // TODO
+	validate(policy, 'policy');
+	// console.warn('addPolicy() is not implemented yet'); // TODO
 	return add_(model, 'policies', policy);
 };
 
@@ -332,9 +362,7 @@ function addPolicy(model, policy) {
 // ## `addPredicate`
 let addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
-	// TODO
-
-	// _validate(edge, schemas['predicate']);
+	validate(predicate, 'predicate');
 	return add_(model, 'predicates', predicate);
 };
 
@@ -343,10 +371,8 @@ function addPredicate(model, predicate) {
 // ## `addProcess`
 let addProcess = module.exports.addProcess =
 function addProcess(model, process) {
-	// TODO
-
-	// _validate(edge, schemas['process']);
-	console.warn('addProcess() is not implemented yet'); // TODO
+	validate(process, 'process');
+	// console.warn('addProcess() is not implemented yet'); // TODO
 	return add_(model, 'processes', process);
 };
 
@@ -355,10 +381,8 @@ function addProcess(model, process) {
 // ## `addRole`
 let addRole = module.exports.addRole =
 function addRole(model, role) {
-	// TODO
-
-	// _validate(edge, schemas['role']);
-	console.warn('addRole() is not implemented yet'); // TODO
+	validate(role, 'role');
+	// console.warn('addRole() is not implemented yet'); // TODO
 	return add_(model, 'roles', role);
 };
 
@@ -367,8 +391,8 @@ function addRole(model, role) {
 // ## `addLocation`
 let addLocation = module.exports.addLocation =
 function addLocation(model, location) {
-	location = _.extend(location || {}, {});
-	// _validate(location, schemas['location']);
+	// location = _.extend(location || {}, {});
+	validate(location, 'location');
 	return add_(model, 'locations', location);
 };
 
@@ -377,9 +401,9 @@ function addLocation(model, location) {
 // ## `addRoom`
 let addRoom = module.exports.addRoom =
 function addRoom(model, room) {
-	room = _.extend(room || {}, {
-		// domain: 'physical'
-	});
+	// room = _.extend(room || {}, {
+	// 	// domain: 'physical'
+	// });
 	return addLocation(model, room);
 };
 
