@@ -12,6 +12,7 @@
   },
   "author": "",
   "devDependencies": {
+    "babel-core": "^6.4.5",
     "babel-preset-es2015": "^6.3.13",
     "babel-register": "^6.4.3",
     "browserify": "^10.2.3",
