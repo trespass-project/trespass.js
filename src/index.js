@@ -6,13 +6,13 @@
 module.exports = {
 	// ## [trespass.model](model.html)
 	// Functions to work with the TREsPASS model format.
-	model: require('./model.js'),
+	model: require('./model'),
 
 	// ## [trespass.attacktree](attacktree.html)
 	// Functions to process attack trees.
-	attacktree: require('./attacktree.js'),
+	attacktree: require('./attacktree'),
 
 	// ## [trespass.apis](apis.html)
 	// Functions for using a number of APIs.
-	apis: require('./apis.js'),
+	apis: require('./apis'),
 };
