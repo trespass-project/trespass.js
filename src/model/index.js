@@ -125,6 +125,7 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId) {
 
 let scenarioToXML = module.exports.scenarioToXML =
 function scenarioToXML(scenario) {
+	scenario.scenario.date = scenario.scenario.date || moment().format('YYYY-MM-DD HH:mm:ss');
 	const prepared = prepareForXml(scenario);
 	var builder = new xml2js.Builder(xml2jsOptions);
 	const xmlStr = builder.buildObject(prepared);

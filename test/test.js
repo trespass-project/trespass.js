@@ -429,8 +429,6 @@ describe(f1('trespass.model'), function() {
 			assert(!!scenario.scenario.assetGoal);
 			assert(scenario.scenario.assetGoal.attacker === 'attackerId');
 			assert(scenario.scenario.assetGoal.asset === 'assetId');
-
-			console.log(trespass.model.scenarioToXML(scenario));
 		});
 	});
 
