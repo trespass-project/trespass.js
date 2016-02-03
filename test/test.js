@@ -19,6 +19,13 @@ const testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 const attrKey = '_attr';
 
+const cheerioOptions = {
+	xmlMode: true,
+	normalizeWhitespace: false,
+	lowerCaseTags: true,
+	// lowerCaseAttributeNames: true
+};
+
 
 var trespass = require('../');
 
@@ -334,7 +341,7 @@ describe(f1('trespass.model'), function() {
 			}
 		};
 		const xmlStr = trespass.model.toXML(origModel);
-		const $system = cheerio.load(xmlStr, trespass.util.cheerioOpts)('system');
+		const $system = cheerio.load(xmlStr, cheerioOptions)('system');
 
 		it(f3('should properly transform model object to XML'), function() {
 			assert( $system.find('locations > location').length === 2 );
