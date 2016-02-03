@@ -407,4 +407,46 @@ describe(f1('trespass.model'), function() {
 		});
 	});
 
+	// ——————————————————————————————————————
+	// SCENARIO
+
+	describe(f2('.scenarioSetModel()'), function() {
+		const empty = trespass.model.createScenario();
+		const scenario = trespass.model.scenarioSetModel(empty, 'model-file-name.xml');
+
+		it(f3('should add model'), function() {
+			assert(!!scenario.scenario.model);
+			assert(scenario.scenario.model === 'model-file-name.xml');
+		});
+	});
+
+	describe(f2('.scenarioSetAssetGoal()'), function() {
+		const empty = trespass.model.createScenario();
+		const scenario = trespass.model.scenarioSetAssetGoal(empty, 'attackerId', 'assetId');
+		// console.log(scenario);
+
+		it(f3('should add goal'), function() {
+			assert(!!scenario.scenario.assetGoal);
+			assert(scenario.scenario.assetGoal.attacker === 'attackerId');
+			assert(scenario.scenario.assetGoal.asset === 'assetId');
+
+			console.log(trespass.model.scenarioToXML(scenario));
+		});
+	});
+
+	describe(f2('.scenarioToXML()'), function() {
+		const empty = trespass.model.createScenario();
+		let scenario = trespass.model.scenarioSetModel(empty, 'model-file-name.xml');
+		scenario = trespass.model.scenarioSetAssetGoal(scenario, 'attackerId', 'assetId');
+
+		const xmlStr = trespass.model.scenarioToXML(scenario);
+		const $system = cheerio.load(xmlStr, cheerioOptions)('scenario');
+
+		it(f3('should properly transform scenario object to XML'), function() {
+			assert( $system.find('model').text() === 'model-file-name.xml' );
+			assert( $system.find('assetGoal').attr('attacker') === 'attackerId' );
+			assert( $system.find('assetGoal > asset').text() === 'assetId' );
+		});
+	});
+
 });

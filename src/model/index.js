@@ -20,9 +20,9 @@ const xml2jsOptions = {
 
 
 // ---
-// ## `empty`
+// ## `emptyModel`
 // > model default structure
-const empty = module.exports.empty = {
+const emptyModel = module.exports.emptyModel = {
 	system: {
 		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -51,7 +51,84 @@ const empty = module.exports.empty = {
 // > return a new, empty model object
 let create = module.exports.create =
 function create() {
-	return _.merge({}, empty);
+	return _.merge({}, emptyModel);
+};
+
+
+// ---
+// ## `emptyModel`
+// > model default structure
+const emptyScenario = module.exports.emptyScenario = {
+	scenario: {
+		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
+		'author': 'trespass.js',
+		'version': '0.0.0',
+		'id': 'Untitled',
+		'date': undefined,
+
+		model: undefined,
+
+		assetGoal: {
+			attacker: undefined,
+			asset: undefined,
+		},
+
+		// TODO: implement
+
+		// locationGoal: {
+		// 	attacker: undefined,
+		// },
+
+		// actionGoal: {
+		// 	attacker: undefined,
+		// 	credentials: [],
+		// 	enabled: undefined
+		// },
+	}
+};
+
+
+// ---
+// ## `createScenario`
+// > return a new, empty model object
+let createScenario = module.exports.createScenario =
+function createScenario() {
+	return _.merge({}, emptyScenario);
+};
+
+let scenarioSetModel = module.exports.scenarioSetModel =
+function scenarioSetModel(scenario, modelFileName) {
+	return _.merge(
+		{},
+		scenario,
+		{ scenario: { model: modelFileName } }
+	);
+};
+
+let scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
+function scenarioSetAssetGoal(scenario, attackerId, assetId) {
+	return _.merge(
+		{},
+		scenario,
+		{
+			scenario: {
+				assetGoal: {
+					attacker: attackerId,
+					asset: assetId
+				}
+			}
+		}
+	);
+};
+
+let scenarioToXML = module.exports.scenarioToXML =
+function scenarioToXML(scenario) {
+	const prepared = prepareForXml(scenario);
+	var builder = new xml2js.Builder(xml2jsOptions);
+	const xmlStr = builder.buildObject(prepared);
+	return xmlStr;
 };
 
 
@@ -421,6 +498,12 @@ function separateAttributeFromObject(attrNames, obj) {
 
 
 const knownAttributes = {
+	// scenario
+	'scenario': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
+	'assetGoal': ['attacker'],
+	// TODO: more
+
+	// model
 	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
 	'location': ['id'],
 	'actor': ['id'],
@@ -500,7 +583,7 @@ function prepareModelForXml(model) {
 					system[collectionName]
 				);
 
-				// remove empty ones
+				// remove emptyModel ones
 				if (!system[collectionName][singular(collectionName)].length) {
 					delete system[collectionName];
 				}
