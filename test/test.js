@@ -1,19 +1,19 @@
 'use strict';
 
-var assert = require('assert');
-var R = require('ramda');
-var _ = require('lodash');
-var chalk = require('chalk');
-var fs = require('fs');
-var path = require('path');
-var cheerio = require('cheerio');
-var diff = require('deep-diff').diff;
+const assert = require('assert');
+const R = require('ramda');
+const _ = require('lodash');
+const chalk = require('chalk');
+const fs = require('fs');
+const path = require('path');
+const cheerio = require('cheerio');
+const diff = require('deep-diff').diff;
 
 // TODO: use `xmllint` instead
 // http://stackoverflow.com/questions/4092812/tool-to-validate-an-xsd-on-ubuntu-linux
-// var libxml = require('libxmljs');
+// const libxml = require('libxmljs');
 
-var rootDir = path.join(__dirname, '..');
+const rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, /*'test',*/ 'data', 'vsphere_export.xml');
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
 
@@ -27,15 +27,15 @@ const cheerioOptions = {
 };
 
 
-var trespass = require('../');
+const trespass = require('../');
 
-var f1 = function(s) {
+const f1 = function(s) {
 	return chalk.magenta(s);
 };
-var f2 = function(s) {
+const f2 = function(s) {
 	return chalk.bgMagenta.black(s);
 };
-var f3 = function(s) {
+const f3 = function(s) {
 	return chalk.bgMagenta.white(s);
 };
 
@@ -44,15 +44,15 @@ var f3 = function(s) {
 
 // 	describe(f2('model'), function() {
 // 		it(f3('should be a valid document'), function() {
-// 			var schemaContent = fs.readFileSync(
+// 			const schemaContent = fs.readFileSync(
 // 				path.join(rootDir, 'data', 'TREsPASS_model.xsd')
 // 			).toString();
-// 			var schema = libxml.parseXmlString(schemaContent);
+// 			const schema = libxml.parseXmlString(schemaContent);
 
-// 			var modelContent = fs.readFileSync(
+// 			const modelContent = fs.readFileSync(
 // 				path.join(rootDir, 'data', 'model_cloud_review.xml')
 // 			).toString();
-// 			var model = libxml.parseXmlString(modelContent);
+// 			const model = libxml.parseXmlString(modelContent);
 
 // 			assert.equal(model.validate(schema), true);
 // 		});
@@ -78,18 +78,18 @@ describe(f1('trespass.model'), function() {
 			});
 
 			it(f3('should import rest of model'), function(done) {
-				var predicates = model.system.predicates;
+				const predicates = model.system.predicates;
 				assert(predicates.length === 3);
 				assert(predicates[0].value.length === 90);
 
-				var data = model.system.data;
+				const data = model.system.data;
 				assert(data.length === 1);
 
 				done();
 			});
 
 			it(f3('atLocations should always be an Array'), function(done) {
-				var data = model.system.data;
+				const data = model.system.data;
 				assert(_.isArray(data[0].atLocations));
 				done();
 			});
@@ -97,8 +97,8 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.add*()'), function() {
-		var model = trespass.model.create();
-		var atLocation = 'atLocation';
+		let model = trespass.model.create();
+		const atLocation = 'atLocation';
 
 		it(f3('should create rooms as locations'), function() {
 			model = trespass.model.addRoom(model, { id: 'test-room' });
@@ -141,12 +141,12 @@ describe(f1('trespass.model'), function() {
 
 	describe(f2('.singular()'), function() {
 		it(f3('should return known singular'), function() {
-			var s = trespass.model.singular('policies');
+			const s = trespass.model.singular('policies');
 			assert(s === 'policy');
 		});
 
 		it(f3('should return `undefined`, if unknonw'), function() {
-			var s = trespass.model.singular('hamburgers');
+			const s = trespass.model.singular('hamburgers');
 			assert(s === undefined);
 		});
 	});
@@ -177,7 +177,7 @@ describe(f1('trespass.model'), function() {
 
 	describe(f2('.prepareModelForXml()'), function() {
 		it(f3('should prefix all the elements of known root-level collections'), function() {
-			let system = {
+			const system = {
 				locations: [
 					{ id: 'location-id-1' },
 					{ id: 'location-id-2' },
@@ -191,8 +191,7 @@ describe(f1('trespass.model'), function() {
 					{ id: 'unknown-id-2' },
 				]
 			};
-			let model = { system };
-			model = trespass.model.prepareModelForXml(model);
+			const model = trespass.model.prepareModelForXml({ system });
 
 			assert(model.system.locations.location.length === 2);
 			assert(model.system.actors.actor.length === 2);
