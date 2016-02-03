@@ -5,7 +5,6 @@ const R = require('ramda');
 const Joi = require('joi');
 const async = require('async');
 const moment = require('moment');
-const parseString = require('xml2js').parseString;
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
 
@@ -133,7 +132,7 @@ function parse(
 	async.series(
 		[
 			function(cb) { // parse
-				parseString(xmlStr, xml2jsOptions, function(err, _parsed) {
+				xml2js.parseString(xmlStr, xml2jsOptions, function(err, _parsed) {
 					if (err) {
 						return cb(err);
 					}
