@@ -30,5 +30,10 @@ module.exports.apis = {
 	tools: {
 		host: 'https://trespass.itrust.lu/',
 		prefix: 'api/json/',
+	},
+
+	knowledgebase: {
+		host: 'http://127.0.0.1:8080/',
+		prefix: 'tkb/',
 	}
 };
