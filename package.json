@@ -3,7 +3,7 @@
   "description": "TREsPASS javascript library",
   "private": true,
   "main": "./src/index.js",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "scripts": {
     "start": "gulp",
     "lint": "eslint ./src",
