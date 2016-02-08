@@ -387,7 +387,7 @@ function add_(model, dest, item) {
 let addActor = module.exports.addActor =
 function addActor(model, actor) {
 	// actor = _.extend(actor || {}, {});
-	validate(actor, 'actor');
+	// validate(actor, 'actor');
 	return add_(model, 'actors', actor);
 };
 
@@ -400,7 +400,7 @@ function addItem(model, item) {
 	if (!item.name) {
 		item.name = item.id;
 	}
-	validate(item, 'item');
+	// validate(item, 'item');
 	return add_(model, 'items', item);
 };
 
@@ -413,7 +413,7 @@ function addData(model, data) {
 	if (!data.name) {
 		data.name = data.id;
 	}
-	validate(data, 'data');
+	// validate(data, 'data');
 	return add_(model, 'data', data);
 };
 
@@ -426,7 +426,7 @@ function addEdge(model, edge) {
 		directed: true
 	});
 	// edge = _.extend(edge || {}, {});
-	validate(edge, 'edge');
+	// validate(edge, 'edge');
 	return add_(model, 'edges', edge);
 };
 
@@ -435,7 +435,7 @@ function addEdge(model, edge) {
 // ## `addPolicy`
 let addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
-	validate(policy, 'policy');
+	// validate(policy, 'policy');
 	// console.warn('addPolicy() is not implemented yet'); // TODO
 	return add_(model, 'policies', policy);
 };
@@ -445,7 +445,7 @@ function addPolicy(model, policy) {
 // ## `addPredicate`
 let addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
-	validate(predicate, 'predicate');
+	// validate(predicate, 'predicate');
 	return add_(model, 'predicates', predicate);
 };
 
@@ -454,7 +454,7 @@ function addPredicate(model, predicate) {
 // ## `addProcess`
 let addProcess = module.exports.addProcess =
 function addProcess(model, process) {
-	validate(process, 'process');
+	// validate(process, 'process');
 	// console.warn('addProcess() is not implemented yet'); // TODO
 	return add_(model, 'processes', process);
 };
@@ -464,7 +464,7 @@ function addProcess(model, process) {
 // ## `addRole`
 let addRole = module.exports.addRole =
 function addRole(model, role) {
-	validate(role, 'role');
+	// validate(role, 'role');
 	// console.warn('addRole() is not implemented yet'); // TODO
 	return add_(model, 'roles', role);
 };
@@ -475,7 +475,7 @@ function addRole(model, role) {
 let addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	// location = _.extend(location || {}, {});
-	validate(location, 'location');
+	// validate(location, 'location');
 	return add_(model, 'locations', location);
 };
 
