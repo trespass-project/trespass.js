@@ -30,6 +30,8 @@ const emptyModel = module.exports.emptyModel = {
 		'author': 'trespass.js',
 		'version': '0.0.0',
 		'title': 'Untitled',
+		'id': undefined,
+		'anm_data': undefined,
 		'date': undefined, // will be filled in on export
 
 		locations: [],
@@ -505,7 +507,7 @@ const knownAttributes = {
 	// TODO: more
 
 	// model
-	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
+	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id', 'anm_data'],
 	'location': ['id'],
 	'actor': ['id'],
 	'edge': ['directed', 'kind'],
@@ -618,6 +620,10 @@ function toXML(
 ) {
 	// duplicate model
 	let model = _.merge({}, _model);
+
+	if (!model.system.id) {
+		console.error('model system needs an id.');
+	}
 
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
