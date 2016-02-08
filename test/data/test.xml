@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<system 
+  xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd" author="trespass.js" version="0.0.0" date="2016-02-08 16:29:30">
+  <title>Untitled</title>
+  <locations>
+    <location id="1454945367225-41udXi-qx-node"/>
+    <location id="1454945367227-N18d_moZ9l-node"/>
+    <location id="1454945367231-V1sxu_7o-ql-node"/>
+    <location id="1454945367231-VkMZ_d7iW9g-node"/>
+  </locations>
+  <edges>
+    <edge directed="true">
+      <source>1454945367231-VkMZ_d7iW9g-node</source>
+      <target>1454945367231-V1sxu_7o-ql-node</target>
+    </edge>
+    <edge directed="true">
+      <source>1454945367231-V1sxu_7o-ql-node</source>
+      <target>1454945367225-41udXi-qx-node</target>
+    </edge>
+    <edge directed="true">
+      <source>1454945367231-V1sxu_7o-ql-node</source>
+      <target>1454945367227-N18d_moZ9l-node</target>
+    </edge>
+    <edge directed="true">
+      <source>1454945367228-4JTO_msW5g-node</source>
+      <target>1454945367225-41udXi-qx-node</target>
+    </edge>
+    <edge directed="true">
+      <source>1454945367229-NyExddmsZce-node</source>
+      <target>1454945367227-N18d_moZ9l-node</target>
+    </edge>
+  </edges>
+  <assets>
+    <data id="1454945367228-4JTO_msW5g-node" name="1454945367228-4JTO_msW5g-node"/>
+    <data id="1454945367229-NyExddmsZce-node" name="1454945367229-NyExddmsZce-node"/>
+  </assets>
+</system>

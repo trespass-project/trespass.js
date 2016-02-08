@@ -269,7 +269,6 @@ function parse(
 						plural: 'roles',
 						collection: 'roles'
 					},
-
 					{
 						singular: 'item',
 						plural: 'assets',
@@ -283,13 +282,21 @@ function parse(
 				];
 
 				mapping.forEach(function(item) {
-					if (parsed.system[item.plural]) {
-						if (!_.isArray(parsed.system[item.plural][item.singular])) {
-							parsed.system[item.plural][item.singular] =
-								[ parsed.system[item.plural][item.singular] ];
+					let coll = parsed.system[item.plural];
+					if (coll) {
+						if (!_.isArray(coll[item.singular])) {
+							coll[item.singular] =[coll[item.singular]];
 						}
-						model.system[item.collection] =
-							recurse(parsed.system[item.plural][item.singular]);
+
+						// filter, because for some reason
+						// `coll[item.singular]` is [undefined] in some cases
+						// TODO: find out why
+						coll[item.singular] = coll[item.singular]
+							.filter((item) => {
+								return !!item;
+							});
+
+						model.system[item.collection] = recurse(coll[item.singular]);
 					}
 				});
 
