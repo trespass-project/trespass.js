@@ -41,7 +41,6 @@ const emptyModel = module.exports.emptyModel = {
 		items: [],
 		data: [],
 		actors: [],
-		roles: [],
 		predicates: [],
 		processes: [],
 		policies: [],
@@ -147,7 +146,6 @@ const collectionNameSingular = module.exports.collectionNameSingular = {
 	policies: 'policy',
 	predicates: 'predicate',
 	processes: 'process',
-	roles: 'role',
 };
 
 
@@ -266,11 +264,6 @@ function parse(
 						collection: 'processes',
 					},
 					{
-						singular: 'role',
-						plural: 'roles',
-						collection: 'roles',
-					},
-					{
 						singular: 'item',
 						plural: 'assets',
 						collection: 'items',
@@ -366,8 +359,6 @@ schemas.metric = Joi.object().keys({
 	namespace: Joi.string(),
 });
 
-// TODO: roles?
-
 const validationOptions = {
 	allowUnknown: true,
 };
@@ -450,7 +441,7 @@ function addEdge(model, edge) {
 const addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
 	// validate(policy, 'policy');
-	// console.warn('addPolicy() is not implemented yet'); // TODO
+	// console.warn('addPolicy() is not implemented yet');
 	return add_(model, 'policies', policy);
 };
 
@@ -469,18 +460,8 @@ function addPredicate(model, predicate) {
 const addProcess = module.exports.addProcess =
 function addProcess(model, process) {
 	// validate(process, 'process');
-	// console.warn('addProcess() is not implemented yet'); // TODO
+	// console.warn('addProcess() is not implemented yet');
 	return add_(model, 'processes', process);
-};
-
-
-// ---
-// ## `addRole`
-const addRole = module.exports.addRole =
-function addRole(model, role) {
-	// validate(role, 'role');
-	// console.warn('addRole() is not implemented yet'); // TODO
-	return add_(model, 'roles', role);
 };
 
 
