@@ -617,7 +617,7 @@ function toXML(
 	let model = _.merge({}, _model);
 
 	if (!model.system.id) {
-		console.error('model system needs an id.');
+		throw new Error('model.system needs an id');
 	}
 
 	// set fill in the gaps with defaults

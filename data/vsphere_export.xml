@@ -2,7 +2,8 @@
 <system author="ciab-exportAsTML.py" date="2016-01-17T23:20:21.866232"
 	version="0.5" xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd">
+	xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd"
+	id="trespass-model-id">
 	<title>CIAB-created TREsPASS XML model</title>
 	<locations>
 		<location id="RoomDatacenter" />

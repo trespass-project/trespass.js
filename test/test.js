@@ -334,6 +334,7 @@ describe(f1('trespass.model'), function() {
 	describe(f2('.toXML()'), function() {
 		const origModel = {
 			system: {
+				id: 'model-id',
 				title: 'title',
 				locations: [
 					{ id: 'location-1' },
@@ -364,6 +365,18 @@ describe(f1('trespass.model'), function() {
 
 		it(f3('should not make elements from array items'), function() {
 			assert( xmlStr.indexOf('<0>') === -1 );
+		});
+
+		it(f3('should require an id'), function() {
+			const origModel = {
+				system: {
+					id: undefined,
+					title: 'title',
+				}
+			};
+			assert.throws(() => {
+				trespass.model.toXML(origModel);
+			});
 		});
 
 		it(f3('should re-import model successfully'), function(done) {
