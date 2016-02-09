@@ -1,0 +1,29 @@
+{
+	"preset": "airbnb",
+	"validateIndentation": "\t",
+
+	"requireSpacesInFunction": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInAnonymousFunction": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"requireSpacesInNamedFunction": {
+		"beforeOpeningCurlyBrace": true
+	},
+
+	"disallowSpacesInFunction": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInAnonymousFunction": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInNamedFunction": {
+		"beforeOpeningRoundBrace": true
+	},
+
+	"disallowSpacesInCallExpression": true,
+
+	"disallowMultipleLineBreaks": false,
+	"requireParenthesesAroundArrowParam": true
+}

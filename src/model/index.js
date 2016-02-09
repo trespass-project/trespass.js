@@ -24,16 +24,17 @@ const xml2jsOptions = {
 // > model default structure
 const emptyModel = module.exports.emptyModel = {
 	system: {
-		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-		'author': 'trespass.js',
-		'version': '0.0.0',
-		'title': 'Untitled',
-		'date': undefined, // will be filled in on export
+		author: 'trespass.js',
+		version: '0.0.0',
+		title: 'Untitled',
+		date: undefined, // will be filled in on export
 
 		locations: [],
 		edges: [],
+
 		// assets: [],
 		items: [],
 		data: [],
@@ -41,8 +42,8 @@ const emptyModel = module.exports.emptyModel = {
 		roles: [],
 		predicates: [],
 		processes: [],
-		policies: []
-	}
+		policies: [],
+	},
 };
 
 
@@ -60,13 +61,13 @@ function create() {
 // > model default structure
 const emptyScenario = module.exports.emptyScenario = {
 	scenario: {
-		'xmlns': 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-		'author': 'trespass.js',
-		'version': '0.0.0',
-		'id': 'Untitled',
-		'date': undefined,
+		author: 'trespass.js',
+		version: '0.0.0',
+		id: 'Untitled',
+		date: undefined,
 
 		model: undefined,
 
@@ -86,7 +87,7 @@ const emptyScenario = module.exports.emptyScenario = {
 		// 	credentials: [],
 		// 	enabled: undefined
 		// },
-	}
+	},
 };
 
 
@@ -116,9 +117,9 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId) {
 			scenario: {
 				assetGoal: {
 					attacker: attackerId,
-					asset: assetId
-				}
-			}
+					asset: assetId,
+				},
+			},
 		}
 	);
 };
@@ -134,16 +135,17 @@ function scenarioToXML(scenario) {
 
 
 const collectionNameSingular = module.exports.collectionNameSingular = {
-	'actors': 'actor',
+	actors: 'actor',
+
 	// 'assets': 'asset',
-	'items': 'item',
-	'data': 'data',
-	'edges': 'edge',
-	'locations': 'location',
-	'policies': 'policy',
-	'predicates': 'predicate',
-	'processes': 'process',
-	'roles': 'role',
+	items: 'item',
+	data: 'data',
+	edges: 'edge',
+	locations: 'location',
+	policies: 'policy',
+	predicates: 'predicate',
+	processes: 'process',
+	roles: 'role',
 };
 
 
@@ -176,11 +178,10 @@ function parse(
 	function recurse(item, key) {
 		if (_.isArray(item)) {
 			return item
-				.map(function(arrItem) {
+				.map((arrItem) => {
 					return recurse(arrItem);
 				});
-		}
-		else if (_.isString(item)) {
+		} else if (_.isString(item)) {
 			item = item
 				.replace(/[\r\n\t]/ig, ' ')
 				.replace(/ +/ig, ' ');
@@ -190,16 +191,15 @@ function parse(
 			}
 
 			return item;
-		}
-		else if (_.isNumber(item)) {
+		} else if (_.isNumber(item)) {
 			return item;
-		}
-		else if (_.isObject(item)) {
+		} else if (_.isObject(item)) {
 			item = mergeAttributes(item);
 			R.keys(item)
-				.forEach(function(key) {
+				.forEach((key) => {
 					item[key] = recurse(item[key], key);
 				});
+
 			return item;
 		}
 	}
@@ -209,83 +209,85 @@ function parse(
 
 	async.series(
 		[
-			function(cb) { // parse
-				xml2js.parseString(xmlStr, xml2jsOptions, function(err, _parsed) {
+			(cb) => { // parse
+				xml2js.parseString(xmlStr, xml2jsOptions, (err, _parsed) => {
 					if (err) {
 						return cb(err);
 					}
+
 					parsed = _parsed;
 					cb(null);
 				});
 			},
 
-			function(cb) { // metadata
+			(cb) => { // metadata
 				const metadata = parsed.system[attrKey];
 				model.system = _.merge(model.system, metadata);
 				cb(null);
 			},
 
-			function(cb) { // title
+			(cb) => { // title
 				model.system = _.merge(model.system, { title: parsed.system.title });
 				cb(null, model);
 			},
 
-			function(cb) { // all the rest
+			(cb) => { // all the rest
 				const mapping = [
 					{
 						singular: 'actor',
 						plural: 'actors',
-						collection: 'actors'
+						collection: 'actors',
 					},
 					{
 						singular: 'edge',
 						plural: 'edges',
-						collection: 'edges'
+						collection: 'edges',
 					},
 					{
 						singular: 'location',
 						plural: 'locations',
-						collection: 'locations'
+						collection: 'locations',
 					},
 					{
 						singular: 'policy',
 						plural: 'policies',
-						collection: 'policies'
+						collection: 'policies',
 					},
 					{
 						singular: 'predicate',
 						plural: 'predicates',
-						collection: 'predicates'
+						collection: 'predicates',
 					},
 					{
 						singular: 'process',
 						plural: 'processes',
-						collection: 'processes'
+						collection: 'processes',
 					},
 					{
 						singular: 'role',
 						plural: 'roles',
-						collection: 'roles'
+						collection: 'roles',
 					},
 
 					{
 						singular: 'item',
 						plural: 'assets',
-						collection: 'items'
+						collection: 'items',
 					},
 					{
 						singular: 'data',
 						plural: 'assets',
-						collection: 'data'
-					}
+						collection: 'data',
+					},
 				];
 
-				mapping.forEach(function(item) {
+				mapping.forEach((item) => {
 					if (parsed.system[item.plural]) {
 						if (!_.isArray(parsed.system[item.plural][item.singular])) {
 							parsed.system[item.plural][item.singular] =
-								[ parsed.system[item.plural][item.singular] ];
+								[parsed.system[item.plural][item.singular]];
 						}
+
 						model.system[item.collection] =
 							recurse(parsed.system[item.plural][item.singular]);
 					}
@@ -295,10 +297,11 @@ function parse(
 			},
 		],
 
-		function(err) {
+		(err) => {
 			if (err) {
 				console.error(err);
 			}
+
 			done(err, model);
 		}
 	);
@@ -308,52 +311,53 @@ function parse(
 // element schema definitions for input validation
 let schemas = {};
 schemas.location = Joi.object().keys({
-	'id': Joi.string().required(),
-	'atLocations': Joi.array().items(Joi.string()),
+	id: Joi.string().required(),
+	atLocations: Joi.array().items(Joi.string()),
 });
 schemas.edge = Joi.object().keys({
-	'source': Joi.string().required(),
-	'target': Joi.string().required(),
-	'kind': Joi.string(),
-	'directed': Joi.boolean(),
+	source: Joi.string().required(),
+	target: Joi.string().required(),
+	kind: Joi.string(),
+	directed: Joi.boolean(),
 });
 schemas.item = Joi.object().keys({
-	'id': Joi.string().required(),
-	'name': Joi.string().required(),
-	'type': Joi.string(),
-	'atLocations': Joi.array().items(Joi.string()).required(),
+	id: Joi.string().required(),
+	name: Joi.string().required(),
+	type: Joi.string(),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.data = Joi.object().keys({
-	'id': Joi.string().required(),
-	'name': Joi.string().required(),
-	'value': Joi.string().required(),
-	'atLocations': Joi.array().items(Joi.string()).required()
+	id: Joi.string().required(),
+	name: Joi.string().required(),
+	value: Joi.string().required(),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.actor = Joi.object().keys({
-	'id': Joi.string().required(),
-	'atLocations': Joi.array().items(Joi.string()).required()
+	id: Joi.string().required(),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.policy = Joi.object().keys({
-	'id': Joi.string().required(),
-	'enabled': Joi.object().required(), // TODO: refine
-	'credentials': Joi.object().required(), // TODO: refine
-	'atLocations': Joi.array().items(Joi.string()).required(),
+	id: Joi.string().required(),
+	enabled: Joi.object().required(), // TODO: refine
+	credentials: Joi.object().required(), // TODO: refine
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.process = Joi.object().keys({
-	'id': Joi.string().required(),
-	'actions': Joi.object().required(), // TODO: refine
-	'atLocations': Joi.array().items(Joi.string()).required(),
+	id: Joi.string().required(),
+	actions: Joi.object().required(), // TODO: refine
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.predicate = Joi.object().keys({
-	'id': Joi.string().required(),
-	'arity': Joi.string().required(),
-	'value': Joi.array().items(Joi.string()).required(),
+	id: Joi.string().required(),
+	arity: Joi.string().required(),
+	value: Joi.array().items(Joi.string()).required(),
 });
 schemas.metric = Joi.object().keys({
-	'name': Joi.string().required(),
-	'value': Joi.string().required(),
-	'namespace': Joi.string(),
+	name: Joi.string().required(),
+	value: Joi.string().required(),
+	namespace: Joi.string(),
 });
+
 // TODO: roles?
 
 const validationOptions = {
@@ -375,6 +379,7 @@ function add_(model, dest, item) {
 	if (!model.system[dest]) {
 		model.system[dest] = [];
 	}
+
 	model.system[dest].push(item);
 	return model;
 };
@@ -398,6 +403,7 @@ function addItem(model, item) {
 	if (!item.name) {
 		item.name = item.id;
 	}
+
 	validate(item, 'item');
 	return add_(model, 'items', item);
 };
@@ -411,6 +417,7 @@ function addData(model, data) {
 	if (!data.name) {
 		data.name = data.id;
 	}
+
 	validate(data, 'data');
 	return add_(model, 'data', data);
 };
@@ -421,8 +428,9 @@ function addData(model, data) {
 let addEdge = module.exports.addEdge =
 function addEdge(model, edge) {
 	edge = _.defaults(edge || {}, {
-		directed: true
+		directed: true,
 	});
+
 	// edge = _.extend(edge || {}, {});
 	validate(edge, 'edge');
 	return add_(model, 'edges', edge);
@@ -434,6 +442,7 @@ function addEdge(model, edge) {
 let addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
 	validate(policy, 'policy');
+
 	// console.warn('addPolicy() is not implemented yet'); // TODO
 	return add_(model, 'policies', policy);
 };
@@ -453,6 +462,7 @@ function addPredicate(model, predicate) {
 let addProcess = module.exports.addProcess =
 function addProcess(model, process) {
 	validate(process, 'process');
+
 	// console.warn('addProcess() is not implemented yet'); // TODO
 	return add_(model, 'processes', process);
 };
@@ -463,6 +473,7 @@ function addProcess(model, process) {
 let addRole = module.exports.addRole =
 function addRole(model, role) {
 	validate(role, 'role');
+
 	// console.warn('addRole() is not implemented yet'); // TODO
 	return add_(model, 'roles', role);
 };
@@ -500,27 +511,28 @@ function separateAttributeFromObject(attrNames, obj) {
 
 const knownAttributes = {
 	// scenario
-	'scenario': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
-	'assetGoal': ['attacker'],
+	scenario: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
+	assetGoal: ['attacker'],
+
 	// TODO: more
 
 	// model
-	'system': ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
-	'location': ['id'],
-	'actor': ['id'],
-	'edge': ['directed', 'kind'],
-	'item': ['id', 'name', 'type'],
-	'data': ['id', 'name', 'value'],
-	'credLocation': ['id'],
-	'credData': ['name'],
-	'credItem': ['name'],
-	'credPredicate': ['name'],
-	'process': ['id'],
-	'in': ['loc'],
-	'out': ['loc'],
-	'predicate': ['id', 'arity'],
-	'policy': ['id'],
-	'metric': ['namespace', 'name', 'value'],
+	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
+	location: ['id'],
+	actor: ['id'],
+	edge: ['directed', 'kind'],
+	item: ['id', 'name', 'type'],
+	data: ['id', 'name', 'value'],
+	credLocation: ['id'],
+	credData: ['name'],
+	credItem: ['name'],
+	credPredicate: ['name'],
+	process: ['id'],
+	in: ['loc'],
+	out: ['loc'],
+	predicate: ['id', 'arity'],
+	policy: ['id'],
+	metric: ['namespace', 'name', 'value'],
 };
 
 
@@ -533,23 +545,21 @@ function toPrefixedObject(prefix, it) {
 let prepareForXml = module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
-		return o.map(function(item) {
+		return o.map((item) => {
 			return prepareForXml(item, parentKey);
 		});
-	}
-	else if (_.isString(o) || _.isNumber(o)) {
+	} else if (_.isString(o) || _.isNumber(o)) {
 		return o;
-	}
-	else if (_.isObject(o)) {
+	} else if (_.isObject(o)) {
 		// handle attributes
 		if (parentKey && knownAttributes[parentKey]) {
-			const {newObject, attrObject} =
+			const { newObject, attrObject } =
 				separateAttributeFromObject(knownAttributes[parentKey], o);
 			o = _.merge(newObject, { [attrKey]: attrObject });
 		}
 
 		return R.keys(o)
-			.reduce(function(result, key) {
+			.reduce((result, key) => {
 				if (key === attrKey) {
 					result[key] = o[key];
 					return result;
@@ -577,7 +587,7 @@ function prepareModelForXml(model) {
 	delete system.data;
 
 	collectionNames
-		.forEach(function(collectionName) {
+		.forEach((collectionName) => {
 			if (system[collectionName]) {
 				system[collectionName] = toPrefixedObject(
 					singular(collectionName),
@@ -598,9 +608,11 @@ function prepareModelForXml(model) {
 	if (!system.assets.item.length) {
 		delete system.assets.item;
 	}
+
 	if (!system.assets.data.length) {
 		delete system.assets.data;
 	}
+
 	if (R.keys(system.assets).length === 0) {
 		delete system.assets;
 	}
@@ -621,7 +633,7 @@ function toXML(
 
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
-		'date': moment().format('YYYY-MM-DD HH:mm:ss')
+		date: moment().format('YYYY-MM-DD HH:mm:ss'),
 	});
 
 	model = prepareModelForXml(model);
