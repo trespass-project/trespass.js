@@ -50,7 +50,7 @@ const emptyModel = module.exports.emptyModel = {
 // ---
 // ## `create`
 // > return a new, empty model object
-let create = module.exports.create =
+const create = module.exports.create =
 function create() {
 	return _.merge({}, emptyModel);
 };
@@ -94,12 +94,12 @@ const emptyScenario = module.exports.emptyScenario = {
 // ---
 // ## `createScenario`
 // > return a new, empty model object
-let createScenario = module.exports.createScenario =
+const createScenario = module.exports.createScenario =
 function createScenario() {
 	return _.merge({}, emptyScenario);
 };
 
-let scenarioSetModel = module.exports.scenarioSetModel =
+const scenarioSetModel = module.exports.scenarioSetModel =
 function scenarioSetModel(scenario, modelFileName) {
 	return _.merge(
 		{},
@@ -108,7 +108,7 @@ function scenarioSetModel(scenario, modelFileName) {
 	);
 };
 
-let scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
+const scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
 function scenarioSetAssetGoal(scenario, attackerId, assetId) {
 	return _.merge(
 		{},
@@ -124,7 +124,7 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId) {
 	);
 };
 
-let scenarioToXML = module.exports.scenarioToXML =
+const scenarioToXML = module.exports.scenarioToXML =
 function scenarioToXML(scenario) {
 	scenario.scenario.date = scenario.scenario.date || moment().format('YYYY-MM-DD HH:mm:ss');
 	const prepared = prepareForXml(scenario);
@@ -155,7 +155,7 @@ R.keys(collectionNameSingular);
 
 // ---
 // ## `singular`
-let singular = module.exports.singular =
+const singular = module.exports.singular =
 function singular(plural) {
 	return collectionNameSingular[plural];
 };
@@ -164,7 +164,7 @@ function singular(plural) {
 // ---
 // ## `parse()`
 // > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
-let parse = module.exports.parse =
+const parse = module.exports.parse =
 function parse(
 	xmlStr, /* String */
 	done /* Function */
@@ -374,7 +374,7 @@ function validate(it, schemaName) {
 
 // ---
 // ## `add_`
-let add_ = module.exports.add_ =
+const add_ = module.exports.add_ =
 function add_(model, dest, item) {
 	if (!model.system[dest]) {
 		model.system[dest] = [];
@@ -387,7 +387,7 @@ function add_(model, dest, item) {
 
 // ---
 // ## `addActor`
-let addActor = module.exports.addActor =
+const addActor = module.exports.addActor =
 function addActor(model, actor) {
 	// actor = _.extend(actor || {}, {});
 	validate(actor, 'actor');
@@ -397,7 +397,7 @@ function addActor(model, actor) {
 
 // ---
 // ## `addItem`
-let addItem = module.exports.addItem =
+const addItem = module.exports.addItem =
 function addItem(model, item) {
 	// item = _.extend(item || {}, {});
 	if (!item.name) {
@@ -411,7 +411,7 @@ function addItem(model, item) {
 
 // ---
 // ## `addData`
-let addData = module.exports.addData =
+const addData = module.exports.addData =
 function addData(model, data) {
 	// data = _.extend(data || {}, {});
 	if (!data.name) {
@@ -425,7 +425,7 @@ function addData(model, data) {
 
 // ---
 // ## `addEdge`
-let addEdge = module.exports.addEdge =
+const addEdge = module.exports.addEdge =
 function addEdge(model, edge) {
 	edge = _.defaults(edge || {}, {
 		directed: true,
@@ -439,7 +439,7 @@ function addEdge(model, edge) {
 
 // ---
 // ## `addPolicy`
-let addPolicy = module.exports.addPolicy =
+const addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
 	validate(policy, 'policy');
 
@@ -450,7 +450,7 @@ function addPolicy(model, policy) {
 
 // ---
 // ## `addPredicate`
-let addPredicate = module.exports.addPredicate =
+const addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
 	validate(predicate, 'predicate');
 	return add_(model, 'predicates', predicate);
@@ -459,7 +459,7 @@ function addPredicate(model, predicate) {
 
 // ---
 // ## `addProcess`
-let addProcess = module.exports.addProcess =
+const addProcess = module.exports.addProcess =
 function addProcess(model, process) {
 	validate(process, 'process');
 
@@ -470,7 +470,7 @@ function addProcess(model, process) {
 
 // ---
 // ## `addRole`
-let addRole = module.exports.addRole =
+const addRole = module.exports.addRole =
 function addRole(model, role) {
 	validate(role, 'role');
 
@@ -481,7 +481,7 @@ function addRole(model, role) {
 
 // ---
 // ## `addLocation`
-let addLocation = module.exports.addLocation =
+const addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	// location = _.extend(location || {}, {});
 	validate(location, 'location');
@@ -491,7 +491,7 @@ function addLocation(model, location) {
 
 // ---
 // ## `addRoom`
-let addRoom = module.exports.addRoom =
+const addRoom = module.exports.addRoom =
 function addRoom(model, room) {
 	// room = _.extend(room || {}, {
 	// 	// domain: 'physical'
@@ -500,7 +500,7 @@ function addRoom(model, room) {
 };
 
 
-let separateAttributeFromObject = module.exports.separateAttributeFromObject =
+const separateAttributeFromObject = module.exports.separateAttributeFromObject =
 function separateAttributeFromObject(attrNames, obj) {
 	attrNames = attrNames || [];
 	let attrObject = R.pick(attrNames, obj);
@@ -536,13 +536,13 @@ const knownAttributes = {
 };
 
 
-let toPrefixedObject = module.exports.toPrefixedObject =
+const toPrefixedObject = module.exports.toPrefixedObject =
 function toPrefixedObject(prefix, it) {
 	return { [prefix]: it };
 };
 
 
-let prepareForXml = module.exports.prepareForXml =
+const prepareForXml = module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
 		return o.map((item) => {
@@ -577,7 +577,7 @@ function prepareForXml(o, parentKey) {
 };
 
 
-let prepareModelForXml = module.exports.prepareModelForXml =
+const prepareModelForXml = module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	let system = model.system;
 
@@ -624,7 +624,7 @@ function prepareModelForXml(model) {
 // ---
 // ## `toXML()`
 // > takes a model `Object` and turns it back into XML.
-let toXML = module.exports.toXML =
+const toXML = module.exports.toXML =
 function toXML(
 	_model /* Object */
 ) {
