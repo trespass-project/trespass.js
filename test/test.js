@@ -84,13 +84,22 @@ describe(f1('trespass.model'), function() {
 
 				const data = model.system.data;
 				assert(data.length === 1);
-
 				done();
 			});
 
 			it(f3('atLocations should always be an Array'), function(done) {
 				const data = model.system.data;
 				assert(_.isArray(data[0].atLocations));
+				done();
+			});
+		});
+
+		const modelXML = fs.readFileSync(
+			path.join(rootDir, 'test', 'data', 'test.xml')
+		).toString();
+		trespass.model.parse(modelXML, function(err, model) {
+			it(f3('should not produce any weird [undefined]s'), function(done) {
+				assert(!model.system.items || model.system.items.length === 0);
 				done();
 			});
 		});

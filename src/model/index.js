@@ -30,6 +30,8 @@ const emptyModel = module.exports.emptyModel = {
 		author: 'trespass.js',
 		version: '0.0.0',
 		title: 'Untitled',
+		id: undefined,
+		anm_data: undefined,
 		date: undefined, // will be filled in on export
 
 		locations: [],
@@ -268,7 +270,6 @@ function parse(
 						plural: 'roles',
 						collection: 'roles',
 					},
-
 					{
 						singular: 'item',
 						plural: 'assets',
@@ -282,14 +283,21 @@ function parse(
 				];
 
 				mapping.forEach((item) => {
-					if (parsed.system[item.plural]) {
-						if (!_.isArray(parsed.system[item.plural][item.singular])) {
-							parsed.system[item.plural][item.singular] =
-								[parsed.system[item.plural][item.singular]];
+					let coll = parsed.system[item.plural];
+					if (coll) {
+						if (!_.isArray(coll[item.singular])) {
+							coll[item.singular] =[coll[item.singular]];
 						}
 
-						model.system[item.collection] =
-							recurse(parsed.system[item.plural][item.singular]);
+						// filter, because for some reason
+						// `coll[item.singular]` is [undefined] in some cases
+						// TODO: find out why
+						coll[item.singular] = coll[item.singular]
+							.filter((item) => {
+								return !!item;
+							});
+
+						model.system[item.collection] = recurse(coll[item.singular]);
 					}
 				});
 
@@ -390,7 +398,7 @@ function add_(model, dest, item) {
 const addActor = module.exports.addActor =
 function addActor(model, actor) {
 	// actor = _.extend(actor || {}, {});
-	validate(actor, 'actor');
+	// validate(actor, 'actor');
 	return add_(model, 'actors', actor);
 };
 
@@ -404,7 +412,7 @@ function addItem(model, item) {
 		item.name = item.id;
 	}
 
-	validate(item, 'item');
+	// validate(item, 'item');
 	return add_(model, 'items', item);
 };
 
@@ -418,7 +426,7 @@ function addData(model, data) {
 		data.name = data.id;
 	}
 
-	validate(data, 'data');
+	// validate(data, 'data');
 	return add_(model, 'data', data);
 };
 
@@ -432,7 +440,7 @@ function addEdge(model, edge) {
 	});
 
 	// edge = _.extend(edge || {}, {});
-	validate(edge, 'edge');
+	// validate(edge, 'edge');
 	return add_(model, 'edges', edge);
 };
 
@@ -441,8 +449,7 @@ function addEdge(model, edge) {
 // ## `addPolicy`
 const addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
-	validate(policy, 'policy');
-
+	// validate(policy, 'policy');
 	// console.warn('addPolicy() is not implemented yet'); // TODO
 	return add_(model, 'policies', policy);
 };
@@ -452,7 +459,7 @@ function addPolicy(model, policy) {
 // ## `addPredicate`
 const addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
-	validate(predicate, 'predicate');
+	// validate(predicate, 'predicate');
 	return add_(model, 'predicates', predicate);
 };
 
@@ -461,8 +468,7 @@ function addPredicate(model, predicate) {
 // ## `addProcess`
 const addProcess = module.exports.addProcess =
 function addProcess(model, process) {
-	validate(process, 'process');
-
+	// validate(process, 'process');
 	// console.warn('addProcess() is not implemented yet'); // TODO
 	return add_(model, 'processes', process);
 };
@@ -472,8 +478,7 @@ function addProcess(model, process) {
 // ## `addRole`
 const addRole = module.exports.addRole =
 function addRole(model, role) {
-	validate(role, 'role');
-
+	// validate(role, 'role');
 	// console.warn('addRole() is not implemented yet'); // TODO
 	return add_(model, 'roles', role);
 };
@@ -484,7 +489,7 @@ function addRole(model, role) {
 const addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	// location = _.extend(location || {}, {});
-	validate(location, 'location');
+	// validate(location, 'location');
 	return add_(model, 'locations', location);
 };
 
@@ -513,11 +518,10 @@ const knownAttributes = {
 	// scenario
 	scenario: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
 	assetGoal: ['attacker'],
-
 	// TODO: more
 
 	// model
-	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date'],
+	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id', 'anm_data'],
 	location: ['id'],
 	actor: ['id'],
 	edge: ['directed', 'kind'],
@@ -630,6 +634,10 @@ function toXML(
 ) {
 	// duplicate model
 	let model = _.merge({}, _model);
+
+	if (!model.system.id) {
+		console.error('model system needs an id.');
+	}
 
 	// set fill in the gaps with defaults
 	model.system = _.defaults(model.system, {
