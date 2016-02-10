@@ -294,6 +294,10 @@ function parse(
 					}
 				});
 
+				if (model.system.anm_data) {
+					model.system.anm_data = JSON.parse(model.system.anm_data);
+				}
+
 				cb(null, model);
 			},
 		],
