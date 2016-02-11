@@ -63,6 +63,15 @@ const f3 = function(s) {
 
 // ---
 describe(f1('trespass.model'), function() {
+	describe(f2('.parse()'), () => {
+		const newModel = trespass.model.create();
+		it(f3('should dynamically create empty collections'), function() {
+			assert(newModel.system.locations.length === 0);
+			assert(newModel.system.data.length === 0);
+			assert(newModel.system.items.length === 0);
+		});
+	});
+
 	describe(f2('.parse()'), function() {
 		trespass.model.parse(testModelXML, function(err, model) {
 			it(f3('should import metadata'), function(done) {
@@ -109,7 +118,7 @@ describe(f1('trespass.model'), function() {
 		).toString();
 		trespass.model.parse(modelXML, function(err, model) {
 			it(f3('should import and parse ANM data'), function(done) {
-				console.log(model.system.anm_data.system);
+				// console.log(model.system.anm_data.system);
 				assert(!!model.system.anm_data.system);
 				assert(model.system.anm_data.system.title === 'embedded');
 				assert(model.system.anm_data.system.locations.length === 2);

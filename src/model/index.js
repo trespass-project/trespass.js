@@ -19,33 +19,84 @@ const xml2jsOptions = {
 };
 
 
+const singularPluralCollection = [
+	{
+		singular: 'actor',
+		plural: 'actors',
+		collection: 'actors',
+	},
+	{
+		singular: 'edge',
+		plural: 'edges',
+		collection: 'edges',
+	},
+	{
+		singular: 'location',
+		plural: 'locations',
+		collection: 'locations',
+	},
+	{
+		singular: 'policy',
+		plural: 'policies',
+		collection: 'policies',
+	},
+	{
+		singular: 'predicate',
+		plural: 'predicates',
+		collection: 'predicates',
+	},
+	{
+		singular: 'process',
+		plural: 'processes',
+		collection: 'processes',
+	},
+	{
+		singular: 'item',
+		plural: 'assets',
+		collection: 'items',
+	},
+	{
+		singular: 'data',
+		plural: 'assets',
+		collection: 'data',
+	},
+];
+
+// collectionNameSingular['processes'] = 'process'
+const collectionNameSingular = module.exports.collectionNameSingular =
+singularPluralCollection.reduce((result, item) => {
+	result[item.plural] = item.singular;
+	return result;
+}, {});
+
+const collectionNames = module.exports.collectionNames =
+R.keys(collectionNameSingular);
+
+
 // ---
 // ## `emptyModel`
 // > model default structure
-const emptyModel = module.exports.emptyModel = {
-	system: {
-		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
-		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-		author: 'trespass.js',
-		version: '0.0.0',
-		title: 'Untitled',
-		id: undefined,
-		anm_data: undefined,
-		date: undefined, // will be filled in on export
-
-		locations: [],
-		edges: [],
-
-		// assets: [],
-		items: [],
-		data: [],
-		actors: [],
-		predicates: [],
-		processes: [],
-		policies: [],
-	},
-};
+const emptyModel = module.exports.emptyModel =
+singularPluralCollection
+	.map(R.prop('collection'))
+	.reduce((result, collectionName) => {
+			result.system[collectionName] = [];
+			return result;
+		},
+		{
+			system: {
+				xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+				'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
+				author: 'trespass.js',
+				version: '0.0.0',
+				title: 'Untitled',
+				id: undefined,
+				anm_data: undefined,
+				date: undefined, // will be set on export
+			},
+		}
+	);
 
 
 // ---
@@ -129,28 +180,10 @@ const scenarioToXML = module.exports.scenarioToXML =
 function scenarioToXML(scenario) {
 	scenario.scenario.date = scenario.scenario.date || moment().format('YYYY-MM-DD HH:mm:ss');
 	const prepared = prepareForXml(scenario);
-	var builder = new xml2js.Builder(xml2jsOptions);
+	const builder = new xml2js.Builder(xml2jsOptions);
 	const xmlStr = builder.buildObject(prepared);
 	return xmlStr;
 };
-
-
-const collectionNameSingular = module.exports.collectionNameSingular = {
-	actors: 'actor',
-
-	// 'assets': 'asset',
-	items: 'item',
-	data: 'data',
-	edges: 'edge',
-	locations: 'location',
-	policies: 'policy',
-	predicates: 'predicate',
-	processes: 'process',
-};
-
-
-const collectionNames = module.exports.collectionNames =
-R.keys(collectionNameSingular);
 
 
 // ---
@@ -232,50 +265,7 @@ function parse(
 			},
 
 			(cb) => { // all the rest
-				const mapping = [
-					{
-						singular: 'actor',
-						plural: 'actors',
-						collection: 'actors',
-					},
-					{
-						singular: 'edge',
-						plural: 'edges',
-						collection: 'edges',
-					},
-					{
-						singular: 'location',
-						plural: 'locations',
-						collection: 'locations',
-					},
-					{
-						singular: 'policy',
-						plural: 'policies',
-						collection: 'policies',
-					},
-					{
-						singular: 'predicate',
-						plural: 'predicates',
-						collection: 'predicates',
-					},
-					{
-						singular: 'process',
-						plural: 'processes',
-						collection: 'processes',
-					},
-					{
-						singular: 'item',
-						plural: 'assets',
-						collection: 'items',
-					},
-					{
-						singular: 'data',
-						plural: 'assets',
-						collection: 'data',
-					},
-				];
-
-				mapping.forEach((item) => {
+				singularPluralCollection.forEach((item) => {
 					let coll = parsed.system[item.plural];
 					if (coll) {
 						if (!_.isArray(coll[item.singular])) {
