@@ -11,7 +11,11 @@ function makeUrl(api, endpoint) {
 const requestOptions = module.exports.requestOptions = {
 	crossDomain: {
 		crossDomain: true,
-		xhrFields: { withCredentials: true }, // to send session cookie
+	},
+
+	withCredentials: {
+		// to send session cookie
+		xhrFields: { withCredentials: true },
 	},
 
 	fileUpload: {
