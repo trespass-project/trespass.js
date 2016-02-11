@@ -209,11 +209,13 @@ function parse(
 		return _.merge({}, withoutAttributes, attributes);
 	}
 
-	function recurse(item, key) {
+	function recurse(item, trace=[]) {
+		// console.log(trace);
+		const key = R.last(trace);
 		if (_.isArray(item)) {
 			return item
-				.map((arrItem) => {
-					return recurse(arrItem);
+				.map((arrItem, index) => {
+					return recurse(arrItem, R.append(index, trace));
 				});
 		} else if (_.isString(item)) {
 			item = item
@@ -221,7 +223,10 @@ function parse(
 				.replace(/ +/ig, ' ');
 
 			if (key === 'atLocations') {
-				item = item.split(' ');
+				item = item.split(/ +/);
+			}
+			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
+				item = item.split(/ +/);
 			}
 
 			return item;
@@ -231,7 +236,7 @@ function parse(
 			item = mergeAttributes(item);
 			R.keys(item)
 				.forEach((key) => {
-					item[key] = recurse(item[key], key);
+					item[key] = recurse(item[key], R.append(key, trace));
 				});
 
 			return item;
@@ -281,7 +286,7 @@ function parse(
 								return !!item;
 							});
 
-						model.system[item.collection] = recurse(coll[item.singular]);
+						model.system[item.collection] = recurse(coll[item.singular], [item.singular]);
 					}
 				});
 
@@ -525,7 +530,12 @@ function toPrefixedObject(prefix, it) {
 const prepareForXml = module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
-		return o.map((item) => {
+		return o.map((item, index) => {
+			// put things back together
+			if (parentKey === 'value' && _.isArray(item)) {
+				item = item.join(' ');
+			}
+
 			return prepareForXml(item, parentKey);
 		});
 	} else if (_.isString(o) || _.isNumber(o)) {
@@ -547,6 +557,7 @@ function prepareForXml(o, parentKey) {
 
 				result[key] = prepareForXml(o[key], key);
 
+				// put things back together
 				if (key === 'atLocations') {
 					result[key] = result[key].join(' ');
 				}

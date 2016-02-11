@@ -101,6 +101,13 @@ describe(f1('trespass.model'), function() {
 				assert(_.isArray(data[0].atLocations));
 				done();
 			});
+
+			it(f3('predicate value should always be an Array'), function(done) {
+				const predicates = model.system.predicates;
+				// console.log(predicates[0].value[0]);
+				assert(_.isArray(predicates[0].value[0]));
+				done();
+			});
 		});
 
 		let modelXML = fs.readFileSync(
