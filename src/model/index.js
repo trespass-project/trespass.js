@@ -64,10 +64,11 @@ const singularPluralCollection = [
 
 // collectionNameSingular['processes'] = 'process'
 const collectionNameSingular = module.exports.collectionNameSingular =
-singularPluralCollection.reduce((result, item) => {
-	result[item.plural] = item.singular;
-	return result;
-}, {});
+singularPluralCollection
+	.reduce((result, item) => {
+		result[item.plural] = item.singular;
+		return result;
+	}, {});
 
 const collectionNames = module.exports.collectionNames =
 R.keys(collectionNameSingular);
@@ -94,7 +95,7 @@ singularPluralCollection
 				id: undefined,
 				anm_data: undefined,
 				date: undefined, // will be set on export
-			},
+			}
 		}
 	);
 
@@ -573,7 +574,7 @@ function prepareModelForXml(model) {
 					system[collectionName]
 				);
 
-				// remove emptyModel ones
+				// remove empty ones
 				if (!system[collectionName][singular(collectionName)].length) {
 					delete system[collectionName];
 				}
