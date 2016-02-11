@@ -21,55 +21,54 @@ const xml2jsOptions = {
 
 const singularPluralCollection = [
 	{
-		singular: 'actor',
-		plural: 'actors',
-		collection: 'actors',
+		origCollection: 'actors', // original collection name
+		singular: 'actor',        //    ↓
+		plural: 'actors',         // internal collection name
 	},
 	{
 		singular: 'edge',
 		plural: 'edges',
-		collection: 'edges',
+		origCollection: 'edges',
 	},
 	{
 		singular: 'location',
 		plural: 'locations',
-		collection: 'locations',
+		origCollection: 'locations',
 	},
 	{
 		singular: 'policy',
 		plural: 'policies',
-		collection: 'policies',
+		origCollection: 'policies',
 	},
 	{
 		singular: 'predicate',
 		plural: 'predicates',
-		collection: 'predicates',
+		origCollection: 'predicates',
 	},
 	{
 		singular: 'process',
 		plural: 'processes',
-		collection: 'processes',
+		origCollection: 'processes',
 	},
 	{
 		singular: 'item',
-		plural: 'assets',
-		collection: 'items',
+		plural: 'items',
+		origCollection: 'assets',
 	},
 	{
 		singular: 'data',
-		plural: 'assets',
-		collection: 'data',
+		plural: 'data',
+		origCollection: 'assets',
 	},
 ];
 
-// collectionNameSingular['processes'] = 'process'
+// collectionNameSingular['items'] = 'item'
 const collectionNameSingular = module.exports.collectionNameSingular =
 singularPluralCollection
 	.reduce((result, item) => {
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
-
 const collectionNames = module.exports.collectionNames =
 R.keys(collectionNameSingular);
 
@@ -79,7 +78,7 @@ R.keys(collectionNameSingular);
 // > model default structure
 const emptyModel = module.exports.emptyModel =
 singularPluralCollection
-	.map(R.prop('collection'))
+	.map(R.prop('plural'))
 	.reduce((result, collectionName) => {
 			result.system[collectionName] = [];
 			return result;
@@ -272,7 +271,7 @@ function parse(
 
 			(cb) => { // all the rest
 				singularPluralCollection.forEach((item) => {
-					let coll = parsed.system[item.plural];
+					let coll = parsed.system[item.origCollection];
 					if (coll) {
 						if (!_.isArray(coll[item.singular])) {
 							coll[item.singular] =[coll[item.singular]];
@@ -286,7 +285,7 @@ function parse(
 								return !!item;
 							});
 
-						model.system[item.collection] = recurse(coll[item.singular], [item.singular]);
+						model.system[item.plural] = recurse(coll[item.singular], [item.singular]);
 					}
 				});
 
@@ -302,7 +301,6 @@ function parse(
 			if (err) {
 				console.error(err);
 			}
-
 			done(err, model);
 		}
 	);
