@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<system
+  xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd"
+  author="trespass.js"
+  version="0.0.0"
+  date="2016-02-08 16:29:30"
+  id="1234"
+  anm_data="{&quot;system&quot;:{&quot;title&quot;:&quot;embedded&quot;,&quot;locations&quot;:[{&quot;id&quot;:&quot;location-1&quot;},{&quot;id&quot;:&quot;location-2&quot;}]}}"
+>
+  <title>embedded anm data</title>
+</system>
