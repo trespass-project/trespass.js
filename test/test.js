@@ -14,7 +14,7 @@ const diff = require('deep-diff').diff;
 // const libxml = require('libxmljs');
 
 const rootDir = path.join(__dirname, '..');
-const testModelFilePath = path.join(rootDir, /*'test',*/ 'data', 'vsphere_export.xml');
+const testModelFilePath = path.join(rootDir, 'test', 'data', 'vsphere_export.xml');
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 const attrKey = '_attr';
@@ -89,7 +89,7 @@ describe(f1('trespass.model'), function() {
 			it(f3('should import rest of model'), function(done) {
 				const predicates = model.system.predicates;
 				assert(predicates.length === 3);
-				assert(predicates[0].value.length === 90);
+				assert(predicates[0].value.length === 26);
 
 				const data = model.system.data;
 				assert(data.length === 1);
