@@ -10,8 +10,8 @@ const cheerio = require('cheerio');
 const diff = require('deep-diff').diff;
 
 // TODO: use `xmllint` instead
-// http://stackoverflow.com/questions/4092812/tool-to-validate-an-xsd-on-ubuntu-linux
-// const libxml = require('libxmljs');
+// https://www.npmjs.com/package/xmllint
+// const xmllint = require('xmllint');
 
 const rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, 'test', 'data', 'vsphere_export.xml');
@@ -40,6 +40,18 @@ const f3 = function(s) {
 };
 
 
+const validateXML = require('xmllint').validateXML;
+const xsdFilePath = path.join(__dirname, '../data/TREsPASS_model.xsd');
+const schemaStr = fs.readFileSync(xsdFilePath).toString();
+function validateXmlWithSchema(schemaStr, modelStr) {
+	const result = validateXML({
+		xml: modelStr,
+		schema: schemaStr,
+	});
+	return result.errors || true;
+}
+
+
 // describe(f1('validation'), function() {
 
 // 	describe(f2('model'), function() {
@@ -63,6 +75,13 @@ const f3 = function(s) {
 
 // ---
 describe(f1('trespass.model'), function() {
+	describe(f2('test file'), () => {
+		it(f3('should be valid'), () => {
+			const isValid = validateXmlWithSchema(schemaStr, testModelXML);
+			assert(isValid);
+		});
+	});
+
 	describe(f2('.parse()'), () => {
 		const newModel = trespass.model.create();
 		it(f3('should dynamically create empty collections'), function() {
@@ -406,6 +425,11 @@ describe(f1('trespass.model'), function() {
 			assert.throws(() => {
 				trespass.model.toXML(origModel);
 			});
+		});
+
+		it(f3('output xml should be valid'), () => {
+			const isValid = validateXmlWithSchema(schemaStr, xmlStr);
+			assert(isValid);
 		});
 
 		it(f3('should re-import model successfully'), function(done) {
