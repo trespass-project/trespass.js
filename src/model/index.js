@@ -87,7 +87,7 @@ singularPluralCollection
 			system: {
 				xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
 				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-				'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
+				'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
 				author: 'trespass.js',
 				version: '0.0.0',
 				title: 'Untitled',
@@ -115,7 +115,7 @@ const emptyScenario = module.exports.emptyScenario = {
 	scenario: {
 		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_scenario',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_scenario.xsd',
+		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_scenario https://www.trespass-project.eu/schemas/TREsPASS_scenario.xsd',
 		author: 'trespass.js',
 		version: '0.0.0',
 		id: 'Untitled', // TODO: set this
