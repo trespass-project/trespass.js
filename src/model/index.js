@@ -113,12 +113,12 @@ function create() {
 // > model default structure
 const emptyScenario = module.exports.emptyScenario = {
 	scenario: {
-		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_scenario',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
+		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_scenario.xsd',
 		author: 'trespass.js',
 		version: '0.0.0',
-		id: 'Untitled',
+		id: 'Untitled', // TODO: set this
 		date: undefined,
 
 		model: undefined,
