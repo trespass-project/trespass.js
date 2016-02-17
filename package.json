@@ -7,8 +7,7 @@
   "scripts": {
     "start": "gulp",
     "lint": "eslint ./src",
-    "test": "mocha",
-    "test-watch": "mocha --watch"
+    "test": "mocha --watch"
   },
   "author": "",
   "devDependencies": {
