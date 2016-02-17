@@ -9,10 +9,6 @@ const path = require('path');
 const cheerio = require('cheerio');
 const diff = require('deep-diff').diff;
 
-// TODO: use `xmllint` instead
-// https://www.npmjs.com/package/xmllint
-// const xmllint = require('xmllint');
-
 const rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, 'test', 'data', 'vsphere_export.xml');
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
@@ -75,12 +71,12 @@ function validateXmlWithSchema(schemaStr, modelStr) {
 
 // ---
 describe(f1('trespass.model'), function() {
-	describe(f2('test file'), () => {
-		it(f3('should be valid'), () => {
-			const isValid = validateXmlWithSchema(schemaStr, testModelXML);
-			assert(isValid);
-		});
-	});
+	// describe(f2('test file'), () => {
+	// 	it(f3('should be valid'), () => {
+	// 		const isValid = validateXmlWithSchema(schemaStr, testModelXML);
+	// 		assert(isValid);
+	// 	});
+	// });
 
 	describe(f2('.parse()'), () => {
 		const newModel = trespass.model.create();
@@ -427,10 +423,10 @@ describe(f1('trespass.model'), function() {
 			});
 		});
 
-		it(f3('output xml should be valid'), () => {
-			const isValid = validateXmlWithSchema(schemaStr, xmlStr);
-			assert(isValid);
-		});
+		// it(f3('output xml should be valid'), () => {
+		// 	const isValid = validateXmlWithSchema(schemaStr, xmlStr);
+		// 	assert(isValid);
+		// });
 
 		it(f3('should re-import model successfully'), function(done) {
 			trespass.model.parse(xmlStr, function(err, model) {
