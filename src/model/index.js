@@ -126,6 +126,7 @@ const emptyScenario = module.exports.emptyScenario = {
 		assetGoal: {
 			attacker: undefined,
 			asset: undefined,
+			profit: undefined,
 		},
 
 		// TODO: implement
@@ -161,13 +162,14 @@ function scenarioSetModel(scenario, modelFileName) {
 };
 
 const scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
-function scenarioSetAssetGoal(scenario, attackerId, assetId) {
+function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 	return _.merge(
 		{},
 		scenario,
 		{
 			scenario: {
 				assetGoal: {
+					profit,
 					attacker: attackerId,
 					asset: assetId,
 				},
@@ -496,7 +498,7 @@ function separateAttributeFromObject(attrNames, obj) {
 const knownAttributes = {
 	// scenario
 	scenario: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
-	assetGoal: ['attacker'],
+	assetGoal: ['attacker', 'profit'],
 	// TODO: more
 
 	// model
