@@ -118,8 +118,8 @@ const emptyScenario = module.exports.emptyScenario = {
 		'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_scenario https://www.trespass-project.eu/schemas/TREsPASS_scenario.xsd',
 		author: 'trespass.js',
 		version: '0.0.0',
-		id: 'Untitled', // TODO: set this
-		date: undefined,
+		id: undefined,
+		date: undefined, // will be set on export
 
 		model: undefined,
 
@@ -179,8 +179,15 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 };
 
 const scenarioToXML = module.exports.scenarioToXML =
-function scenarioToXML(scenario) {
+function scenarioToXML(_scenario) {
+	const scenario = _.merge({}, _scenario);
+
 	scenario.scenario.date = scenario.scenario.date || moment().format('YYYY-MM-DD HH:mm:ss');
+
+	if (!scenario.scenario.id) {
+		throw new Error('scenario needs an id');
+	}
+
 	const prepared = prepareForXml(scenario);
 	const builder = new xml2js.Builder(xml2jsOptions);
 	const xmlStr = builder.buildObject(prepared);

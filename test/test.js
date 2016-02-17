@@ -508,9 +508,19 @@ describe(f1('trespass.model'), function() {
 	});
 
 	describe(f2('.scenarioToXML()'), function() {
+		it(f3('should require an id'), () => {
+			const origScenario = {
+				scenario: { id: undefined }
+			};
+			assert.throws(() => {
+				trespass.model.scenarioToXML(origScenario);
+			});
+		});
+
 		const empty = trespass.model.createScenario();
 		let scenario = trespass.model.scenarioSetModel(empty, 'model-file-name.xml');
 		scenario = trespass.model.scenarioSetAssetGoal(scenario, 'attackerId', 'assetId');
+		scenario.scenario.id = 'scenario-id';
 
 		const xmlStr = trespass.model.scenarioToXML(scenario);
 		const $system = cheerio.load(xmlStr, cheerioOptions)('scenario');
