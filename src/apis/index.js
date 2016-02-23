@@ -7,19 +7,21 @@ function makeUrl(api, endpoint) {
 };
 
 
-// jquery request options
+// request options
 const requestOptions = module.exports.requestOptions = {
 	crossDomain: {
-		crossDomain: true,
+		crossDomain: true, // jquery.ajax
+		mode: 'cors', // fetch
 	},
 
 	withCredentials: { // to send session cookie
-		xhrFields: { withCredentials: true },
+		xhrFields: { withCredentials: true }, // jquery.ajax
+		credentials: 'include' // fetch
 	},
 
 	fileUpload: { // to upload files as FormData to tools API
-		type: 'POST',
-		processData: false,
+		type: 'post',
+		processData: false, // jquery.ajax
 		contentType: false,
 	}
 };
