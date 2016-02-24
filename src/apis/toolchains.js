@@ -12,6 +12,7 @@ run tool → taskId
 
 const R = require('ramda');
 const _ = require('lodash');
+const FormData = require('form-data');
 
 const api = require('./index.js');
 const toolsApi = api.apis.tools;
@@ -21,7 +22,6 @@ const retryRate = 1000;
 
 const checkStatusCodeAndReturnJSON = module.exports.checkStatusCodeAndReturnJSON =
 function checkStatusCodeAndReturnJSON(res) {
-	// console.log(res.status);
 	if (res.status !== 200) {
 		throw new Error(`HTTP status code: ${res.status}`);
 	} else {
@@ -30,56 +30,47 @@ function checkStatusCodeAndReturnJSON(res) {
 };
 
 
-const getTask = module.exports.getTask =
-function getTask(fetch, taskId, propagateParams) {
-	console.log('getTask');
-	const url = api.makeUrl(toolsApi, `secured/task/${taskId}`);
-	const _params = _.merge(
+const defaultParams = module.exports.defaultParams =
+function defaultParams(propagateParams) {
+	return _.merge(
 		{},
 		api.requestOptions.crossDomain,
 		api.requestOptions.withCredentials,
 		propagateParams || {}
 	);
-	return fetch(url, _params)
+};
+
+
+const getTask = module.exports.getTask =
+function getTask(fetch, taskId, propagateParams) {
+	const url = api.makeUrl(toolsApi, `secured/task/${taskId}`);
+	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
 };
 
 
 const getTaskStatus = module.exports.getTaskStatus =
 function getTaskStatus(fetch, taskId, propagateParams) {
-	console.log('getTaskStatus');
 	const url = api.makeUrl(toolsApi, `secured/task/${taskId}/status`);
-	const _params = _.merge(
-		{},
-		api.requestOptions.crossDomain,
-		api.requestOptions.withCredentials,
-		propagateParams || {}
-	);
-	return fetch(url, _params)
+	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
 };
 
 
 const monitorTaskStatus = module.exports.monitorTaskStatus =
 function monitorTaskStatus(fetch, taskId, propagateParams) {
-	console.log('monitorTaskStatus');
-
 	return new Promise((resolve, reject) => {
 		let intervalId;
 
 		function check() {
 			getTaskStatus(fetch, taskId, propagateParams)
 				.catch((err) => {
-					console.log(err);
 					clearInterval(intervalId);
 					reject(err);
 				})
 				.then((taskStatusData) => {
-					console.log(taskStatusData);
-
 					if (taskStatusData.status) {
-						console.log('  status:', taskStatusData.status);
-
+						console.log('  ', taskStatusData.status);
 						switch (taskStatusData.status) {
 							case 'processing':
 							case 'pending':
@@ -102,7 +93,7 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 							case 'done':
 								clearInterval(intervalId);
 
-								// workaround
+								// workaround, to get the correct duration
 								const {beginDate, endDate} = taskStatusData;
 
 								getTask(fetch, taskId, propagateParams)
@@ -118,21 +109,20 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 								break;
 						}
 					} else {
-						console.log('  no status');
 					}
 				});
 		}
 
 		intervalId = setInterval(check, retryRate);
 	});
-}
+};
 
 
 const runTool = module.exports.runTool =
-function runTool(fetch, toolId, params, propagateParams, cb) {
-	console.log('runTool');
+function runTool(fetch, toolId, params, propagateParams) {
+	console.log('—————————————————————————');
+	console.log(toolId);
 	const url = api.makeUrl(toolsApi, `secured/tool/${toolId}/run`);
-
 	const _params = _.merge(
 		{},
 		api.requestOptions.fileUpload,
@@ -146,25 +136,38 @@ function runTool(fetch, toolId, params, propagateParams, cb) {
 		.then(checkStatusCodeAndReturnJSON)
 		.then((runData) => {
 			if (runData.error) {
-				return new Error(runData.error);
+				throw new Error(runData.error);
 			}
-			return monitorTaskStatus(fetch, runData.id, propagateParams)
-				.catch((err) => {
-					console.log(err);
-				});
-		})
-		.then((taskData) => {
-			console.log(taskData);
-		})
-		.catch((err) => {
-			console.log(err);
-			cb(err);
+			return monitorTaskStatus(fetch, runData.id, propagateParams);
 		});
-}
+};
+
+
+const retrieveFile = module.exports.retrieveFile =
+function retrieveFile(fetch, url, params, propagateParams) {
+	const _params = _.merge(
+		{},
+		api.requestOptions.crossDomain,
+		api.requestOptions.withCredentials,
+		params,
+		propagateParams || {}
+	);
+
+	return fetch(url, _params);
+};
+
+
+const makeFileUrl = module.exports.makeFileUrl =
+function makeFileUrl(apiObj, outputURL) {
+	if (!outputURL) {
+		throw new Error('No output URL');
+	}
+	return `${apiObj.host.replace(/\/$/, '')}${outputURL}`;
+};
 
 
 const runToolChain = module.exports.runToolChain =
-function runToolChain(toolChainData) {
+function runToolChain(fetch, toolChainData, params, propagateParams) {
 	// toolChainData:
 	// {
 	// 	"id": 47,
@@ -172,4 +175,37 @@ function runToolChain(toolChainData) {
 	// 	"description": "description text",
 	// 	"tools": [...]
 	// }
-}
+
+	const first = runTool(fetch, toolChainData.tools[0].id, params, propagateParams);
+
+	const chain = R.tail(toolChainData.tools)
+		.reduce((result, toolData) => {
+			return result
+				.then((taskData) => {
+					const url = makeFileUrl(toolsApi, taskData.outputURL);
+					return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
+						.then((res) => {
+							// console.log(res.headers.raw()); // TODO: get file name
+							let formData = new FormData();
+							formData.append('file', res.body, { filename: 'output' });
+							return formData;
+						})
+						.then((formData) => {
+							const params = {
+								method: 'post',
+								body: formData
+							};
+							return runTool(fetch, toolData.id, params, propagateParams);
+						});
+				});
+		}, first);
+
+	return chain
+		.then((taskData) => {
+			const url = makeFileUrl(toolsApi, taskData.outputURL);
+			return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
+				.then((res) => {
+					return res.text();
+				});
+		});
+};
