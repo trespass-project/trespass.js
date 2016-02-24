@@ -10,57 +10,123 @@ run tool → taskId
 */
 
 
+const R = require('ramda');
 const _ = require('lodash');
+
 const api = require('./index.js');
 const toolsApi = api.apis.tools;
 
 const retryRate = 1000;
 
 
-const getTaskStatus = module.exports.getTaskStatus =
-function getTaskStatus(fetch, taskId, propagateParams) {
-	const url = api.makeUrl(toolsApi, `secured/task/${taskId}`); // /status
-	// console.log('getTaskStatus', taskId, url);
+const getTask = module.exports.getTask =
+function getTask(fetch, taskId, propagateParams) {
+	console.log('getTask');
+	const url = api.makeUrl(toolsApi, `secured/task/${taskId}`);
 	const _params = _.merge(
 		{},
 		api.requestOptions.crossDomain,
 		api.requestOptions.withCredentials,
 		propagateParams || {}
 	);
-	const req = fetch(url, _params);
 	return fetch(url, _params);
-}
+};
+
+
+const getTaskStatus = module.exports.getTaskStatus =
+function getTaskStatus(fetch, taskId, propagateParams) {
+	console.log('getTaskStatus');
+	const url = api.makeUrl(toolsApi, `secured/task/${taskId}/status`);
+	const _params = _.merge(
+		{},
+		api.requestOptions.crossDomain,
+		api.requestOptions.withCredentials,
+		propagateParams || {}
+	);
+	return fetch(url, _params);
+};
 
 
 const monitorTaskStatus = module.exports.monitorTaskStatus =
-function monitorTaskStatus(fetch, taskId, propagateParams, cb) {
-	// console.log('monitorTaskStatus', taskId);
+function monitorTaskStatus(fetch, taskId, propagateParams) {
+	console.log('monitorTaskStatus');
 
-	const intervalId = setInterval(
-		() => {
+	return new Promise((resolve, reject) => {
+		let intervalId;
+
+		function check() {
 			getTaskStatus(fetch, taskId, propagateParams)
-				.catch((err) => { cb(err); })
+				.catch((err) => {
+					console.log(err);
+					clearInterval(intervalId);
+					reject(err);
+				})
 				.then((res) => {
-					// console.log(res.status); // TODO: check status
+					console.log(res.status); // TODO: check status
 					return res.json();
 				})
-				.then((taskData) => {
-					// console.log('task status', taskData);
-					if (taskData.status) { // data has become available
-						clearInterval(intervalId); // so stop checking
-						cb(null, taskData);
+				.then((taskStatusData) => {
+					console.log(taskStatusData);
+
+					if (taskStatusData.status) {
+						console.log('  status:', taskStatusData.status);
+
+						switch (taskStatusData.status) {
+							case 'processing':
+							case 'pending':
+								// do nothing
+								break;
+
+							case 'rejected':
+							case 'task_not_found':
+							case 'app_not_found':
+								clearInterval(intervalId);
+								reject(new Error(`Error: ${taskStatusData.status}`));
+								break;
+
+							case 'error':
+								clearInterval(intervalId);
+								reject(new Error('An unspecified error occured.'));
+								break;
+
+							case 'abort':
+							case 'done':
+								clearInterval(intervalId);
+
+								// workaround
+								const {beginDate, endDate} = taskStatusData;
+
+								getTask(fetch, taskId, propagateParams)
+									.then((res) => {
+										// console.log(res.status); // TODO: check status
+										return res.json();
+									})
+									.then((taskData) => {
+										const merged = _.merge(taskData, {beginDate, endDate});
+										resolve(merged);
+									});
+								break;
+
+							default:
+								clearInterval(intervalId);
+								reject(new Error(`Unknown status: ${taskStatusData.status}.`));
+								break;
+						}
+					} else {
+						console.log('  no status');
 					}
 				});
-		},
-		retryRate
-	);
+		}
+
+		intervalId = setInterval(check, retryRate);
+	});
 }
 
 
 const runTool = module.exports.runTool =
 function runTool(fetch, toolId, params, propagateParams, cb) {
+	console.log('runTool');
 	const url = api.makeUrl(toolsApi, `secured/tool/${toolId}/run`);
-	// console.log('runTool', toolId);
 
 	const _params = _.merge(
 		{},
@@ -72,29 +138,31 @@ function runTool(fetch, toolId, params, propagateParams, cb) {
 	);
 
 	return fetch(url, _params)
-		.catch((err) => { cb(err); })
 		.then((res) => {
 			// console.log(res.status); // TODO: check status
 			return res.json();
 		})
 		.then((runData) => {
-			// console.log(runData);
 			if (runData.error) {
-				return cb(new Error(runData.error));
+				return new Error(runData.error);
 			}
-
-			monitorTaskStatus(fetch, runData.id, propagateParams, (err, taskData) => {
-				// once task status is there
-				// console.log(err, taskData);
-			});
+			return monitorTaskStatus(fetch, runData.id, propagateParams)
+				.catch((err) => {
+					console.log(err);
+				});
+		})
+		.then((taskData) => {
+			console.log(taskData);
+		})
+		.catch((err) => {
+			console.log(err);
+			cb(err);
 		});
 }
 
 
 const runToolChain = module.exports.runToolChain =
 function runToolChain(toolChainData) {
-	// console.log('runToolChain');
-
 	// toolChainData:
 	// {
 	// 	"id": 47,
@@ -102,8 +170,4 @@ function runToolChain(toolChainData) {
 	// 	"description": "description text",
 	// 	"tools": [...]
 	// }
-
-	// const p = new Promise((resolve, reject) => {
-
-	// });
 }
