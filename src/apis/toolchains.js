@@ -19,6 +19,17 @@ const toolsApi = api.apis.tools;
 const retryRate = 1000;
 
 
+const checkStatusCodeAndReturnJSON = module.exports.checkStatusCodeAndReturnJSON =
+function checkStatusCodeAndReturnJSON(res) {
+	// console.log(res.status);
+	if (res.status !== 200) {
+		throw new Error(`HTTP status code: ${res.status}`);
+	} else {
+		return res.json();
+	}
+};
+
+
 const getTask = module.exports.getTask =
 function getTask(fetch, taskId, propagateParams) {
 	console.log('getTask');
@@ -29,7 +40,8 @@ function getTask(fetch, taskId, propagateParams) {
 		api.requestOptions.withCredentials,
 		propagateParams || {}
 	);
-	return fetch(url, _params);
+	return fetch(url, _params)
+		.then(checkStatusCodeAndReturnJSON);
 };
 
 
@@ -43,7 +55,8 @@ function getTaskStatus(fetch, taskId, propagateParams) {
 		api.requestOptions.withCredentials,
 		propagateParams || {}
 	);
-	return fetch(url, _params);
+	return fetch(url, _params)
+		.then(checkStatusCodeAndReturnJSON);
 };
 
 
@@ -60,10 +73,6 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 					console.log(err);
 					clearInterval(intervalId);
 					reject(err);
-				})
-				.then((res) => {
-					console.log(res.status); // TODO: check status
-					return res.json();
 				})
 				.then((taskStatusData) => {
 					console.log(taskStatusData);
@@ -97,10 +106,6 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 								const {beginDate, endDate} = taskStatusData;
 
 								getTask(fetch, taskId, propagateParams)
-									.then((res) => {
-										// console.log(res.status); // TODO: check status
-										return res.json();
-									})
 									.then((taskData) => {
 										const merged = _.merge(taskData, {beginDate, endDate});
 										resolve(merged);
@@ -138,10 +143,7 @@ function runTool(fetch, toolId, params, propagateParams, cb) {
 	);
 
 	return fetch(url, _params)
-		.then((res) => {
-			// console.log(res.status); // TODO: check status
-			return res.json();
-		})
+		.then(checkStatusCodeAndReturnJSON)
 		.then((runData) => {
 			if (runData.error) {
 				return new Error(runData.error);
