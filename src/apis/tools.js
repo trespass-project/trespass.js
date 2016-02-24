@@ -1,15 +1,5 @@
 'use strict';
 
-/*
-run tool → taskId
-	periodically check task status → taskData
-		on error: stop, alert user
-		when done:
-			retrieve taskData.outputURL
-
-*/
-
-
 const R = require('ramda');
 const _ = require('lodash');
 const FormData = require('form-data');
