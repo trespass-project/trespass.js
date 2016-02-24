@@ -9,23 +9,34 @@ function makeUrl(api, endpoint) {
 
 // request options
 const requestOptions = module.exports.requestOptions = {
-	crossDomain: {
-		// crossDomain: true, // jquery.ajax
-		mode: 'cors', // fetch
-		// xDomain: true // axios
+	jquery: {
+		crossDomain: {
+			crossDomain: true
+		},
+		withCredentials: { // to send session cookie
+			xhrFields: { withCredentials: true }
+		},
+		fileUpload: { // to upload files as FormData to tools API
+			method: 'post',
+			processData: false,
+			contentType: false
+		}
 	},
 
-	withCredentials: { // to send session cookie
-		// xhrFields: { withCredentials: true }, // jquery.ajax
-		credentials: 'include' // fetch
-		// withCredentials: true, // axios
-	},
-
-	fileUpload: { // to upload files as FormData to tools API
-		method: 'post', // all
-		// processData: false, // jquery.ajax
-		// contentType: false,
+	fetch: {
+		crossDomain: {
+			mode: 'cors',
+			// xDomain: true, // axios
+		},
+		withCredentials: { // to send session cookie
+			credentials: 'include'
+			// withCredentials: true, // axios
+		},
+		fileUpload: { // to upload files as FormData to tools API
+			method: 'post'
+		}
 	}
+
 };
 
 

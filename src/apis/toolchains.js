@@ -34,8 +34,8 @@ const defaultParams = module.exports.defaultParams =
 function defaultParams(propagateParams) {
 	return _.merge(
 		{},
-		api.requestOptions.crossDomain,
-		api.requestOptions.withCredentials,
+		api.requestOptions.fetch.crossDomain,
+		api.requestOptions.fetch.withCredentials,
 		propagateParams || {}
 	);
 };
@@ -125,9 +125,9 @@ function runTool(fetch, toolId, params, propagateParams) {
 	const url = api.makeUrl(toolsApi, `secured/tool/${toolId}/run`);
 	const _params = _.merge(
 		{},
-		api.requestOptions.fileUpload,
-		api.requestOptions.crossDomain,
-		api.requestOptions.withCredentials,
+		api.requestOptions.fetch.fileUpload,
+		api.requestOptions.fetch.crossDomain,
+		api.requestOptions.fetch.withCredentials,
 		params,
 		propagateParams || {}
 	);
@@ -147,8 +147,8 @@ const retrieveFile = module.exports.retrieveFile =
 function retrieveFile(fetch, url, params, propagateParams) {
 	const _params = _.merge(
 		{},
-		api.requestOptions.crossDomain,
-		api.requestOptions.withCredentials,
+		api.requestOptions.fetch.crossDomain,
+		api.requestOptions.fetch.withCredentials,
 		params,
 		propagateParams || {}
 	);
