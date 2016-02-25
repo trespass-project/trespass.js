@@ -16,6 +16,7 @@ const paths = { host, prefix };
 // ———
 
 
+const noop = () => {};
 const retryRate = 1000;
 
 
@@ -57,7 +58,11 @@ function getTaskStatus(fetch, taskId, propagateParams) {
 
 
 const monitorTaskStatus = module.exports.monitorTaskStatus =
-function monitorTaskStatus(fetch, taskId, propagateParams) {
+function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams) {
+	const callbacks = _.defaults(_callbacks, {
+		onTaskStatus: noop,
+	});
+
 	return new Promise((resolve, reject) => {
 		let intervalId;
 
@@ -69,6 +74,7 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 				})
 				.then((taskStatusData) => {
 					if (taskStatusData.status) {
+						callbacks.onTaskStatus(taskStatusData);
 						console.log('  ', taskStatusData.status);
 						switch (taskStatusData.status) {
 							case 'processing':
@@ -107,8 +113,8 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 								reject(new Error(`Unknown status: ${taskStatusData.status}.`));
 								break;
 						}
-					} else {
-					}
+					}/* else {
+					}*/
 				});
 		}
 
@@ -118,7 +124,12 @@ function monitorTaskStatus(fetch, taskId, propagateParams) {
 
 
 const runTool = module.exports.runTool =
-function runTool(fetch, toolId, params, propagateParams) {
+function runTool(fetch, toolId, _callbacks, params, propagateParams) {
+	const callbacks = _.defaults(_callbacks, {
+		onToolStart: noop,
+		onToolEnd: noop,
+	});
+
 	console.log('—————————————————————————');
 	console.log(toolId);
 	const url = api.makeUrl(paths, `secured/tool/${toolId}/run`);
@@ -131,13 +142,18 @@ function runTool(fetch, toolId, params, propagateParams) {
 		propagateParams || {}
 	);
 
+	callbacks.onToolStart(toolId);
 	return fetch(url, _params)
 		.then(checkStatusCodeAndReturnJSON)
 		.then((runData) => {
 			if (runData.error) {
 				throw new Error(runData.error);
 			}
-			return monitorTaskStatus(fetch, runData.id, propagateParams);
+			return monitorTaskStatus(fetch, runData.id, callbacks, propagateParams)
+				.then((arg) => {
+					callbacks.onToolEnd(toolId);
+					return arg;
+				});
 		});
 };
 
@@ -166,7 +182,7 @@ function makeFileUrl(pathsObj, outputURL) {
 
 
 const runToolChain = module.exports.runToolChain =
-function runToolChain(fetch, toolChainData, params, propagateParams) {
+function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams) {
 	// toolChainData:
 	// {
 	// 	"id": 47,
@@ -175,12 +191,22 @@ function runToolChain(fetch, toolChainData, params, propagateParams) {
 	// 	"tools": [...]
 	// }
 
-	const first = runTool(fetch, toolChainData.tools[0].id, params, propagateParams);
+	const callbacks = _.defaults(_callbacks, {
+		onToolChainStart: noop,
+		onToolChainEnd: noop,
+	});
+
+	// TODO: clean this up a bit
+	callbacks.onToolChainStart();
+	const first = runTool(fetch, toolChainData.tools[0].id, callbacks, params, propagateParams);
 
 	const chain = R.tail(toolChainData.tools)
 		.reduce((result, toolData) => {
 			return result
 				.then((taskData) => {
+					if (taskData.error) {
+						throw new Error(taskData.error);
+					}
 					const url = makeFileUrl(paths, taskData.outputURL);
 					return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
 						.then((res) => {
@@ -194,7 +220,7 @@ function runToolChain(fetch, toolChainData, params, propagateParams) {
 								method: 'post',
 								body: formData
 							};
-							return runTool(fetch, toolData.id, params, propagateParams);
+							return runTool(fetch, toolData.id, callbacks, params, propagateParams);
 						});
 				});
 		}, first);
@@ -204,6 +230,7 @@ function runToolChain(fetch, toolChainData, params, propagateParams) {
 			const url = makeFileUrl(paths, taskData.outputURL);
 			return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
 				.then((res) => {
+					callbacks.onToolChainEnd();
 					return res.text();
 				});
 		});
