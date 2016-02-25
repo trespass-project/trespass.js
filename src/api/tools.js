@@ -3,9 +3,18 @@
 const R = require('ramda');
 const _ = require('lodash');
 const FormData = require('form-data');
-
 const api = require('./index.js');
-const toolsApi = api.apis.tools;
+
+
+/*
+itrust tools paths
+https://trespass.itrust.lu/api/json
+*/
+const host = module.exports.host = 'https://trespass.itrust.lu/';
+const prefix = module.exports.prefix = 'api/json/';
+const paths = { host, prefix };
+// ———
+
 
 const retryRate = 1000;
 
@@ -33,7 +42,7 @@ function defaultParams(propagateParams) {
 
 const getTask = module.exports.getTask =
 function getTask(fetch, taskId, propagateParams) {
-	const url = api.makeUrl(toolsApi, `secured/task/${taskId}`);
+	const url = api.makeUrl(paths, `secured/task/${taskId}`);
 	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
 };
@@ -41,7 +50,7 @@ function getTask(fetch, taskId, propagateParams) {
 
 const getTaskStatus = module.exports.getTaskStatus =
 function getTaskStatus(fetch, taskId, propagateParams) {
-	const url = api.makeUrl(toolsApi, `secured/task/${taskId}/status`);
+	const url = api.makeUrl(paths, `secured/task/${taskId}/status`);
 	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
 };
@@ -112,7 +121,7 @@ const runTool = module.exports.runTool =
 function runTool(fetch, toolId, params, propagateParams) {
 	console.log('—————————————————————————');
 	console.log(toolId);
-	const url = api.makeUrl(toolsApi, `secured/tool/${toolId}/run`);
+	const url = api.makeUrl(paths, `secured/tool/${toolId}/run`);
 	const _params = _.merge(
 		{},
 		api.requestOptions.fetch.fileUpload,
@@ -148,11 +157,11 @@ function retrieveFile(fetch, url, params, propagateParams) {
 
 
 const makeFileUrl = module.exports.makeFileUrl =
-function makeFileUrl(apiObj, outputURL) {
+function makeFileUrl(pathsObj, outputURL) {
 	if (!outputURL) {
 		throw new Error('No output URL');
 	}
-	return `${apiObj.host.replace(/\/$/, '')}${outputURL}`;
+	return `${pathsObj.host.replace(/\/$/, '')}${outputURL}`;
 };
 
 
@@ -172,7 +181,7 @@ function runToolChain(fetch, toolChainData, params, propagateParams) {
 		.reduce((result, toolData) => {
 			return result
 				.then((taskData) => {
-					const url = makeFileUrl(toolsApi, taskData.outputURL);
+					const url = makeFileUrl(paths, taskData.outputURL);
 					return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
 						.then((res) => {
 							// console.log(res.headers.raw()); // TODO: get file name
@@ -192,7 +201,7 @@ function runToolChain(fetch, toolChainData, params, propagateParams) {
 
 	return chain
 		.then((taskData) => {
-			const url = makeFileUrl(toolsApi, taskData.outputURL);
+			const url = makeFileUrl(paths, taskData.outputURL);
 			return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
 				.then((res) => {
 					return res.text();

@@ -12,7 +12,7 @@ module.exports = {
 	// Functions to process attack trees.
 	attacktree: require('./attacktree'),
 
-	// ## [trespass.apis](apis.html)
+	// ## [trespass.api](api.html)
 	// Functions for using a number of APIs.
-	apis: require('./apis'),
+	api: require('./api'),
 };
