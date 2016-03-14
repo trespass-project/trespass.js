@@ -501,7 +501,8 @@ function separateAttributeFromObject(attrNames, obj) {
 };
 
 
-const knownAttributes = {
+const knownAttributes =
+module.exports.knownAttributes = {
 	// scenario
 	scenario: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id'],
 	assetGoal: ['attacker', 'profit'],
