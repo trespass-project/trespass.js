@@ -107,11 +107,12 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 										return res.text();
 									})
 									.then((stdErr) => {
-										throw new Error(stdErr);
 										alert(stdErr);
+										// throw new Error(stdErr);
+										reject(new Error(stdErr));
 									});
 
-								reject(new Error('An unspecified error occured.'));
+								// reject(new Error('An unspecified error occured.'));
 								break;
 
 							case 'abort':
