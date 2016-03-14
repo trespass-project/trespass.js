@@ -2,7 +2,9 @@
 
 const R = require('ramda');
 const _ = require('lodash');
-const FormData = require('form-data');
+const FormData = (!!window)
+	? window.FormData
+	: require('form-data');
 const api = require('./index.js');
 
 
