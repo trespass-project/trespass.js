@@ -211,7 +211,7 @@ function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams)
 					return retrieveFile(fetch, url, defaultParams(propagateParams), propagateParams)
 						.then((res) => {
 							// console.log(res.headers.raw()); // TODO: get file name
-							let formData = new FormData();
+							const formData = new FormData();
 							formData.append('file', res.body, { filename: 'output' });
 							return formData;
 						})

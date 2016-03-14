@@ -80,23 +80,22 @@ const emptyModel = module.exports.emptyModel =
 singularPluralCollection
 	.map(R.prop('plural'))
 	.reduce((result, collectionName) => {
-			result.system[collectionName] = [];
-			return result;
-		},
-		{
-			system: {
-				xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
-				'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-				'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
-				author: 'trespass.js',
-				version: '0.0.0',
-				title: 'Untitled',
-				id: undefined,
-				anm_data: undefined,
-				date: undefined, // will be set on export
-			}
+		result.system[collectionName] = [];
+		return result;
+	},
+	{
+		system: {
+			xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_model',
+			'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+			'xsi:schemaLocation': 'https://www.trespass-project.eu/schemas/TREsPASS_model https://www.trespass-project.eu/schemas/TREsPASS_model.xsd',
+			author: 'trespass.js',
+			version: '0.0.0',
+			title: 'Untitled',
+			id: undefined,
+			anm_data: undefined,
+			date: undefined, // will be set on export
 		}
-	);
+	});
 
 
 // ---
