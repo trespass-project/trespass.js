@@ -62,15 +62,15 @@ const singularPluralCollection = [
 	},
 ];
 
-// collectionNameSingular['items'] = 'item'
-const collectionNameSingular = module.exports.collectionNameSingular =
+// collectionNamesSingular['items'] = 'item'
+const collectionNamesSingular = module.exports.collectionNamesSingular =
 singularPluralCollection
 	.reduce((result, item) => {
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
 const collectionNames = module.exports.collectionNames =
-R.keys(collectionNameSingular);
+R.keys(collectionNamesSingular);
 
 
 // ---
@@ -199,7 +199,7 @@ function scenarioToXML(_scenario) {
 // ## `singular`
 const singular = module.exports.singular =
 function singular(plural) {
-	return collectionNameSingular[plural];
+	return collectionNamesSingular[plural];
 };
 
 
