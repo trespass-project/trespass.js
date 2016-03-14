@@ -93,6 +93,25 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 
 							case 'error':
 								clearInterval(intervalId);
+
+								// this currently doesn't work for some reason:
+								// getTask(fetch, taskStatusData.id, propagateParams)
+								// 	.then((taskData) => {
+								// 		console.log(taskData);
+								// 		// ...
+								// 	});
+
+								// so we do this instead:
+								const outputFileUrl = `https://trespass.itrust.lu/api/json/secured/task/${taskStatusData.id}/download/output`;
+								retrieveFile(fetch, outputFileUrl, defaultParams(propagateParams), propagateParams)
+									.then((res) => {
+										return res.text();
+									})
+									.then((stdErr) => {
+										console.error(stdErr);
+										alert(stdErr);
+									});
+
 								reject(new Error('An unspecified error occured.'));
 								break;
 
@@ -169,7 +188,7 @@ function retrieveFile(fetch, url, params, propagateParams={}) {
 		params,
 		propagateParams || {}
 	);
-
+	console.log('retrieving', url);
 	return fetch(url, _params);
 };
 
