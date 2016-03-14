@@ -42,7 +42,7 @@ function defaultParams(propagateParams) {
 
 
 const getTask = module.exports.getTask =
-function getTask(fetch, taskId, propagateParams) {
+function getTask(fetch, taskId, propagateParams={}) {
 	const url = api.makeUrl(paths, `secured/task/${taskId}`);
 	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
@@ -50,7 +50,7 @@ function getTask(fetch, taskId, propagateParams) {
 
 
 const getTaskStatus = module.exports.getTaskStatus =
-function getTaskStatus(fetch, taskId, propagateParams) {
+function getTaskStatus(fetch, taskId, propagateParams={}) {
 	const url = api.makeUrl(paths, `secured/task/${taskId}/status`);
 	return fetch(url, defaultParams(propagateParams))
 		.then(checkStatusCodeAndReturnJSON);
@@ -58,7 +58,7 @@ function getTaskStatus(fetch, taskId, propagateParams) {
 
 
 const monitorTaskStatus = module.exports.monitorTaskStatus =
-function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams) {
+function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 	const callbacks = _.defaults(_callbacks, {
 		onTaskStatus: noop,
 	});
@@ -124,7 +124,7 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams) {
 
 
 const runTool = module.exports.runTool =
-function runTool(fetch, toolId, _callbacks, params, propagateParams) {
+function runTool(fetch, toolId, _callbacks, params, propagateParams={}) {
 	const callbacks = _.defaults(_callbacks, {
 		onToolStart: noop,
 		onToolEnd: noop,
@@ -159,7 +159,7 @@ function runTool(fetch, toolId, _callbacks, params, propagateParams) {
 
 
 const retrieveFile = module.exports.retrieveFile =
-function retrieveFile(fetch, url, params, propagateParams) {
+function retrieveFile(fetch, url, params, propagateParams={}) {
 	const _params = _.merge(
 		{},
 		api.requestOptions.fetch.crossDomain,
@@ -182,7 +182,7 @@ function makeFileUrl(pathsObj, outputURL) {
 
 
 const runToolChain = module.exports.runToolChain =
-function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams) {
+function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams={}) {
 	// toolChainData:
 	// {
 	// 	"id": 47,
