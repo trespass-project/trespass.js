@@ -77,7 +77,6 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 				.then((taskStatusData) => {
 					if (taskStatusData.status) {
 						callbacks.onTaskStatus(taskStatusData);
-						console.log('  ', taskStatusData.status);
 						switch (taskStatusData.status) {
 							case 'processing':
 							case 'pending':
@@ -108,7 +107,7 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 										return res.text();
 									})
 									.then((stdErr) => {
-										console.error(stdErr);
+										throw new Error(stdErr);
 										alert(stdErr);
 									});
 
@@ -145,14 +144,13 @@ function monitorTaskStatus(fetch, taskId, _callbacks, propagateParams={}) {
 
 
 const runTool = module.exports.runTool =
-function runTool(fetch, toolId, _callbacks, params, propagateParams={}) {
+function runTool(fetch, toolData, _callbacks, params, propagateParams={}) {
 	const callbacks = _.defaults(_callbacks, {
 		onToolStart: noop,
 		onToolEnd: noop,
 	});
 
-	console.log('—————————————————————————');
-	console.log(toolId);
+	const toolId = toolData.id;
 	const url = api.makeUrl(paths, `secured/tool/${toolId}/run`);
 	const _params = _.merge(
 		{},
@@ -163,7 +161,7 @@ function runTool(fetch, toolId, _callbacks, params, propagateParams={}) {
 		propagateParams || {}
 	);
 
-	callbacks.onToolStart(toolId);
+	callbacks.onToolStart(toolData);
 	return fetch(url, _params)
 		.then(checkStatusCodeAndReturnJSON)
 		.then((runData) => {
@@ -172,7 +170,7 @@ function runTool(fetch, toolId, _callbacks, params, propagateParams={}) {
 			}
 			return monitorTaskStatus(fetch, runData.id, callbacks, propagateParams)
 				.then((arg) => {
-					callbacks.onToolEnd(toolId);
+					callbacks.onToolEnd(toolData);
 					return arg;
 				});
 		});
@@ -188,7 +186,6 @@ function retrieveFile(fetch, url, params, propagateParams={}) {
 		params,
 		propagateParams || {}
 	);
-	console.log('retrieving', url);
 	return fetch(url, _params);
 };
 
@@ -219,7 +216,7 @@ function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams=
 
 	// TODO: clean this up a bit
 	callbacks.onToolChainStart();
-	const first = runTool(fetch, toolChainData.tools[0].id, callbacks, params, propagateParams);
+	const first = runTool(fetch, toolChainData.tools[0], callbacks, params, propagateParams);
 
 	const chain = R.tail(toolChainData.tools)
 		.reduce((result, toolData) => {
@@ -244,7 +241,7 @@ function runToolChain(fetch, toolChainData, _callbacks, params, propagateParams=
 								method: 'post',
 								body: formData
 							};
-							return runTool(fetch, toolData.id, callbacks, params, propagateParams);
+							return runTool(fetch, toolData, callbacks, params, propagateParams);
 						});
 				});
 		}, first);
