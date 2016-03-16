@@ -406,7 +406,7 @@ const addItem = module.exports.addItem =
 function addItem(model, item) {
 	// item = _.extend(item || {}, {});
 	if (!item.name) {
-		item.name = item.id;
+		item.name = item.label || item.id;
 	}
 
 	// validate(item, 'item');
@@ -510,11 +510,11 @@ module.exports.knownAttributes = {
 
 	// model
 	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id', 'anm_data'],
-	location: ['id'],
-	actor: ['id'],
+	location: ['id', 'kbType'],
+	actor: ['id', 'kbType'],
 	edge: ['directed', 'kind'],
-	item: ['id', 'name', 'type'],
-	data: ['id', 'name', 'value'],
+	item: ['id', 'name', 'type', 'kbType'],
+	data: ['id', 'name', 'value', 'kbType'],
 	credLocation: ['id'],
 	credData: ['name'],
 	credItem: ['name'],
