@@ -405,10 +405,6 @@ function addActor(model, actor) {
 const addItem = module.exports.addItem =
 function addItem(model, item) {
 	// item = _.extend(item || {}, {});
-	if (!item.name) {
-		item.name = item.label || item.id;
-	}
-
 	// validate(item, 'item');
 	return add_(model, 'items', item);
 };
@@ -510,8 +506,8 @@ module.exports.knownAttributes = {
 
 	// model
 	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id', 'anm_data'],
-	location: ['id', 'kbType'],
-	actor: ['id', 'kbType'],
+	location: ['id', 'kbType', 'name'],
+	actor: ['id', 'kbType', 'name'],
 	edge: ['directed', 'kind'],
 	item: ['id', 'name', 'type', 'kbType'],
 	data: ['id', 'name', 'value', 'kbType'],
