@@ -506,11 +506,11 @@ module.exports.knownAttributes = {
 
 	// model
 	system: ['xmlns', 'xmlns:xsi', 'xsi:schemaLocation', 'author', 'version', 'date', 'id', 'anm_data'],
-	location: ['id', 'kbType', 'name'],
-	actor: ['id', 'kbType', 'name'],
+	location: ['id', 'type', 'name'],
+	actor: ['id', 'type', 'name'],
 	edge: ['directed', 'kind'],
-	item: ['id', 'name', 'type', 'kbType'],
-	data: ['id', 'name', 'value', 'kbType'],
+	item: ['id', 'name', 'type', 'type'],
+	data: ['id', 'name', 'value', 'type'],
 	credLocation: ['id'],
 	credData: ['name'],
 	credItem: ['name'],
