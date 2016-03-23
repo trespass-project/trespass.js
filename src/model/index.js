@@ -491,8 +491,8 @@ function addRoom(model, room) {
 const separateAttributeFromObject = module.exports.separateAttributeFromObject =
 function separateAttributeFromObject(attrNames, obj) {
 	attrNames = attrNames || [];
-	let attrObject = R.pick(attrNames, obj);
-	let newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
+	const attrObject = R.pick(attrNames, obj);
+	const newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
 	return { newObject, attrObject };
 };
 
@@ -637,7 +637,7 @@ function toXML(
 	model = prepareModelForXml(model);
 	model = prepareForXml(model);
 
-	var builder = new xml2js.Builder(xml2jsOptions);
+	const builder = new xml2js.Builder(xml2jsOptions);
 	const xmlStr = builder.buildObject(model);
 
 	// return xmlStr;
