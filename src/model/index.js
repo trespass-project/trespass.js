@@ -250,7 +250,7 @@ function parse(
 		}
 	}
 
-	let model = create();
+	const model = create();
 	let parsed;
 
 	async.series(
@@ -279,7 +279,7 @@ function parse(
 
 			(cb) => { // all the rest
 				singularPluralCollection.forEach((item) => {
-					let coll = parsed.system[item.origCollection];
+					const coll = parsed.system[item.origCollection];
 					if (coll) {
 						if (!_.isArray(coll[item.singular])) {
 							coll[item.singular] =[coll[item.singular]];
@@ -324,7 +324,7 @@ const options = {
 		// }
 	}
 };
-let schemas = {};
+const schemas = {};
 schemas.location = Joi.object().keys({
 	id: Joi.string().required(),
 	atLocations: Joi.array().items(Joi.string()).options(options['atLocations']),
@@ -378,7 +378,6 @@ const validationOptions = {
 };
 
 function validate(it, schemaName) {
-	// console.log(it);
 	const result = Joi.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
 		result.error.details
@@ -592,7 +591,7 @@ function prepareForXml(o, parentKey) {
 
 const prepareModelForXml = module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
-	let system = model.system;
+	const system = model.system;
 
 	const items = system.items || [];
 	const data = system.data || [];
