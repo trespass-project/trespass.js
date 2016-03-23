@@ -380,19 +380,38 @@ const validationOptions = {
 function validate(it, schemaName) {
 	const result = Joi.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
-		result.error.details
-			.forEach((detail) => {
+		return result.error.details
+			.map((detail) => {
 				const label = (it.name)
 					? it.name
 					: it.id;
-				const msg = (detail.path === 'atLocations')
+				const message = (detail.path === 'atLocations')
 					// ? detail.message.replace(/\".*\"/, label)
 					? `${label} must be located somewhere`
 					: `${label}: ${detail.message}`;
-				console.warn(msg);
+				// console.warn(msg);
+				return { message };
 			});
+	} else {
+		return [];
 	}
 }
+
+
+const validateModel =
+module.exports.validateModel =
+function validateModel(model) {
+	let errors = [];
+	collectionNames
+		.forEach((collectionName) => {
+			(model.system[collectionName] || [])
+				.forEach((item) => {
+					const schemaName = collectionNamesSingular[collectionName];
+					errors = errors.concat(validate(item, schemaName));
+				});
+		});
+	return errors;
+};
 
 
 // ---
@@ -413,7 +432,6 @@ function add_(model, dest, item) {
 const addActor = module.exports.addActor =
 function addActor(model, actor) {
 	// actor = _.extend(actor || {}, {});
-	// validate(actor, 'actor');
 	return add_(model, 'actors', actor);
 };
 
@@ -423,7 +441,6 @@ function addActor(model, actor) {
 const addItem = module.exports.addItem =
 function addItem(model, item) {
 	// item = _.extend(item || {}, {});
-	// validate(item, 'item');
 	return add_(model, 'items', item);
 };
 
@@ -437,7 +454,6 @@ function addData(model, data) {
 		data.name = data.id;
 	}
 
-	// validate(data, 'data');
 	return add_(model, 'data', data);
 };
 
@@ -451,7 +467,6 @@ function addEdge(model, edge) {
 	});
 
 	// edge = _.extend(edge || {}, {});
-	// validate(edge, 'edge');
 	return add_(model, 'edges', edge);
 };
 
@@ -460,7 +475,6 @@ function addEdge(model, edge) {
 // ## `addPolicy`
 const addPolicy = module.exports.addPolicy =
 function addPolicy(model, policy) {
-	// validate(policy, 'policy');
 	// console.warn('addPolicy() is not implemented yet');
 	return add_(model, 'policies', policy);
 };
@@ -470,7 +484,6 @@ function addPolicy(model, policy) {
 // ## `addPredicate`
 const addPredicate = module.exports.addPredicate =
 function addPredicate(model, predicate) {
-	// validate(predicate, 'predicate');
 	return add_(model, 'predicates', predicate);
 };
 
@@ -479,7 +492,6 @@ function addPredicate(model, predicate) {
 // ## `addProcess`
 const addProcess = module.exports.addProcess =
 function addProcess(model, process) {
-	// validate(process, 'process');
 	// console.warn('addProcess() is not implemented yet');
 	return add_(model, 'processes', process);
 };
@@ -490,7 +502,6 @@ function addProcess(model, process) {
 const addLocation = module.exports.addLocation =
 function addLocation(model, location) {
 	// location = _.extend(location || {}, {});
-	// validate(location, 'location');
 	return add_(model, 'locations', location);
 };
 
