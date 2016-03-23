@@ -27,6 +27,9 @@ const requestOptions = module.exports.requestOptions = {
 	},
 
 	fetch: {
+		acceptJSON: {
+			headers: { 'Accept': 'application/json' }
+		},
 		crossDomain: {
 			mode: 'cors',
 			// xDomain: true, // axios
