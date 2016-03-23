@@ -316,10 +316,18 @@ function parse(
 
 
 // element schema definitions for input validation
+const options = {
+	atLocations: {
+		// language: {
+		// 	// label: ' ',
+		// 	any: { required: 'must be located somewhere' }
+		// }
+	}
+};
 let schemas = {};
 schemas.location = Joi.object().keys({
 	id: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()),
+	atLocations: Joi.array().items(Joi.string()).options(options['atLocations']),
 });
 schemas.edge = Joi.object().keys({
 	source: Joi.string().required(),
@@ -331,28 +339,28 @@ schemas.item = Joi.object().keys({
 	id: Joi.string().required(),
 	name: Joi.string().required(),
 	type: Joi.string(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
 });
 schemas.data = Joi.object().keys({
 	id: Joi.string().required(),
 	name: Joi.string().required(),
 	value: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
 });
 schemas.actor = Joi.object().keys({
 	id: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
 });
 schemas.policy = Joi.object().keys({
 	id: Joi.string().required(),
 	enabled: Joi.object().required(), // TODO: refine
 	credentials: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required(),
+	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
 });
 schemas.process = Joi.object().keys({
 	id: Joi.string().required(),
 	actions: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required(),
+	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
 });
 schemas.predicate = Joi.object().keys({
 	id: Joi.string().required(),
@@ -370,9 +378,20 @@ const validationOptions = {
 };
 
 function validate(it, schemaName) {
+	// console.log(it);
 	const result = Joi.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
-		console.warn(schemaName, '→', result.error);
+		result.error.details
+			.forEach((detail) => {
+				const label = (it.name)
+					? it.name
+					: it.id;
+				const msg = (detail.path === 'atLocations')
+					// ? detail.message.replace(/\".*\"/, label)
+					? `${label} must be located somewhere`
+					: `${label}: ${detail.message}`;
+				console.warn(msg);
+			});
 	}
 }
 
