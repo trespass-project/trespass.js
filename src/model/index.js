@@ -279,10 +279,16 @@ function parse(
 
 			(cb) => { // all the rest
 				singularPluralCollection.forEach((item) => {
-					const coll = parsed.system[item.origCollection];
+					let coll = parsed.system[item.origCollection];
+
+					// this happens when
+					// <locations>       </locations>
+					if (_.isString(coll)) { // that's a bad sign
+						coll = [];
+					}
 					if (coll) {
 						if (!_.isArray(coll[item.singular])) {
-							coll[item.singular] =[coll[item.singular]];
+							coll[item.singular] = [coll[item.singular]];
 						}
 
 						// filter, because for some reason
