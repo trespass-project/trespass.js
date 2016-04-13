@@ -316,18 +316,19 @@ function parse(
 
 
 // element schema definitions for input validation
-const options = {
-	atLocations: {
-		// language: {
-		// 	// label: ' ',
-		// 	any: { required: 'must be located somewhere' }
-		// }
-	}
-};
+// const options = {
+// 	atLocations: {
+// 		language: {
+// 			// label: ' ',
+// 			any: { required: 'must be located somewhere' }
+// 		}
+// 	}
+// };
 const schemas = {};
 schemas.location = Joi.object().keys({
 	id: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()).options(options['atLocations']),
+	atLocations: Joi.array().items(Joi.string()),
+	type: Joi.string(),
 });
 schemas.edge = Joi.object().keys({
 	source: Joi.string().required(),
@@ -339,32 +340,34 @@ schemas.item = Joi.object().keys({
 	id: Joi.string().required(),
 	name: Joi.string().required(),
 	type: Joi.string(),
-	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.data = Joi.object().keys({
 	id: Joi.string().required(),
 	name: Joi.string().required(),
 	value: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
+	type: Joi.string(),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.actor = Joi.object().keys({
 	id: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
+	type: Joi.string(),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.policy = Joi.object().keys({
 	id: Joi.string().required(),
 	enabled: Joi.object().required(), // TODO: refine
 	credentials: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.process = Joi.object().keys({
 	id: Joi.string().required(),
 	actions: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required().options(options['atLocations']),
+	atLocations: Joi.array().items(Joi.string()).required(),
 });
 schemas.predicate = Joi.object().keys({
 	id: Joi.string().required(),
-	arity: Joi.string().required(),
+	arity: Joi.number().required(),
 	value: Joi.array().items(Joi.string()).required(),
 });
 schemas.metric = Joi.object().keys({
@@ -377,7 +380,10 @@ const validationOptions = {
 	allowUnknown: true,
 };
 
-function validate(it, schemaName) {
+
+const validateComponent =
+module.exports.validateComponent =
+function validateComponent(it, schemaName) {
 	const result = Joi.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
 		return result.error.details
@@ -407,7 +413,7 @@ function validateModel(model) {
 			(model.system[collectionName] || [])
 				.forEach((item) => {
 					const schemaName = collectionNamesSingular[collectionName];
-					errors = errors.concat(validate(item, schemaName));
+					errors = errors.concat(validateComponent(item, schemaName));
 				});
 		});
 	return errors;
