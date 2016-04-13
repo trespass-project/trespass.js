@@ -27,6 +27,9 @@ const requestOptions = module.exports.requestOptions = {
 	},
 
 	fetch: {
+		contentTypeJSON: {
+			headers: { 'Content-Type': 'application/json' }
+		},
 		acceptJSON: {
 			headers: { 'Accept': 'application/json' }
 		},
