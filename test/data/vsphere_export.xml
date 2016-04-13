@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<system id="trespass-model-id" author="ciab-exportAsTML.py" date="2016-02-11T17:07:07.098347"
+<system id="trespass-model-id" author="ciab-exportAsTML.py" date="2016-03-30T09:14:59.292151"
 	version="0.5" xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd">
@@ -10,7 +10,7 @@
 	</locations>
 	<edges>
 		<edge directed="false">
-			<source>entity_vim.VirtualMachine_vm-15</source>
+			<source>entity_vim.VirtualMachine_vm-26</source>
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
@@ -18,15 +18,23 @@
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
-			<source>entity_vim.VirtualMachine_vm-27</source>
-			<target>entity_vim.Network_network-14</target>
-		</edge>
-		<edge directed="false">
 			<source>entity_vim.VirtualMachine_vm-29</source>
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
-			<source>entity_vim.HostSystem_host-12</source>
+			<source>entity_vim.VirtualMachine_vm-27</source>
+			<target>entity_vim.Network_network-14</target>
+		</edge>
+		<edge directed="false">
+			<source>entity_vim.VirtualMachine_vm-18</source>
+			<target>entity_vim.Network_network-14</target>
+		</edge>
+		<edge directed="false">
+			<source>entity_vim.VirtualMachine_vm-15</source>
+			<target>entity_vim.Network_network-14</target>
+		</edge>
+		<edge directed="false">
+			<source>entity_vim.HostSystem_host-20</source>
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
@@ -34,7 +42,7 @@
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
-			<source>entity_vim.VirtualMachine_vm-18</source>
+			<source>entity_vim.HostSystem_host-12</source>
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
@@ -43,14 +51,6 @@
 		</edge>
 		<edge directed="false">
 			<source>entity_vim.VirtualMachine_vm-32</source>
-			<target>entity_vim.Network_network-14</target>
-		</edge>
-		<edge directed="false">
-			<source>entity_vim.VirtualMachine_vm-26</source>
-			<target>entity_vim.Network_network-14</target>
-		</edge>
-		<edge directed="false">
-			<source>entity_vim.HostSystem_host-20</source>
 			<target>entity_vim.Network_network-14</target>
 		</edge>
 		<edge directed="false">
@@ -63,57 +63,68 @@
 			<atLocations>entity_vim.VirtualMachine_vm-26</atLocations>
 		</data>
 		<item id="entity_vim.Datastore_datastore-13" name="vsanDatastore"
-			type="storage">
+			type="tkb:vmware-datastore">
 			<atLocations>RoomDatacenter</atLocations>
 		</item>
-		<item id="laptop" name="Laptop" type="laptop">
+		<item id="laptop" name="Laptop" type="tkb:laptop">
 			<atLocations>RoomInternal</atLocations>
 		</item>
-		<item id="entity_vim.VirtualMachine_vm-16" name="viz" type="vm">
+		<item id="entity_vim.VirtualMachine_vm-16" name="viz"
+			type="tkb:vmware-virtualmachine">
 			<atLocations>entity_vim.HostSystem_host-12
 				entity_vim.Datastore_datastore-13</atLocations>
 		</item>
 		<item id="entity_vim.VirtualMachine_vm-15" name="ubuntu-template"
-			type="vm">
+			type="tkb:vmware-virtualmachine">
 			<atLocations>entity_vim.Datastore_datastore-13
 				entity_vim.HostSystem_host-12</atLocations>
 		</item>
-		<item id="entity_vim.Network_network-14" name="VM Network" type="network">
+		<item id="entity_vim.Network_network-14" name="VM Network"
+			type="tkb:vmware-network">
 			<atLocations>RoomDatacenter</atLocations>
 		</item>
-		<item id="entity_vim.VirtualMachine_vm-18" name="vcsa" type="vm">
-			<atLocations>entity_vim.HostSystem_host-12
+		<item id="entity_vim.VirtualMachine_vm-18" name="vcsa"
+			type="tkb:vmware-virtualmachine">
+			<atLocations>entity_vim.Datastore_datastore-13
+				entity_vim.HostSystem_host-12</atLocations>
+		</item>
+		<item id="entity_vim.VirtualMachine_vm-28" name="vm3"
+			type="tkb:vmware-virtualmachine">
+			<atLocations>entity_vim.HostSystem_host-20
 				entity_vim.Datastore_datastore-13</atLocations>
 		</item>
-		<item id="entity_vim.VirtualMachine_vm-28" name="vm3" type="vm">
+		<item id="entity_vim.VirtualMachine_vm-29" name="vm4"
+			type="tkb:vmware-virtualmachine">
 			<atLocations>entity_vim.Datastore_datastore-13
 				entity_vim.HostSystem_host-20</atLocations>
 		</item>
-		<item id="entity_vim.VirtualMachine_vm-29" name="vm4" type="vm">
+		<item id="entity_vim.HostSystem_host-12" name="nuc1"
+			type="tkb:vmware-hostsystem">
+			<atLocations>RoomDatacenter entity_vim.Datastore_datastore-13
+			</atLocations>
+		</item>
+		<item id="entity_vim.HostSystem_host-20" name="nuc3"
+			type="tkb:vmware-hostsystem">
+			<atLocations>RoomDatacenter entity_vim.Datastore_datastore-13
+			</atLocations>
+		</item>
+		<item id="entity_vim.VirtualMachine_vm-26" name="vm1"
+			type="tkb:vmware-virtualmachine">
+			<atLocations>entity_vim.Datastore_datastore-13
+				entity_vim.HostSystem_host-19</atLocations>
+		</item>
+		<item id="entity_vim.VirtualMachine_vm-27" name="vm2"
+			type="tkb:vmware-virtualmachine">
 			<atLocations>entity_vim.Datastore_datastore-13
 				entity_vim.HostSystem_host-20</atLocations>
 		</item>
-		<item id="entity_vim.HostSystem_host-12" name="nuc1" type="server">
+		<item id="entity_vim.HostSystem_host-19" name="nuc2"
+			type="tkb:vmware-hostsystem">
 			<atLocations>RoomDatacenter entity_vim.Datastore_datastore-13
 			</atLocations>
 		</item>
-		<item id="entity_vim.HostSystem_host-20" name="nuc3" type="server">
-			<atLocations>RoomDatacenter entity_vim.Datastore_datastore-13
-			</atLocations>
-		</item>
-		<item id="entity_vim.VirtualMachine_vm-26" name="vm1" type="vm">
-			<atLocations>entity_vim.HostSystem_host-19
-				entity_vim.Datastore_datastore-13</atLocations>
-		</item>
-		<item id="entity_vim.VirtualMachine_vm-27" name="vm2" type="vm">
-			<atLocations>entity_vim.Datastore_datastore-13
-				entity_vim.HostSystem_host-20</atLocations>
-		</item>
-		<item id="entity_vim.HostSystem_host-19" name="nuc2" type="server">
-			<atLocations>RoomDatacenter entity_vim.Datastore_datastore-13
-			</atLocations>
-		</item>
-		<item id="entity_vim.VirtualMachine_vm-32" name="OpenVAS" type="vm">
+		<item id="entity_vim.VirtualMachine_vm-32" name="OpenVAS"
+			type="tkb:vmware-virtualmachine">
 			<atLocations>entity_vim.HostSystem_host-12
 				entity_vim.Datastore_datastore-13</atLocations>
 		</item>
@@ -748,8 +759,6 @@
 			<value> big entity_vim.VirtualMachine_vm-28 </value>
 			<value> big entity_vim.VirtualMachine_vm-29 </value>
 			<value> big entity_vim.VirtualMachine_vm-32 </value>
-			<value> finn entity_vim.VirtualMachine_vm-28 </value>
-			<value> finn entity_vim.VirtualMachine_vm-29 </value>
 			<value> ethan entity_vim.VirtualMachine_vm-26 </value>
 			<value> sydney entity_vim.HostSystem_host-12 </value>
 			<value> sydney entity_vim.HostSystem_host-19 </value>
@@ -763,20 +772,22 @@
 			<value> sydney entity_vim.VirtualMachine_vm-29 </value>
 			<value> sydney entity_vim.VirtualMachine_vm-32 </value>
 			<value> sydney laptop </value>
+			<value> finn entity_vim.VirtualMachine_vm-28 </value>
+			<value> finn entity_vim.VirtualMachine_vm-29 </value>
 		</predicate>
 		<predicate arity="2" id="isPasswordOf"><!-- example: <value>x007_v ethan</value> -->
 			<value>pw_big big</value>
-			<value>pw_finn finn</value>
+			<value>pw_terry terry</value>
 			<value>pw_ethan ethan</value>
 			<value>pw_sydney sydney</value>
-			<value>pw_terry terry</value>
+			<value>pw_finn finn</value>
 		</predicate>
 		<predicate arity="2" id="isUidOf"><!-- example: <value>ethan Ethan</value> -->
 			<value>big Mr_Big</value>
-			<value>finn Finn</value>
+			<value>terry Terry</value>
 			<value>ethan Ethan</value>
 			<value>sydney Sydney</value>
-			<value>terry Terry</value>
+			<value>finn Finn</value>
 		</predicate>
 	</predicates>
 </system>
