@@ -32,11 +32,9 @@ const requestOptions = module.exports.requestOptions = {
 		},
 		crossDomain: {
 			mode: 'cors',
-			// xDomain: true, // axios
 		},
 		withCredentials: { // to send session cookie
 			credentials: 'include'
-			// withCredentials: true, // axios
 		},
 		fileUpload: { // to upload files as FormData to tools API
 			method: 'post'

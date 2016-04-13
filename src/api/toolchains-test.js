@@ -109,7 +109,7 @@ const callbacks = {
 	// onTaskStatus: (taskStatusData) => {
 	// 	console.log('onTaskStatus', taskStatusData);
 	// },
-}
+};
 
 toolsApi.runToolChain(fetch, toolChainData, callbacks, params, propagateParams)
 	.then((data) => {

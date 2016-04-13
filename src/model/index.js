@@ -395,7 +395,7 @@ function validate(it, schemaName) {
 	} else {
 		return [];
 	}
-}
+};
 
 
 const validateModel =
