@@ -204,7 +204,6 @@ function singular(plural) {
 
 // ---
 // ## `parse()`
-// > parse XML with [`cheerio`](https://www.npmjs.com/package/cheerio), so that we can query the model 'jquery-style'.
 const parse = module.exports.parse =
 function parse(
 	xmlStr, /* String */
@@ -228,14 +227,19 @@ function parse(
 			item = item
 				.replace(/[\r\n\t]/ig, ' ')
 				.replace(/ +/ig, ' ');
-
 			if (key === 'atLocations') {
-				item = item.split(/ +/);
+				item = item.split(/ +/)
+					.map(loc => {
+						return loc.trim();
+					})
+					.filter(loc => {
+						return !_.isEmpty(loc);
+					});
+				console.log(item);
 			}
 			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
 				item = item.split(/ +/);
 			}
-
 			return item;
 		} else if (_.isNumber(item)) {
 			return item;
@@ -245,7 +249,6 @@ function parse(
 				.forEach((key) => {
 					item[key] = recurse(item[key], R.append(key, trace));
 				});
-
 			return item;
 		}
 	}
