@@ -235,7 +235,6 @@ function parse(
 					.filter(loc => {
 						return !_.isEmpty(loc);
 					});
-				console.log(item);
 			}
 			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
 				item = item.split(/ +/);
