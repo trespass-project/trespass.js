@@ -576,7 +576,7 @@ function toPrefixedObject(prefix, it) {
 const prepareForXml = module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
-		return o.map((item, index) => {
+		return o.map((item) => {
 			// put things back together
 			if (parentKey === 'value' && _.isArray(item)) {
 				item = item.join(' ');
@@ -639,8 +639,8 @@ function prepareModelForXml(model) {
 		});
 
 	system.assets = {
+		data,
 		item: items,
-		data: data,
 	};
 	if (!system.assets.item.length) {
 		delete system.assets.item;
