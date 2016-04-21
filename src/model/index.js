@@ -154,27 +154,22 @@ function createScenario() {
 
 const scenarioSetModel = module.exports.scenarioSetModel =
 function scenarioSetModel(scenario, modelFileName) {
-	return _.merge(
-		{},
+	return update(
 		scenario,
-		{ scenario: { model: modelFileName } }
+		{ scenario: { model: { $set: modelFileName } } }
 	);
 };
 
 const scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
 function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
-	return _.merge(
-		{},
+	const goal = {
+		profit,
+		attacker: attackerId,
+		asset: assetId,
+	};
+	return update(
 		scenario,
-		{
-			scenario: {
-				assetGoal: {
-					profit,
-					attacker: attackerId,
-					asset: assetId,
-				},
-			},
-		}
+		{ scenario: { assetGoal: { $set: goal } } }
 	);
 };
 
@@ -433,102 +428,99 @@ function validateModel(model) {
 // ## `add_`
 const add_ = module.exports.add_ =
 function add_(model, dest, item) {
-	if (!model.system[dest]) {
-		model.system[dest] = [];
-	}
-
-	model.system[dest].push(item);
-	return model;
+	const updateData = {
+		[dest]: {
+			$set: (!model.system[dest])
+				? [item]
+				: [...model.system[dest], item]
+		}
+	};
+	return update(model, { system: updateData });
 };
 
 
 // ---
 // ## `addActor`
 const addActor = module.exports.addActor =
-function addActor(model, actor) {
-	// actor = _.extend(actor || {}, {});
-	return add_(model, 'actors', actor);
+function addActor(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'actors', it);
 };
 
 
 // ---
 // ## `addItem`
 const addItem = module.exports.addItem =
-function addItem(model, item) {
-	// item = _.extend(item || {}, {});
-	return add_(model, 'items', item);
+function addItem(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'items', it);
 };
 
 
 // ---
 // ## `addData`
 const addData = module.exports.addData =
-function addData(model, data) {
-	// data = _.extend(data || {}, {});
-	if (!data.name) {
-		data.name = data.id;
+function addData(model, _it={}) {
+	const it = _.merge({}, _it);
+	if (!it.name) {
+		it.name = it.id;
 	}
-
-	return add_(model, 'data', data);
+	return add_(model, 'data', it);
 };
 
 
 // ---
 // ## `addEdge`
 const addEdge = module.exports.addEdge =
-function addEdge(model, edge) {
-	edge = _.defaults(edge || {}, {
-		directed: true,
-	});
-
-	// edge = _.extend(edge || {}, {});
-	return add_(model, 'edges', edge);
+function addEdge(model, _it={}) {
+	const it = _.merge({ directed: true }, _it);
+	return add_(model, 'edges', it);
 };
 
 
 // ---
 // ## `addPolicy`
 const addPolicy = module.exports.addPolicy =
-function addPolicy(model, policy) {
-	// console.warn('addPolicy() is not implemented yet');
-	return add_(model, 'policies', policy);
+function addPolicy(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'policies', it);
 };
 
 
 // ---
 // ## `addPredicate`
 const addPredicate = module.exports.addPredicate =
-function addPredicate(model, predicate) {
-	return add_(model, 'predicates', predicate);
+function addPredicate(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'predicates', it);
 };
 
 
 // ---
 // ## `addProcess`
 const addProcess = module.exports.addProcess =
-function addProcess(model, process) {
-	// console.warn('addProcess() is not implemented yet');
-	return add_(model, 'processes', process);
+function addProcess(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'processes', it);
 };
 
 
 // ---
 // ## `addLocation`
 const addLocation = module.exports.addLocation =
-function addLocation(model, location) {
-	// location = _.extend(location || {}, {});
-	return add_(model, 'locations', location);
+function addLocation(model, _it={}) {
+	const it = _.merge({}, _it);
+	return add_(model, 'locations', it);
 };
 
 
 // ---
 // ## `addRoom`
 const addRoom = module.exports.addRoom =
-function addRoom(model, room) {
-	// room = _.extend(room || {}, {
-	// 	// domain: 'physical'
-	// });
-	return addLocation(model, room);
+function addRoom(model, _it={}) {
+	const it = _.merge({}, _it);
+	console.warn('use addLocation() instead');
+	return addLocation(model, it);
 };
 
 
@@ -667,7 +659,7 @@ function toXML(
 	_model /* Object */
 ) {
 	// duplicate model
-	let model = _.merge({}, _model);
+	const model = _.merge({}, _model);
 
 	if (!model.system.id) {
 		throw new Error('model.system needs an id');
@@ -678,11 +670,11 @@ function toXML(
 		date: moment().format('YYYY-MM-DD HH:mm:ss'),
 	});
 
-	model = prepareModelForXml(model);
-	model = prepareForXml(model);
+	/*model = */prepareModelForXml(model);
+	const preparedModel = prepareForXml(model);
 
 	const builder = new xml2js.Builder(xml2jsOptions);
-	const xmlStr = builder.buildObject(model);
+	const xmlStr = builder.buildObject(preparedModel);
 
 	// return xmlStr;
 	return pd.xml(xmlStr)
