@@ -1,5 +1,6 @@
 'use strict';
 
+import update from 'immutability-helper';
 const _ = require('lodash');
 const R = require('ramda');
 const Joi = require('joi');
