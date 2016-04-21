@@ -177,7 +177,8 @@ const scenarioToXML = module.exports.scenarioToXML =
 function scenarioToXML(_scenario) {
 	const scenario = _.merge({}, _scenario);
 
-	scenario.scenario.date = scenario.scenario.date || moment().format('YYYY-MM-DD HH:mm:ss');
+	scenario.scenario.date = (scenario.scenario.date || moment())
+		.format('YYYY-MM-DD HH:mm:ss');
 
 	if (!scenario.scenario.id) {
 		throw new Error('scenario needs an id');
@@ -255,10 +256,7 @@ function parse(
 		[
 			(cb) => { // parse
 				xml2js.parseString(xmlStr, xml2jsOptions, (err, _parsed) => {
-					if (err) {
-						return cb(err);
-					}
-
+					if (err) { return cb(err); }
 					parsed = _parsed;
 					cb(null);
 				});
@@ -293,9 +291,7 @@ function parse(
 						// `coll[item.singular]` is [undefined] in some cases
 						// TODO: find out why
 						coll[item.singular] = coll[item.singular]
-							.filter((item) => {
-								return !!item;
-							});
+							.filter((item) => !!item);
 
 						model.system[item.plural] = recurse(coll[item.singular], [item.singular]);
 					}
@@ -310,9 +306,7 @@ function parse(
 		],
 
 		(err) => {
-			if (err) {
-				console.error(err);
-			}
+			if (err) { console.error(err); }
 			done(err, model);
 		}
 	);
@@ -402,9 +396,8 @@ function validateComponent(it, schemaName) {
 				// console.warn(msg);
 				return { message };
 			});
-	} else {
-		return [];
 	}
+	return [];
 };
 
 
@@ -525,8 +518,7 @@ function addRoom(model, _it={}) {
 
 
 const separateAttributeFromObject = module.exports.separateAttributeFromObject =
-function separateAttributeFromObject(attrNames, obj) {
-	attrNames = attrNames || [];
+function separateAttributeFromObject(attrNames=[], obj) {
 	const attrObject = R.pick(attrNames, obj);
 	const newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
 	return { newObject, attrObject };
