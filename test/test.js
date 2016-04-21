@@ -488,6 +488,7 @@ describe(f1('trespass.model'), function() {
 		it(f3('should add model'), function() {
 			assert(!!scenario.scenario.model);
 			assert(scenario.scenario.model === 'model-file-name.xml');
+			assert(scenario.scenario.model !== empty.scenario.model);
 		});
 	});
 
