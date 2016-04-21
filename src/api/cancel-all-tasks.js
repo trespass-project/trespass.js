@@ -19,7 +19,7 @@ const authParams = {
 
 
 function getAllTasks() {
-	const url = api.makeUrl(toolsApi, `secured/task`);
+	const url = api.makeUrl(toolsApi, 'secured/task');
 	const params = _.merge(
 		{},
 		api.requestOptions.fetch.crossDomain,
@@ -55,9 +55,7 @@ function cancelTask(taskId) {
 
 
 getAllTasks()
-	.then((res) => {
-		return res.json();
-	})
+	.then((res) => res.json())
 	.then((tasks) => {
 		tasks.forEach((task) => {
 			console.log(task.id, chalk.green(task.status), '... cancelling');
