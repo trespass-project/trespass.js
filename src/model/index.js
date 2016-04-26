@@ -3,7 +3,7 @@
 import update from 'immutability-helper';
 const _ = require('lodash');
 const R = require('ramda');
-const Joi = require('joi');
+const yup = require('yup');
 const async = require('async');
 const moment = require('moment');
 const xml2js = require('xml2js');
@@ -323,55 +323,55 @@ function parse(
 // 	}
 // };
 const schemas = {};
-schemas.location = Joi.object().keys({
-	id: Joi.string().required(),
-	atLocations: Joi.array().items(Joi.string()),
-	type: Joi.string(),
+schemas.location = yup.object().shape({
+	id: yup.string().required(),
+	atLocations: yup.array().of(yup.string()),
+	type: yup.string(),
 });
-schemas.edge = Joi.object().keys({
-	source: Joi.string().required(),
-	target: Joi.string().required(),
-	kind: Joi.string(),
-	directed: Joi.boolean(),
+schemas.edge = yup.object().shape({
+	source: yup.string().required(),
+	target: yup.string().required(),
+	kind: yup.string(),
+	directed: yup.boolean(),
 });
-schemas.item = Joi.object().keys({
-	id: Joi.string().required(),
-	name: Joi.string().required(),
-	type: Joi.string(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+schemas.item = yup.object().shape({
+	id: yup.string().required(),
+	name: yup.string().required(),
+	type: yup.string(),
+	atLocations: yup.array().of(yup.string()).required(),
 });
-schemas.data = Joi.object().keys({
-	id: Joi.string().required(),
-	name: Joi.string().required(),
-	value: Joi.string().required(),
-	type: Joi.string(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+schemas.data = yup.object().shape({
+	id: yup.string().required(),
+	name: yup.string().required(),
+	value: yup.string().required(),
+	type: yup.string(),
+	atLocations: yup.array().of(yup.string()).required(),
 });
-schemas.actor = Joi.object().keys({
-	id: Joi.string().required(),
-	type: Joi.string(),
-	atLocations: Joi.array().items(Joi.string()).required(),
+schemas.actor = yup.object().shape({
+	id: yup.string().required(),
+	type: yup.string(),
+	atLocations: yup.array().of(yup.string()).required(),
 });
-schemas.policy = Joi.object().keys({
-	id: Joi.string().required(),
-	enabled: Joi.object().required(), // TODO: refine
-	credentials: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required(),
+schemas.policy = yup.object().shape({
+	id: yup.string().required(),
+	enabled: yup.object().required(), // TODO: refine
+	credentials: yup.object().required(), // TODO: refine
+	atLocations: yup.array().of(yup.string()).required(),
 });
-schemas.process = Joi.object().keys({
-	id: Joi.string().required(),
-	actions: Joi.object().required(), // TODO: refine
-	atLocations: Joi.array().items(Joi.string()).required(),
+schemas.process = yup.object().shape({
+	id: yup.string().required(),
+	actions: yup.object().required(), // TODO: refine
+	atLocations: yup.array().of(yup.string()).required(),
 });
-schemas.predicate = Joi.object().keys({
-	id: Joi.string().required(),
-	arity: Joi.number().required(),
-	value: Joi.array().items(Joi.string()).required(),
+schemas.predicate = yup.object().shape({
+	id: yup.string().required(),
+	arity: yup.number().required(),
+	value: yup.array().of(yup.string()).required(),
 });
-schemas.metric = Joi.object().keys({
-	name: Joi.string().required(),
-	value: Joi.string().required(),
-	namespace: Joi.string(),
+schemas.metric = yup.object().shape({
+	name: yup.string().required(),
+	value: yup.string().required(),
+	namespace: yup.string(),
 });
 
 const validationOptions = {
@@ -382,7 +382,7 @@ const validationOptions = {
 const validateComponent =
 module.exports.validateComponent =
 function validateComponent(it, schemaName) {
-	const result = Joi.validate(it, schemas[schemaName], validationOptions);
+	const result = yup.validate(it, schemas[schemaName], validationOptions);
 	if (result.error) {
 		return result.error.details
 			.map((detail) => {
