@@ -502,7 +502,6 @@ describe(f1('trespass.model'), function() {
 			assert(scenario.scenario.assetGoal.attacker === 'attackerId');
 			assert(scenario.scenario.assetGoal.asset === 'assetId');
 		});
-	});
 
 	describe(f2('.scenarioToXML()'), function() {
 		it(f3('should require an id'), () => {
@@ -529,4 +528,45 @@ describe(f1('trespass.model'), function() {
 		});
 	});
 
+	// ——————————————————————————————————————
+
+	});
+
+	describe(f2('.validateComponent()'), function() {
+		it(f3('should work'), function() {
+			let obj = { type: 'type', };
+			let result = trespass.model.validateComponent(obj, 'location');
+			assert(result.length);
+
+			obj = { type: 123, };
+			result = trespass.model.validateComponent(obj, 'location');
+			assert(result.length);
+			assert(result.length === 2);
+		});
+
+		it(f3('should work with arrays of things'), function() {
+			let obj = {
+				id: 'actor',
+				atLocations: [],
+			};
+			let result = trespass.model.validateComponent(obj, 'actor');
+			assert(result.length > 0);
+
+			obj = {
+				id: 'actor',
+				atLocations: [1, 2, 3],
+			};
+			result = trespass.model.validateComponent(obj, 'actor');
+			assert(result.length > 0);
+		});
+
+		it(f3('should return a custom message for atLocations'), function() {
+			let obj = {
+				id: 'actor',
+				// atLocations: [],
+			};
+			let result = trespass.model.validateComponent(obj, 'actor');
+			assert(result[0].message === 'actor must be located somewhere');
+		});
+	});
 });

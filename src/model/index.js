@@ -3,7 +3,7 @@
 import update from 'immutability-helper';
 const _ = require('lodash');
 const R = require('ramda');
-const yup = require('yup');
+const revalidator = require('revalidator');
 const async = require('async');
 const moment = require('moment');
 const xml2js = require('xml2js');
@@ -323,77 +323,230 @@ function parse(
 // 	}
 // };
 const schemas = {};
-schemas.location = yup.object().shape({
-	id: yup.string().required(),
-	atLocations: yup.array().of(yup.string()),
-	type: yup.string(),
-});
-schemas.edge = yup.object().shape({
-	source: yup.string().required(),
-	target: yup.string().required(),
-	kind: yup.string(),
-	directed: yup.boolean(),
-});
-schemas.item = yup.object().shape({
-	id: yup.string().required(),
-	name: yup.string().required(),
-	type: yup.string(),
-	atLocations: yup.array().of(yup.string()).required(),
-});
-schemas.data = yup.object().shape({
-	id: yup.string().required(),
-	name: yup.string().required(),
-	value: yup.string().required(),
-	type: yup.string(),
-	atLocations: yup.array().of(yup.string()).required(),
-});
-schemas.actor = yup.object().shape({
-	id: yup.string().required(),
-	type: yup.string(),
-	atLocations: yup.array().of(yup.string()).required(),
-});
-schemas.policy = yup.object().shape({
-	id: yup.string().required(),
-	enabled: yup.object().required(), // TODO: refine
-	credentials: yup.object().required(), // TODO: refine
-	atLocations: yup.array().of(yup.string()).required(),
-});
-schemas.process = yup.object().shape({
-	id: yup.string().required(),
-	actions: yup.object().required(), // TODO: refine
-	atLocations: yup.array().of(yup.string()).required(),
-});
-schemas.predicate = yup.object().shape({
-	id: yup.string().required(),
-	arity: yup.number().required(),
-	value: yup.array().of(yup.string()).required(),
-});
-schemas.metric = yup.object().shape({
-	name: yup.string().required(),
-	value: yup.string().required(),
-	namespace: yup.string(),
-});
+schemas.location = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				// anyOf: [{ type: 'string' }],
+				type: 'string',
+			},
+			required: false,
+		},
+		type: {
+			type: 'string',
+			required: false,
+		},
+	}
+};
+schemas.edge = {
+	properties: {
+		source: {
+			type: 'string',
+			required: true,
+		},
+		target: {
+			type: 'string',
+			required: true,
+		},
+		kind: {
+			type: 'string',
+			required: false,
+		},
+		directed: {
+			type: 'boolean',
+			required: false,
+		},
+	}
+};
+schemas.item = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		name: {
+			type: 'string',
+			required: true,
+		},
+		type: {
+			type: 'string',
+			required: false,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.data = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		name: {
+			type: 'string',
+			required: true,
+		},
+		value: {
+			type: 'string',
+			required: true,
+		},
+		type: {
+			type: 'string',
+			required: false,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.actor = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		type: {
+			type: 'string',
+			required: false,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.policy = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		enabled: {
+			type: 'object',
+			required: true,
+		},
+		credentials: {
+			type: 'object',
+			required: true,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.process = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		actions: {
+			type: 'object',
+			required: true,
+		},
+		atLocations: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.predicate = {
+	properties: {
+		id: {
+			type: 'string',
+			required: true,
+		},
+		arity: {
+			type: 'number',
+			required: true,
+		},
+		value: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+			minItems: 1,
+			required: true,
+		},
+	}
+};
+schemas.metric = {
+	properties: {
+		name: {
+			type: 'string',
+			required: true,
+		},
+		value: {
+			type: 'string',
+			required: true,
+		},
+		namespace: {
+			type: 'string',
+			required: false,
+		},
+	}
+};
 
 const validationOptions = {
-	allowUnknown: true,
+	additionalProperties: true,
 };
 
 
 const validateComponent =
 module.exports.validateComponent =
 function validateComponent(it, schemaName) {
-	const result = yup.validate(it, schemas[schemaName], validationOptions);
-	if (result.error) {
-		return result.error.details
-			.map((detail) => {
-				const label = (it.name)
-					? it.name
-					: it.id;
-				const message = (detail.path === 'atLocations')
-					// ? detail.message.replace(/\".*\"/, label)
+	const result = revalidator.validate(it, schemas[schemaName], validationOptions);
+	/*
+	{ valid: false,
+	  errors:
+	   [ { attribute: 'required',
+	       property: 'name',
+	       expected: true,
+	       actual: undefined,
+	       message: 'is required' },
+	     { attribute: 'required',
+	       property: 'age',
+	       expected: true,
+	       actual: undefined,
+	       message: 'is required' } ] }
+	*/
+
+	if (!result.valid) {
+		return result.errors
+			.map((err) => {
+				const label = it.name || it.id || `(unnamed ${schemaName})`;
+				const message = (err.property === 'atLocations')
 					? `${label} must be located somewhere`
-					: `${label}: ${detail.message}`;
-				// console.warn(msg);
+					: `${label}: ${err.property} ${err.message}`;
 				return { message };
 			});
 	}
