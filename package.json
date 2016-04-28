@@ -8,7 +8,7 @@
     "start": "gulp",
     "lint": "eslint ./src",
     "test": "mocha",
-    "test-watch": "mocha --watch"
+    "test-watch": "npm run test -- --watch"
   },
   "author": "",
   "devDependencies": {
