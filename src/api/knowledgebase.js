@@ -93,7 +93,8 @@ function createItem(ajax, modelId, item) {
 			method: 'put',
 			data: JSON.stringify(data),
 		},
-		api.requestOptions.jquery.acceptJSON,
+		// api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.acceptPlainText,
 		api.requestOptions.jquery.contentTypeJSON,
 		api.requestOptions.jquery.crossDomain
 	);
@@ -122,7 +123,8 @@ function deleteItem(ajax, modelId, itemId) {
 			url,
 			method: 'delete'
 		},
-		api.requestOptions.jquery.acceptJSON,
+		// api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.acceptPlainText,
 		api.requestOptions.jquery.contentTypeJSON,
 		api.requestOptions.jquery.crossDomain
 	);

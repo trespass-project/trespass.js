@@ -30,6 +30,9 @@ const requestOptions = module.exports.requestOptions = {
 		acceptJSON: {
 			dataType: 'json',
 		},
+		acceptPlainText: {
+			dataType: 'text',
+		},
 	},
 
 	fetch: {
