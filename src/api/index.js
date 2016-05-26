@@ -23,7 +23,16 @@ const requestOptions = module.exports.requestOptions = {
 			method: 'post',
 			processData: false,
 			contentType: false
-		}
+		},
+		contentTypeJSON: {
+			contentType: 'application/json',
+		},
+		acceptJSON: {
+			dataType: 'json',
+		},
+		acceptPlainText: {
+			dataType: 'text',
+		},
 	},
 
 	fetch: {
