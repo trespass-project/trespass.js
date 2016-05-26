@@ -9,7 +9,10 @@ const api = require('./index.js');
 knowledge base API
 http://localhost:8080/tkb/
 */
-const host = module.exports.host = (window.location.toString().indexOf('itrust') > -1)
+const isItrust = (typeof window !== 'undefined')
+	? (window.location.toString().indexOf('itrust') > -1)
+	: false;
+const host = module.exports.host = (isItrust)
 	? 'https://trespass-tkb.itrust.lu/'
 	: 'http://localhost:8080/';
 const prefix = module.exports.prefix = 'tkb/';
