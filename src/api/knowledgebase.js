@@ -23,6 +23,20 @@ const noop = () => {};
 const retryRate = 1000;
 
 
+const listModels =
+module.exports.listModels =
+function listModels(ajax) {
+	const url = api.makeUrl(paths, 'model');
+	const params = _.merge(
+		{ url },
+		api.requestOptions.jquery.acceptJSON,
+		// api.requestOptions.jquery.contentTypeJSON,
+		api.requestOptions.jquery.crossDomain
+	);
+	return ajax(params);
+};
+
+
 // const createModel =
 // module.exports.createModel =
 // function createModel(fetch, modelId) {
