@@ -13,8 +13,13 @@ http://localhost:8080/tkb/
 const isItrust = (typeof window !== 'undefined')
 	? (window.location.toString().indexOf('itrust') > -1)
 	: false;
+const isDynu = (typeof window !== 'undefined')
+	? (window.location.toString().indexOf('dynu.com') > -1)
+	: false;
 const host = module.exports.host = (isItrust)
 	? 'https://trespass-tkb.itrust.lu/'
+	: (isDynu) 
+	? 'http://trespass-anm.dynu.com/' 
 	: 'http://localhost:8080/';
 const prefix = module.exports.prefix = 'tkb/';
 const paths = { host, prefix };
