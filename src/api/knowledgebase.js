@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const R = require('ramda');
 const api = require('./index.js');
+const queryString = require('query-string');
 
 
 /*
@@ -37,32 +38,121 @@ function listModels(ajax) {
 };
 
 
-// const createModel =
-// module.exports.createModel =
-// function createModel(fetch, modelId) {
-// 	const url = api.makeUrl(paths, `model/${modelId}`);
-// 	const params = _.merge(
-// 		{ method: 'put' },
-// 		api.requestOptions.fetch.acceptJSON,
-// 		api.requestOptions.fetch.contentTypeJSON,
-// 		api.requestOptions.fetch.crossDomain
-// 	);
-// 	return fetch(url, params);
-// };
+const getModel =
+module.exports.getModel =
+function getModel(ajax, modelId) {
+	return new Promise((resolve, reject) => {
+		if (!modelId) {
+			return reject('no model id provided');
+		}
+
+		const url = api.makeUrl(paths, `model/${modelId}`);
+		const params = _.merge(
+			{ url },
+			api.requestOptions.jquery.acceptJSON,
+			api.requestOptions.jquery.crossDomain
+		);
+
+		ajax(params)
+			.done((model, textStatus, xhr) => {
+				console.log(model);
+				return resolve(modelId);
+			})
+			.fail((xhr, textStatus, err) => {
+				if (xhr.status === 404) {
+					return resolve(null); // model does not exist
+				} else {
+					return reject(`something went wrong: ${xhr.status}`);
+				}
+			});
+	});
+};
+
+
+/**
+ * creates a new model
+ * @param {string} `desiredModelId`
+ * @returns {Promise} - `{ modelId, isNew }`
+ */
 const createModel =
 module.exports.createModel =
-function createModel(ajax, modelId) {
-	const url = api.makeUrl(paths, `model/${modelId}`);
+function createModel(ajax, desiredModelId) {
+	return new Promise((resolve, reject) => {
+		if (!desiredModelId) {
+			return reject(new Error('can\'t create model: no model id provided'));
+		}
+
+		const url = api.makeUrl(paths, `model/${desiredModelId}`);
+		const params = _.merge(
+			{
+				url,
+				method: 'put',
+				dataType: 'text',
+				// apparently jquery complains about the response body
+				// of the OPTIONS request not being json — even if it is :[
+			},
+			// api.requestOptions.jquery.acceptJSON,
+			api.requestOptions.jquery.contentTypeJSON,
+			api.requestOptions.jquery.crossDomain
+		);
+
+		ajax(params)
+			// .fail((xhr, textStatus, err) => {
+			// 	return reject();
+			// })
+			.done((data, textStatus, xhr) => {
+				if (xhr.status === 200) {
+					const isNew = true;
+					return resolve({ modelId: desiredModelId, isNew });
+				} else {
+					return reject(new Error(`something went wrong: ${xhr.status}`));
+				}
+			});
+	});
+};
+
+
+/**
+ * @param {string} `modelId`
+ * @returns {Promise} - model xml string
+ */
+const getModelFile =
+module.exports.getModelFile =
+function getModelFile(ajax, modelId) {
+	const query = queryString.stringify({
+		model_id: modelId,
+		filename: 'model.xml',
+	});
+	const url = `${api.makeUrl(paths, 'files')}?${query}`;
 	const params = _.merge(
 		{
 			url,
-			method: 'put',
-			dataType: 'text',
-			// apparently jquery complains about the response body
-			// of the OPTIONS request not being json — even if it is :[
+			contentType: 'text/xml',
 		},
-		// api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON,
+		api.requestOptions.jquery.acceptPlainText,
+		api.requestOptions.jquery.crossDomain
+	);
+	return ajax(params);
+};
+
+
+const saveModelFile =
+module.exports.saveModelFile =
+function saveModelFile(ajax, modelId, modelXmlStr) {
+	const query = queryString.stringify({
+		model_id: modelId,
+		filename: 'model.xml',
+		filetype: 'model_file',
+	});
+	const url = `${api.makeUrl(paths, 'files')}?${query}`;
+	const params = _.merge(
+		{
+			url,
+			data: modelXmlStr,
+			method: 'put',
+			contentType: 'text/xml',
+		},
+		api.requestOptions.jquery.acceptPlainText,
 		api.requestOptions.jquery.crossDomain
 	);
 	return ajax(params);
@@ -83,25 +173,13 @@ function getItem(fetch, modelId, itemId) {
 };
 
 
-// const createItem =
-// module.exports.createItem =
-// function createItem(fetch, modelId, item) {
-// 	const url = api.makeUrl(paths, `model/${modelId}/${item.id}`);
-// 	const data = R.omit(['id'], item);
-// 	const params = _.merge(
-// 		{
-// 			method: 'put',
-// 			body: JSON.stringify(data), // needs to be stringified
-// 		},
-// 		api.requestOptions.fetch.acceptJSON,
-// 		api.requestOptions.fetch.contentTypeJSON,
-// 		api.requestOptions.fetch.crossDomain
-// 	);
-// 	return fetch(url, params);
-// };
 const createItem =
 module.exports.createItem =
 function createItem(ajax, modelId, item) {
+	if (!modelId) {
+		return Promise.reject(new Error('no model id provided'));
+	}
+
 	const url = api.makeUrl(paths, `model/${modelId}/${item.id}`);
 	const data = R.omit(['id'], item);
 	const params = _.merge(
@@ -115,22 +193,15 @@ function createItem(ajax, modelId, item) {
 		api.requestOptions.jquery.contentTypeJSON,
 		api.requestOptions.jquery.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.done((data, textStatus, xhr) => {
+			if (xhr.status !== 200) {
+				return Promise.reject(new Error(`something went wrong: ${xhr.status}`));
+			}
+		});
 };
 
 
-// const deleteItem =
-// module.exports.deleteItem =
-// function deleteItem(fetch, modelId, itemId) {
-// 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
-// 	const params = _.merge(
-// 		{ method: 'delete' },
-// 		api.requestOptions.fetch.acceptJSON,
-// 		api.requestOptions.fetch.contentTypeJSON,
-// 		api.requestOptions.fetch.crossDomain
-// 	);
-// 	return fetch(url, params);
-// };
 const deleteItem =
 module.exports.deleteItem =
 function deleteItem(ajax, modelId, itemId) {
@@ -151,37 +222,32 @@ function deleteItem(ajax, modelId, itemId) {
 
 const getAttackerProfiles =
 module.exports.getAttackerProfiles =
-function getAttackerProfiles(fetch, modelId) {
+function getAttackerProfiles(ajax, modelId) {
 	const url = api.makeUrl(paths, `attackerprofile?model_id=${modelId}`);
 	const params = _.merge(
-		{ method: 'get' },
-		api.requestOptions.fetch.acceptJSON,
-		api.requestOptions.fetch.contentTypeJSON,
-		api.requestOptions.fetch.crossDomain
+		{ url },
+		api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.contentTypeJSON,
+		api.requestOptions.jquery.crossDomain
 	);
-	return fetch(url, params);
+	return ajax(params);
 };
 
 
-// const runToolChain =
-// module.exports.runToolChain =
-// function runToolChain(fetch, modelId, toolChainId, attackerProfileId, _callbacks) {
-// 	const callbacks = _.defaults(_callbacks, {
-// 		onToolChainStart: noop,
-// 		onToolChainEnd: noop,
-// 	});
+const getToolChains =
+module.exports.getToolChains =
+function getToolChains(ajax, modelId) {
+	const url = api.makeUrl(paths, `toolchain?model_id=${modelId}`);
+	const params = _.merge(
+		{ url },
+		api.requestOptions.jquery.crossDomain,
+		api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.contentTypeJSON
+	);
+	return ajax(params);
+};
 
-// 	const url = api.makeUrl(paths, `toolchain/${toolChainId}?model_id=${modelId}&attackerprofile_id=${attackerProfileId}`);
 
-// 	const params = _.merge(
-// 		{ method: 'post' },
-// 		api.requestOptions.fetch.acceptJSON,
-// 		api.requestOptions.fetch.crossDomain
-// 	);
-
-// 	callbacks.onToolChainStart();
-// 	return fetch(url, params);
-// };
 const runToolChain =
 module.exports.runToolChain =
 function runToolChain(ajax, modelId, toolChainId, attackerProfileId, _callbacks) {
