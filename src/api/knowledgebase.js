@@ -10,17 +10,24 @@ const queryString = require('query-string');
 knowledge base API
 http://localhost:8080/tkb/
 */
-const isItrust = (typeof window !== 'undefined')
-	? (window.location.toString().indexOf('itrust') > -1)
-	: false;
-const isDynu = (typeof window !== 'undefined')
-	? (window.location.toString().indexOf('dynu.com') > -1)
-	: false;
-const host = module.exports.host = (isItrust)
-	? 'https://trespass-tkb.itrust.lu/'
-	: (isDynu) 
-	? 'http://trespass-anm.dynu.com/' 
-	: 'http://localhost:8080/';
+const hostExceptions = [
+	{
+		check: () => (window.location.toString().indexOf('itrust') > -1),
+		host: 'https://trespass-tkb.itrust.lu/',
+	},
+	{
+		check: () => (window.location.toString().indexOf('dynu.com') > -1),
+		host: 'http://trespass-anm.dynu.com/',
+	},
+];
+const defaultHost = 'http://localhost:8080/';
+const host = (typeof window === 'undefined')
+	? defaultHost
+	: hostExceptions.reduce((result, item) => {
+		return (item.check())
+			? item.host
+			: result;
+	}, defaultHost);
 const prefix = module.exports.prefix = 'tkb/';
 const paths = { host, prefix };
 // ———
