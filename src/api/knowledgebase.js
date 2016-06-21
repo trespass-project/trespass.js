@@ -7,7 +7,7 @@ const queryString = require('query-string');
 
 
 /*
-knowledge base API
+knowledgebase API
 http://localhost:8080/tkb/
 */
 const hostExceptions = [
@@ -151,16 +151,23 @@ function getModelFile(ajax, modelId) {
 const saveModelFile =
 module.exports.saveModelFile =
 function saveModelFile(ajax, modelId, modelXmlStr) {
+	return putFile(ajax, modelId, modelXmlStr, 'model.xml', 'model_file');
+};
+
+
+const putFile =
+module.exports.putFile =
+function putFile(ajax, modelId, data, fileName, fileType) {
 	const query = queryString.stringify({
 		model_id: modelId,
-		filename: 'model.xml',
-		filetype: 'model_file',
+		filename: fileName,
+		filetype: fileType,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
 	const params = _.merge(
 		{
 			url,
-			data: modelXmlStr,
+			data,
 			method: 'put',
 			contentType: 'text/xml',
 		},
@@ -171,18 +178,31 @@ function saveModelFile(ajax, modelId, modelXmlStr) {
 };
 
 
-const getItem =
-module.exports.getItem =
-function getItem(fetch, modelId, itemId) {
-	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
+const getTypes =
+module.exports.getTypes =
+function getTypes(ajax, modelId) {
+	const url = api.makeUrl(paths, `type?model_id=${modelId}`);
 	const params = _.merge(
-		{ method: 'get' },
-		api.requestOptions.fetch.acceptJSON,
-		api.requestOptions.fetch.contentTypeJSON,
-		api.requestOptions.fetch.crossDomain
+		{ url },
+		api.requestOptions.jquery.crossDomain,
+		api.requestOptions.jquery.acceptJSON
 	);
-	return fetch(url, params);
+	return ajax(params);
 };
+
+
+// const getItem =
+// module.exports.getItem =
+// function getItem(fetch, modelId, itemId) {
+// 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
+// 	const params = _.merge(
+// 		{ method: 'get' },
+// 		api.requestOptions.fetch.acceptJSON,
+// 		api.requestOptions.fetch.contentTypeJSON,
+// 		api.requestOptions.fetch.crossDomain
+// 	);
+// 	return fetch(url, params);
+// };
 
 
 const createItem =
@@ -281,4 +301,55 @@ function runToolChain(ajax, modelId, toolChainId, attackerProfileId, _callbacks)
 
 	callbacks.onToolChainStart();
 	return ajax(params);
+};
+
+
+const getTaskStatus =
+module.exports.getTaskStatus =
+function getTaskStatus(ajax, taskUrl) {
+	const url = taskUrl;
+	const params = _.merge(
+		{ url },
+		api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.contentTypeJSON,
+		api.requestOptions.jquery.crossDomain
+	);
+	return ajax(params);
+};
+
+
+const retrieveAnalysisResults =
+module.exports.retrieveAnalysisResults =
+function retrieveAnalysisResults(ajax, taskStatusData, analysisToolNames=['A.T. Analyzer', 'A.T. Evaluator']) {
+	const tools = taskStatusData.tool_status
+		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
+
+	const promises = tools
+		.map((tool) => {
+			const params = _.merge(
+				{
+					url: tool.result_file_url,
+					method: 'get'
+				},
+				// api.requestOptions.jquery.acceptJSON,
+				// api.requestOptions.jquery.contentTypeJSON,
+				api.requestOptions.jquery.crossDomain
+			);
+
+			return ajax(params)
+				.done((blob, textStatus, xhr) => {
+					// TODO: don't hard-code this
+					const type = (tool.name === 'A.T. Analyzer')
+						? 'application/zip'
+						: 'text/plain';
+
+					// jquery doesn't return blobs (fetch() does)
+					const realBlob = new Blob([blob], { type });
+
+					return resolve({
+						name: tool.name,
+						blob: realBlob,
+					});
+				});
+		});
 };
