@@ -21,7 +21,7 @@ const hostExceptions = [
 	},
 ];
 const defaultHost = 'http://localhost:8080/';
-const host = (typeof window === 'undefined')
+const host = module.exports.host = (typeof window === 'undefined')
 	? defaultHost
 	: hostExceptions.reduce((result, item) => {
 		return (item.check())
