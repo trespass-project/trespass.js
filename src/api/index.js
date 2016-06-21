@@ -1,12 +1,15 @@
 'use strict';
 
+const urljoin = require('url-join');
+
 module.exports.tools = require('./tools.js');
 module.exports.knowledgebase = require('./knowledgebase.js');
 
 
 const makeUrl = module.exports.makeUrl =
 function makeUrl(api, endpoint) {
-	return `${api.host}${api.prefix}${endpoint}`;
+	const url = urljoin(api.host, api.prefix, endpoint);
+	return url;
 };
 
 
