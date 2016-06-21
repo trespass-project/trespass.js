@@ -318,9 +318,9 @@ function getTaskStatus(ajax, taskUrl) {
 };
 
 
-const retrieveAnalysisResults =
-module.exports.retrieveAnalysisResults =
-function retrieveAnalysisResults(ajax, taskStatusData, analysisToolNames=['A.T. Analyzer', 'A.T. Evaluator']) {
+const getAnalysisResults =
+module.exports.getAnalysisResults =
+function getAnalysisResults(ajax, taskStatusData, analysisToolNames=['A.T. Analyzer', 'A.T. Evaluator']) {
 	const tools = taskStatusData.tool_status
 		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
 
