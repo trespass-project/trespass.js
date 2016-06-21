@@ -336,20 +336,26 @@ function getAnalysisResults(ajax, taskStatusData, analysisToolNames=['A.T. Analy
 				api.requestOptions.jquery.crossDomain
 			);
 
-			return ajax(params)
-				.done((blob, textStatus, xhr) => {
-					// TODO: don't hard-code this
-					const type = (tool.name === 'A.T. Analyzer')
-						? 'application/zip'
-						: 'text/plain';
+			return new Promise((resolve, reject) => {
+				ajax(params)
+					// .done((blob, textStatus, xhr) => {
+					.then((blob) => {
+						// TODO: don't hard-code this
+						const type = (tool.name === 'A.T. Analyzer')
+							? 'application/zip'
+							: 'text/plain';
 
-					// jquery doesn't return blobs (fetch() does)
-					const realBlob = new Blob([blob], { type });
+						// jquery doesn't return blobs (fetch() does)
+						// const realBlob = new Blob([blob], { type });
+						const realBlob = blob;
 
-					return resolve({
-						name: tool.name,
-						blob: realBlob,
+						return resolve({
+							name: tool.name,
+							blob: realBlob,
+						});
 					});
-				});
+			});
 		});
+
+	return Promise.all(promises);
 };
