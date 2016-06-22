@@ -234,6 +234,23 @@ function createItem(ajax, modelId, item) {
 };
 
 
+const renameItemId =
+module.exports.renameItemId =
+function renameItemId(ajax, modelId, itemId, newId) {
+	const url = api.makeUrl(paths, `model/${modelId}/${itemId}/?rename_to=${newId}`);
+	const params = _.merge(
+		{
+			url,
+			method: 'post'
+		},
+		api.requestOptions.jquery.acceptJSON,
+		api.requestOptions.jquery.contentTypeJSON,
+		api.requestOptions.jquery.crossDomain
+	);
+	return ajax(params);
+};
+
+
 const deleteItem =
 module.exports.deleteItem =
 function deleteItem(ajax, modelId, itemId) {
