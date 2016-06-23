@@ -67,7 +67,6 @@ function getModel(ajax, modelId) {
 
 		ajax(params)
 			.done((model, textStatus, xhr) => {
-				console.log(model);
 				return resolve(modelId);
 			})
 			.fail((xhr, textStatus, err) => {
