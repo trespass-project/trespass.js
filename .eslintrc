@@ -27,6 +27,7 @@
 		"comma-dangle": 0,
 		"quote-props": 0,
 		"dot-notation": 0,
+		"space-infix-ops": 0,
 		"spaces-in-parens": 0,
 		"spaced-comment": 0,
 		"max-len": 0
