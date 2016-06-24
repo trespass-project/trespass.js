@@ -1,4 +1,42 @@
-const findLeafNodes =
+const xml2js = require('xml2js');
+
+const attrKey = '_attr';
+const charKey = '_text';
+const xml2jsOptions = {
+	attrkey: attrKey,
+	charkey: charKey,
+	trim: true,
+	explicitArray: /*true*/ false,
+};
+
+const rootElemName = 'adtree';
+
+
+// const parseXml =
+module.exports.parseXml =
+function parseXml(xmlStr, opts=xml2jsOptions) {
+	return new Promise((resolve, reject) => {
+		xml2js.parseString(xmlStr, opts, (err, parsed) => {
+			if (err) { return reject(err); }
+			const rootNode = parsed[rootElemName].node;
+			return resolve(rootNode);
+		});
+	});
+};
+
+
+// const toXml =
+module.exports.toXml =
+function toXml(rootNode, opts=xml2jsOptions) {
+	const builder = new xml2js.Builder(opts);
+	const xmlStr = builder.buildObject({
+		[rootElemName]: { node: rootNode }
+	});
+	return Promise.resolve(xmlStr);
+};
+
+
+// const findLeafNodes =
 module.exports.findLeafNodes =
 function findLeafNodes(nodes, childrenKey='node') {
 	const leafNodes = [];
