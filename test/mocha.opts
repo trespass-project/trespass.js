@@ -2,4 +2,5 @@
 --growl
 --colors
 
-test/test.js
+test/model.js
+test/attacktree.js
