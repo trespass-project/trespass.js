@@ -5,10 +5,10 @@
   "main": "./src/index.js",
   "version": "0.8.0",
   "scripts": {
-    "start": "gulp",
-    "lint": "eslint ./src",
-    "test": "ava",
-    "test-watch": "npm run test -- --watch"
+    "build": "make build",
+    "lint": "make lint",
+    "test": "make test",
+    "test-watch": "make test-watch"
   },
   "author": "",
   "devDependencies": {
