@@ -1,5 +1,0 @@
---compilers js:babel-register
---growl
---colors
-
-test/test.js

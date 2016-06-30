@@ -22,11 +22,13 @@
 		"arrow-body-style": 1,
 		"no-alert": 0,
 		"no-unused-vars": 1,
+		"no-underscore-dangle": 0,
 		"no-console": 0,
 		"no-use-before-define": 0,
 		"comma-dangle": 0,
 		"quote-props": 0,
 		"dot-notation": 0,
+		"space-infix-ops": 0,
 		"spaces-in-parens": 0,
 		"spaced-comment": 0,
 		"max-len": 0
