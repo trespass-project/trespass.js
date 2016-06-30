@@ -6,4 +6,9 @@ docs
 _old
 npm-debug.log
 
-dist
+src
+test
+data
+Makefile
+gulpfile.js
+.*

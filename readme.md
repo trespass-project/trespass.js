@@ -1,24 +1,23 @@
-# trespass.js
+# about
 
-> the [TREsPASS](https://www.trespass-project.eu) javascript library
+`trespass.js` is the core library used in the node.js or web-based tools in the [TREsPASS project](https://www.trespass-project.eu/).
 
-it is a commonJS module to be used in js / node.js projects.
 
----
 
-## as dependency
+## installation
 
-`package.json`:
+at the moment:
 
 ```json
-{
-	"dependencies": {
-		"trespass.js": "git+ssh://git@gitlab.com:freder/trespass.js.git#master"
-	}
-}
+npm install gitlab:freder/trespass.js
 ```
 
----
+in the future:
+
+```
+npm install trespass.js
+```
+
 
 ## documentation
 
@@ -27,3 +26,9 @@ to generate the documentation, run:
 ```javascript
 gulp docco
 ```
+
+
+
+## development
+
+when using the package `npm link`ed, don't forget to run `make build-watch`.

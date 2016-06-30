@@ -1,5 +1,3 @@
-'use strict';
-
 // `trespass.js` is the core library used in the node.js or web-based tools in the [TREsPASS project](https://www.trespass-project.eu/).
 // It is divided into the following sub-modules:
 
