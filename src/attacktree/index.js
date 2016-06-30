@@ -10,18 +10,28 @@ const xml2jsOptions = {
 };
 
 const rootElemName = 'adtree';
+const childElemName = 'node';
 
 
 // const parseXml =
 module.exports.parseXml =
 function parseXml(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
-		xml2js.parseString(xmlStr, opts, (err, parsed) => {
-			if (err) { return reject(err); }
-			const rootNode = parsed[rootElemName].node;
-			return resolve(rootNode);
+		xml2js.parseString(xmlStr, opts, (err, parsedTree) => {
+			if (err) {
+				console.error('failed to parse attack tree xml');
+				return reject(err);
+			}
+			return resolve(parsedTree[rootElemName]);
 		});
 	});
+};
+
+
+const getRootNode =
+module.exports.getRootNode =
+function getRootNode(tree, childrenKey=childElemName) {
+	return tree[childrenKey];
 };
 
 
@@ -38,7 +48,7 @@ function toXml(rootNode, opts=xml2jsOptions) {
 
 // const findLeafNodes =
 module.exports.findLeafNodes =
-function findLeafNodes(nodes, childrenKey='node') {
+function findLeafNodes(nodes, childrenKey=childElemName) {
 	const leafNodes = [];
 
 	function recurse(item) {

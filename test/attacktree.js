@@ -2,8 +2,10 @@ import { test } from 'ava-spec';
 const R = require('ramda');
 const trespass = require('../');
 
+
 test.group('parseXml()', (test) => {
 	test('should work', (t) => {
+		/* eslint indent: 0 */
 		const xmlStr = [
 			'<?xml version="1.0" encoding="UTF-8"?>',
 			'<adtree profit="5000" id="tree-id">',
