@@ -1,6 +1,0 @@
---compilers js:babel-register
---growl
---colors
-
-test/model.js
-test/attacktree.js

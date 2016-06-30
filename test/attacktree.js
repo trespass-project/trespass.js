@@ -1,50 +1,62 @@
-const assert = require('assert');
+import { test } from 'ava-spec';
 const R = require('ramda');
-
 const trespass = require('../');
 
-const common = require('./common.js');
-const f1 = common.f1;
-const f2 = common.f2;
-const f3 = common.f3;
+test.group('parseXml()', (test) => {
+	test('should work', (t) => {
+		const xmlStr = [
+			'<?xml version="1.0" encoding="UTF-8"?>',
+			'<adtree profit="5000" id="tree-id">',
+				'<node refinement="disjunctive" />',
+				'<label>node label</label>',
+			'</adtree>',
+		].join('\n');
+
+		return trespass.attacktree.parseXml(xmlStr/*, opts*/)
+			.then((tree) => {
+				t.true(tree._attr.profit === '5000');
+				// t.true(tree._attr.profit === 5000);
+			});
+	});
+});
 
 
-describe(f1('trespass.attacktree'), () => {
-	describe(f2('.findLeafNodes()'), () => {
-		it(f3('should find all leaf nodes'), () => {
-			const NOT_A_LEAF = 'not-a-leaf-node';
-			const tree = {
-				label: NOT_A_LEAF,
-				node: [
-					{
-						label: NOT_A_LEAF,
-						node: [{ label: 'leaf-1' }]
-					},
-					{
-						label: NOT_A_LEAF,
-						node: [
-							{ label: 'leaf-2' },
-							{ label: 'leaf-3' },
-						]
-					},
-					{
-						label: NOT_A_LEAF,
-						node: [
-							{
-								label: NOT_A_LEAF,
-								node: [
-									{ label: 'leaf-4' },
-								]
-							},
-							{ label: 'leaf-5' },
-						]
-					},
-				]
-			};
-			const leafNodes = trespass.attacktree.findLeafNodes([tree]);
-			assert(leafNodes.length === 5);
-			const labels = leafNodes.map(R.prop('label'));
-			assert(!R.contains(NOT_A_LEAF, labels));
-		});
+test.group('findLeafNodes()', (test) => {
+	test('should find all leaf nodes', (t) => {
+		const NOT_A_LEAF = 'not-a-leaf-node';
+		const tree = {
+			label: NOT_A_LEAF,
+			node: [
+				{
+					label: NOT_A_LEAF,
+					node: [{ label: 'leaf-1' }]
+				},
+				{
+					label: NOT_A_LEAF,
+					node: [
+						{ label: 'leaf-2' },
+						{ label: 'leaf-3' },
+					]
+				},
+				{
+					label: NOT_A_LEAF,
+					node: [
+						{
+							label: NOT_A_LEAF,
+							node: [
+								{ label: 'leaf-4' },
+							]
+						},
+						{ label: 'leaf-5' },
+					]
+				},
+			]
+		};
+
+		const leafNodes = trespass.attacktree.findLeafNodes([tree]);
+		t.true(leafNodes.length === 5);
+
+		const labels = leafNodes.map(R.prop('label'));
+		t.true(!R.contains(NOT_A_LEAF, labels));
 	});
 });
