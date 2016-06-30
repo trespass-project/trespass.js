@@ -1,11 +1,11 @@
 {
   "name": "trespass.js",
   "description": "TREsPASS javascript library",
-  "private": true,
-  "main": "./src/index.js",
+  "main": "./dist",
   "version": "0.8.0",
   "scripts": {
     "build": "make build",
+    "prepublish": "npm run build",
     "lint": "make lint",
     "test": "make test",
     "test-watch": "make test-watch"
