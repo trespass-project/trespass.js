@@ -8,7 +8,7 @@
 
 at the moment:
 
-```json
+```
 npm install gitlab:freder/trespass.js
 ```
 
