@@ -1,6 +1,7 @@
 {
   "name": "trespass.js",
-  "description": "TREsPASS javascript library",
+  "description": "TREsPASS javascript / node library",
+  "author": "freder.code@gmail.com",
   "main": "./dist",
   "version": "0.8.0",
   "scripts": {
@@ -10,7 +11,6 @@
     "test": "make test",
     "test-watch": "make test-watch"
   },
-  "author": "",
   "devDependencies": {
     "ava": "^0.15.2",
     "ava-spec": "^1.0.1",
