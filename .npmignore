@@ -1,1 +1,14 @@
-src/
+.DS_Store
+node_modules
+trespass.js.sublime-project
+trespass.js.sublime-workspace
+docs
+_old
+npm-debug.log
+
+src
+test
+data
+Makefile
+gulpfile.js
+.*
