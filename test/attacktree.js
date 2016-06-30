@@ -62,3 +62,47 @@ test.group('findLeafNodes()', (test) => {
 		t.true(!R.contains(NOT_A_LEAF, labels));
 	});
 });
+
+
+test.group('getAllPaths()', (test) => {
+	test('should find all paths', (t) => {
+		const tree = {
+			label: 'root',
+			node: [
+				{
+					label: 'a',
+					node: [
+						{
+							label: 'ab',
+							node: []
+						}
+					]
+				},
+				{
+					label: 'b',
+					node: [
+						{
+							label: 'ba',
+							node: []
+						},
+						{
+							label: 'bb',
+							node: []
+						},
+					]
+				},
+			]
+		};
+
+		const paths = trespass.attacktree.getAllPaths([tree]);
+		t.true(paths.length === 3);
+
+		const labelPaths = paths
+			.map((p) => {
+				return p.map(R.prop('label')).join(', ');
+			});
+		t.true(R.contains('root, a, ab', labelPaths));
+		t.true(R.contains('root, b, ba', labelPaths));
+		t.true(R.contains('root, b, bb', labelPaths));
+	});
+});

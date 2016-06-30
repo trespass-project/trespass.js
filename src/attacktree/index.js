@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const xml2js = require('xml2js');
 
 const attrKey = '_attr';
@@ -62,4 +63,34 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 
 	nodes.forEach(node => recurse(node));
 	return leafNodes;
+};
+
+
+// const getAllPaths =
+module.exports.getAllPaths =
+function getAllPaths(tree, childrenKey=childElemName) {
+	// returns a list of all the paths in a tree.
+	// does not take conjunctive-ness into account.
+
+	function recurse(tree, currentPath, allPaths) {
+		tree.forEach((node) => {
+			const children = node[childrenKey];
+			const newCurrentPath = [...currentPath, node];
+			if (children && children.length > 0) {
+				recurse(
+					(!_.isArray(children))
+						? [children]
+						: children,
+					newCurrentPath,
+					allPaths
+				);
+			} else {
+				allPaths.push(newCurrentPath);
+			}
+		});
+	}
+
+	const allPaths = [];
+	recurse(tree, [], allPaths);
+	return allPaths;
 };
