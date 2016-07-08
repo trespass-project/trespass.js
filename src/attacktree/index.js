@@ -1,3 +1,4 @@
+const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
 
@@ -14,16 +15,46 @@ const rootElemName = 'adtree';
 const childElemName = 'node';
 
 
+const stringToNumber =
+module.exports.stringToNumber =
+function stringToNumber(str) {
+	const trimmed = str.trim();
+
+	const digitsOnly = /^\d+$/ig;
+	if (!digitsOnly.test(trimmed)) {
+		return str;
+	}
+
+	const parsed = parseFloat(trimmed, 10);
+	return (!_.isNaN(parsed))
+		? parsed
+		: str;
+};
+
+
 // const parseXml =
 module.exports.parseXml =
 function parseXml(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
 		xml2js.parseString(xmlStr, opts, (err, parsedTree) => {
 			if (err) {
-				console.error('failed to parse attack tree xml');
+				console.error(err);
 				return reject(err);
 			}
-			return resolve(parsedTree[rootElemName]);
+			if (!parsedTree[rootElemName]) {
+				const message = 'failed to parse attack tree xml';
+				console.error(message);
+				return reject(new Error(message));
+			}
+
+			const treeRoot = parsedTree[rootElemName];
+
+			R.keys(treeRoot[attrKey])
+				.forEach((key) => {
+					treeRoot[attrKey][key] = stringToNumber(treeRoot[attrKey][key]);
+				});
+
+			return resolve(treeRoot);
 		});
 	});
 };
