@@ -8,7 +8,7 @@ const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
 	trim: true,
-	explicitArray: true,
+	explicitArray: false, // we'll take care of `node` elems ourselves
 };
 
 const rootElemName = module.exports.rootElemName = 'adtree';
@@ -30,6 +30,15 @@ function stringToNumber(str) {
 	return (!_.isNaN(parsed))
 		? parsed
 		: str;
+};
+
+
+const toArrayIfNotAlready =
+module.exports.toArrayIfNotAlready =
+function toArrayIfNotAlready(list) {
+	return (_.isArray(list))
+		? list
+		: [list];
 };
 
 
@@ -89,6 +98,11 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 			.forEach((key) => {
 				item[attrKey][key] = stringToNumber(item[attrKey][key]);
 			});
+
+		// make sure children are array
+		if (item[childrenKey]) {
+			item[childrenKey] = toArrayIfNotAlready(item[childrenKey]);
+		}
 
 		const children = item[childrenKey];
 		if (!!children) {
