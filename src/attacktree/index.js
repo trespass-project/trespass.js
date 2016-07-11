@@ -13,6 +13,7 @@ const xml2jsOptions = {
 
 const rootElemName = module.exports.rootElemName = 'adtree';
 const childElemName = module.exports.childElemName = 'node';
+const parameterElemName = module.exports.parameterElemName = 'parameter';
 
 
 const stringToNumber =
@@ -29,6 +30,28 @@ function stringToNumber(str) {
 	return (!_.isNaN(parsed))
 		? parsed
 		: str;
+};
+
+
+const toHashMap =
+module.exports.toHashMap =
+function toHashMap(key='id', list) {
+	return list
+		.reduce((acc, item) => {
+			acc[item[key]] = item;
+			return acc;
+		}, {});
+};
+
+
+const prepareParameter =
+module.exports.prepareParameter =
+function prepareParameter(param) {
+	return {
+		name: param[attrKey].name,
+		class: param[attrKey].class,
+		value: stringToNumber(param[charKey]),
+	};
 };
 
 
@@ -49,6 +72,7 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 
 			let treeRoot = parsedTree[rootElemName];
 			treeRoot = prepareTree(treeRoot);
+			treeRoot = prepareAnnotatedTree(treeRoot);
 
 			return resolve(treeRoot);
 		});
@@ -65,6 +89,28 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 			.forEach((key) => {
 				item[attrKey][key] = stringToNumber(item[attrKey][key]);
 			});
+
+		const children = item[childrenKey];
+		if (!!children) {
+			children.forEach(node => recurse(node));
+		}
+	}
+
+	[rootNode].forEach(node => recurse(node));
+	return rootNode;
+};
+
+
+const prepareAnnotatedTree =
+module.exports.prepareAnnotatedTree =
+function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
+	function recurse(item) {
+		if (item[parameterElemName]) {
+			item[parameterElemName] = toHashMap(
+				'name',
+				item[parameterElemName].map(prepareParameter)
+			);
+		}
 
 		const children = item[childrenKey];
 		if (!!children) {

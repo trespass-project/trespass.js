@@ -3,6 +3,25 @@ const _ = require('lodash');
 const R = require('ramda');
 const trespass = require('../');
 
+const parameters = [
+	{
+		_attr: { 'class': 'numeric', 'name': 'cost' },
+		_text: '1000',
+	},
+	{
+		_attr: { 'class': 'ordinal', 'name': 'likelihood' },
+		_text: '0.5', // TODO: how is this ordinal?!
+	},
+	{
+		_attr: { 'class': 'ordinal', 'name': 'difficulty' },
+		_text: 'M',
+	},
+	{
+		_attr: { 'class': 'ordinal', 'name': 'time' },
+		_text: 'D',
+	},
+];
+
 
 test.group('stringToNumber()', (test) => {
 	test('should work', (t) => {
@@ -74,17 +93,68 @@ test.group('prepareTree()', (test) => {
 });
 
 
-// test.group('prepareATATree()', (test) => {
-// 	const attacktree = {
-// 		_attr: {},
-// 		node: []
-// 	};
-// 	const prepared = trespass.attacktree.prepareATATree(attacktree);
+test.group('prepareParameter()', (test) => {
+	test('should work', (t) => {
+		const param = parameters[0];
+		const prepared = trespass.attacktree.prepareParameter(param);
+		t.true(prepared.name === 'cost');
+		t.true(prepared.class === 'numeric');
+		t.true(prepared.value === 1000);
+	});
+});
 
-// 	test('should work', (t) => {
-// 		t.true(tree._attr.id === 'tree-id');
-// 	});
-// });
+
+test.group('toHashMap()', (test) => {
+	const list = [
+		{ name: 'cost', value: 1 },
+		{ name: 'likelihood', value: 0.5 },
+		{ name: 'difficulty', value: 'M' },
+		{ name: 'time', value: 'D' },
+	];
+	const result = trespass.attacktree.toHashMap('name', list);
+
+	test('should work', (t) => {
+		t.true(result['cost'].value === 1);
+		t.true(result['likelihood'].value === 0.5);
+		t.true(result['difficulty'].value === 'M');
+		t.true(result['time'].value === 'D');
+	});
+});
+
+
+test.group('prepareAnnotatedTree()', (test) => {
+	const attacktree = {
+		node: [
+			{
+				node: [
+					{
+						parameter: undefined,
+					}
+				]
+			},
+			{
+				parameter: parameters,
+				node: [
+					{
+						parameter: parameters,
+					},
+				]
+			},
+		]
+	};
+	const prepared = trespass.attacktree.prepareAnnotatedTree(attacktree);
+
+	test('should transform all parameters to hash maps', (t) => {
+		t.true(!prepared.node[0].parameter);
+		t.true(!prepared.node[0].node[0].parameter);
+
+		t.true(_.isObject(prepared.node[1].parameter));
+		t.true(prepared.node[1].parameter['cost'].value === 1000);
+
+		t.true(_.isObject(prepared.node[1].node[0].parameter));
+		t.true(prepared.node[1].node[0].parameter['difficulty'].value === 'M');
+	});
+});
 
 
 test.group('findLeafNodes()', (test) => {
