@@ -25,7 +25,7 @@ test.group('ATE()', (test) => {
 
 			t.true(results[0].probability === 0.31);
 			t.true(results[0].cost === 37000.0);
-			t.ture(results[0].labels.length === 37);
+			t.true(results[0].labels.length === 37);
 		});
 	});
 });
