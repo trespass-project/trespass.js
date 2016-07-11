@@ -2,8 +2,8 @@ const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
 
-const attrKey = '_attr';
-const charKey = '_text';
+const attrKey = module.exports.attrKey = '_attr';
+const charKey = module.exports.charKey = '_text';
 const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
@@ -11,8 +11,8 @@ const xml2jsOptions = {
 	explicitArray: true,
 };
 
-const rootElemName = 'adtree';
-const childElemName = 'node';
+const rootElemName = module.exports.rootElemName = 'adtree';
+const childElemName = module.exports.childElemName = 'node';
 
 
 const stringToNumber =
