@@ -47,12 +47,8 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 				return reject(new Error(message));
 			}
 
-			const treeRoot = parsedTree[rootElemName];
-
-			R.keys(treeRoot[attrKey])
-				.forEach((key) => {
-					treeRoot[attrKey][key] = stringToNumber(treeRoot[attrKey][key]);
-				});
+			let treeRoot = parsedTree[rootElemName];
+			treeRoot = prepareTree(treeRoot);
 
 			return resolve(treeRoot);
 		});
@@ -60,10 +56,23 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 };
 
 
-const getRootNode =
-module.exports.getRootNode =
-function getRootNode(tree, childrenKey=childElemName) {
-	return tree[childrenKey];
+const prepareTree =
+module.exports.prepareTree =
+function prepareTree(rootNode, childrenKey=childElemName) {
+	function recurse(item) {
+		R.keys(item[attrKey])
+			.forEach((key) => {
+				item[attrKey][key] = stringToNumber(item[attrKey][key]);
+			});
+
+		const children = item[childrenKey];
+		if (!!children) {
+			children.forEach(node => recurse(node));
+		}
+	}
+
+	[rootNode].forEach(node => recurse(node));
+	return rootNode;
 };
 
 

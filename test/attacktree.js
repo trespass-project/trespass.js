@@ -46,11 +46,6 @@ test.group('parseXml()', (test) => {
 				t.true(tree._attr.id === 'tree-id');
 			});
 
-			test('should convert strings to numbers', (t) => {
-				// t.true(tree._attr.profit === '5000');
-				t.true(tree._attr.profit === 5000);
-			});
-
 			test('child nodes should be arrays – even with only one child', (t) => {
 				t.true(_.isArray(tree.node)); // root node
 				t.true(_.isArray(tree.node[0].node));
@@ -59,6 +54,37 @@ test.group('parseXml()', (test) => {
 			});
 		});
 });
+
+
+test.group('prepareTree()', (test) => {
+	const attacktree = {
+		_attr: { profit: '5000' },
+		node: [
+			{
+				_attr: { profit: '6000' },
+			}
+		]
+	};
+	const prepared = trespass.attacktree.prepareTree(attacktree);
+
+	test('should convert strings to numbers', (t) => {
+		t.true(prepared._attr.profit === 5000);
+		t.true(prepared.node[0]._attr.profit === 6000);
+	});
+});
+
+
+// test.group('prepareATATree()', (test) => {
+// 	const attacktree = {
+// 		_attr: {},
+// 		node: []
+// 	};
+// 	const prepared = trespass.attacktree.prepareATATree(attacktree);
+
+// 	test('should work', (t) => {
+// 		t.true(tree._attr.id === 'tree-id');
+// 	});
+// });
 
 
 test.group('findLeafNodes()', (test) => {
