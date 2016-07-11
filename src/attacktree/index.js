@@ -60,6 +60,7 @@ const prepareTree =
 module.exports.prepareTree =
 function prepareTree(rootNode, childrenKey=childElemName) {
 	function recurse(item) {
+		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
 			.forEach((key) => {
 				item[attrKey][key] = stringToNumber(item[attrKey][key]);
