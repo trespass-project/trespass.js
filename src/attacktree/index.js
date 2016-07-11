@@ -21,8 +21,9 @@ module.exports.stringToNumber =
 function stringToNumber(str) {
 	const trimmed = str.trim();
 
-	const digitsOnly = /^\d+$/ig;
-	if (!digitsOnly.test(trimmed)) {
+	const intPattern = /^\d+$/ig;
+	const floatPattern = /^\d*\.\d+$/ig;
+	if (!intPattern.test(trimmed) && !floatPattern.test(trimmed)) {
 		return str;
 	}
 

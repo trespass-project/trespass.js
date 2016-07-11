@@ -31,6 +31,10 @@ test.group('stringToNumber()', (test) => {
 		t.true(result2 === '12xxx34');
 		const result3 = trespass.attacktree.stringToNumber('xxx');
 		t.true(result3 === 'xxx');
+		const result4 = trespass.attacktree.stringToNumber('0.50');
+		t.true(result4 === 0.5);
+		const result5 = trespass.attacktree.stringToNumber('.666');
+		t.true(result5 === 0.666);
 	});
 });
 
