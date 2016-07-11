@@ -1,25 +1,63 @@
 import { test } from 'ava-spec';
+const _ = require('lodash');
 const R = require('ramda');
 const trespass = require('../');
 
 
-test.group('parseXml()', (test) => {
+test.group('stringToNumber()', (test) => {
 	test('should work', (t) => {
-		/* eslint indent: 0 */
-		const xmlStr = [
-			'<?xml version="1.0" encoding="UTF-8"?>',
-			'<adtree profit="5000" id="tree-id">',
-				'<node refinement="disjunctive" />',
-				'<label>node label</label>',
-			'</adtree>',
-		].join('\n');
-
-		return trespass.attacktree.parseXml(xmlStr/*, opts*/)
-			.then((tree) => {
-				t.true(tree._attr.profit === '5000');
-				// t.true(tree._attr.profit === 5000);
-			});
+		const result1 = trespass.attacktree.stringToNumber('1234');
+		t.true(result1 === 1234);
+		const result2 = trespass.attacktree.stringToNumber('12xxx34');
+		t.true(result2 === '12xxx34');
+		const result3 = trespass.attacktree.stringToNumber('xxx');
+		t.true(result3 === 'xxx');
 	});
+});
+
+
+test.group('parseXml()', (test) => {
+	/* eslint indent: 0 */
+	const xmlStr = [
+		'<?xml version="1.0" encoding="UTF-8"?>',
+		'<adtree profit="5000" id="tree-id">',
+			'<node refinement="disjunctive">',
+				'<label>root node</label>',
+
+				'<node refinement="disjunctive">',
+					'<label>child node 1</label>',
+
+					'<node refinement="disjunctive">',
+						'<label>child node 1-1</label>',
+					'</node>',
+				'</node>',
+
+				'<node refinement="disjunctive">',
+					'<label>child node 2</label>',
+				'</node>',
+
+			'</node>',
+		'</adtree>',
+	].join('\n');
+
+	return trespass.attacktree.parseXml(xmlStr/*, opts*/)
+		.then((tree) => {
+			test('should work', (t) => {
+				t.true(tree._attr.id === 'tree-id');
+			});
+
+			test('should convert strings to numbers', (t) => {
+				// t.true(tree._attr.profit === '5000');
+				t.true(tree._attr.profit === 5000);
+			});
+
+			test('child nodes should be arrays – even with only one child', (t) => {
+				t.true(_.isArray(tree.node)); // root node
+				t.true(_.isArray(tree.node[0].node));
+				t.true(_.isArray(tree.node[0].node[0].node)); // 1
+				t.true(!tree.node[0].node[1].node); // 2
+			});
+		});
 });
 
 

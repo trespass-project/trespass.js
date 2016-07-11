@@ -8,7 +8,7 @@ const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
 	trim: true,
-	explicitArray: /*true*/ false,
+	explicitArray: true,
 };
 
 const rootElemName = 'adtree';
@@ -88,7 +88,9 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
-			item[childrenKey].forEach(node => recurse(node));
+			// TODO: make sure this is always an array, already when parsing
+			const children = item[childrenKey];
+			children.forEach(node => recurse(node));
 		}
 	}
 
