@@ -71,6 +71,10 @@ test.group('parseXml()', (test) => {
 				t.true(_.isArray(tree.node[0].node[0].node)); // 1
 				t.true(!tree.node[0].node[1].node); // 2
 			});
+
+			test('labels should NOT be arrays', (t) => {
+				t.true(!_.isArray(tree.node.label));
+			});
 		});
 });
 
