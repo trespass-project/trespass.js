@@ -194,11 +194,15 @@ test.group('findLeafNodes()', (test) => {
 						{ label: 'leaf-5' },
 					]
 				},
+				{
+					label: 'leaf-6',
+					node: [],
+				},
 			]
 		};
 
 		const leafNodes = trespass.attacktree.findLeafNodes([tree]);
-		t.true(leafNodes.length === 5);
+		t.true(leafNodes.length === 6);
 
 		const labels = leafNodes.map(R.prop('label'));
 		t.true(!R.contains(NOT_A_LEAF, labels));

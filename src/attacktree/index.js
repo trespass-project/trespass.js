@@ -155,7 +155,7 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 	const leafNodes = [];
 
 	function recurse(item) {
-		const isLeaf = !item[childrenKey];
+		const isLeaf = _.isEmpty(item[childrenKey]);
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
