@@ -20,6 +20,7 @@ const xml2jsOptions = {
 const rootElemName = module.exports.rootElemName = 'adtree';
 const childElemName = module.exports.childElemName = 'node';
 const parameterElemName = module.exports.parameterElemName = 'parameter';
+const parentKey = module.exports.parentKey = 'parent';
 
 
 const prepareParameter =
@@ -111,27 +112,36 @@ const prepareTree =
  * @returns {Object} root node
  */
 module.exports.prepareTree =
-function prepareTree(rootNode, childrenKey=childElemName) {
-	function recurse(item) {
+function prepareTree(attacktree, childrenKey=childElemName) {
+	function recurse(item, depth=0) {
+		item.depth = depth;
+
 		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
 			.forEach((key) => {
 				item[attrKey][key] = utils.stringToNumber(item[attrKey][key]);
 			});
 
-		// make sure children are array
+		// make sure children are an array
 		if (item[childrenKey]) {
 			item[childrenKey] = utils.ensureArray(item[childrenKey]);
 		}
 
 		const children = item[childrenKey];
 		if (!!children) {
-			children.forEach(node => recurse(node));
+			// set parent
+			children.forEach((node) => {
+				node[parentKey] = (depth > 0)
+					? item
+					: null;
+			});
+
+			children.forEach(node => recurse(node, depth + 1));
 		}
 	}
 
-	[rootNode].forEach(node => recurse(node));
-	return rootNode;
+	[attacktree].forEach(node => recurse(node));
+	return attacktree;
 };
 
 
@@ -143,7 +153,7 @@ const prepareAnnotatedTree =
  * @returns {Object} root node
  */
 module.exports.prepareAnnotatedTree =
-function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
+function prepareAnnotatedTree(attacktree, childrenKey=childElemName) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
 			item[parameterElemName] = utils.toHashMap(
@@ -158,8 +168,8 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 		}
 	}
 
-	[rootNode].forEach(node => recurse(node));
-	return rootNode;
+	[attacktree].forEach(node => recurse(node));
+	return attacktree;
 };
 
 
