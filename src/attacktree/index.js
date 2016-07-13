@@ -80,11 +80,11 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 				return reject(new Error(message));
 			}
 
-			let treeRoot = parsedTree[rootElemName];
-			treeRoot = prepareTree(treeRoot);
-			treeRoot = prepareAnnotatedTree(treeRoot);
+			let attacktree = parsedTree[rootElemName];
+			attacktree = prepareTree(attacktree);
+			attacktree = prepareAnnotatedTree(attacktree);
 
-			return resolve(treeRoot);
+			return resolve(attacktree);
 		});
 	});
 };
