@@ -36,7 +36,7 @@ function parse(str) {
 	const lines = str
 		// split on line breaks
 		.replace(/\r/ig)
-		.split(/[\n]+/ig)
+		.split(/\n+/ig)
 
 		// trim white space
 		.map((line) => line.trim())
