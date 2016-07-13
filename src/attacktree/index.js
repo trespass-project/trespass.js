@@ -90,6 +90,13 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 };
 
 
+const getRootNode =
+module.exports.getRootNode =
+function getRootNode(attacktree, childrenKey=childElemName) {
+	return attacktree[childrenKey][0];
+};
+
+
 const prepareTree =
 module.exports.prepareTree =
 function prepareTree(rootNode, childrenKey=childElemName) {
