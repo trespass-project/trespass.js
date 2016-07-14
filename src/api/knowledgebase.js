@@ -46,7 +46,6 @@ function listModels(ajax) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return ajax(params);
@@ -183,7 +182,6 @@ function putFile(ajax, modelId, data, fileName, fileType) {
 			// headers: { 'Content-type': 'text/plain' },
 			headers: { 'Content-type': 'text/xml' },
 		},
-		// api.requestOptions.acceptPlainText,
 		api.requestOptions.crossDomain
 	);
 	console.log(params);
@@ -241,9 +239,6 @@ function createItem(ajax, modelId, item) {
 			// data: JSON.stringify(data),
 			data,
 		},
-		// api.requestOptions.acceptJSON,
-		// api.requestOptions.acceptPlainText,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return ajax(params)
@@ -269,7 +264,6 @@ function renameItemId(ajax, modelId, itemId, newId) {
 			method: 'post',
 		},
 		api.requestOptions.acceptJSON,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return ajax(params);
@@ -285,9 +279,6 @@ function deleteItem(ajax, modelId, itemId) {
 			url,
 			method: 'delete'
 		},
-		// api.requestOptions.acceptJSON,
-		// api.requestOptions.acceptPlainText,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return ajax(params);
@@ -301,7 +292,6 @@ function getAttackerProfiles(ajax, modelId) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return ajax(params);
@@ -316,7 +306,6 @@ function getToolChains(ajax, modelId) {
 		{ url },
 		api.requestOptions.crossDomain,
 		api.requestOptions.acceptJSON
-		// api.requestOptions.contentTypeJSON
 	);
 	return ajax(params);
 };
@@ -373,8 +362,6 @@ function getAnalysisResults(ajax, taskStatusData, analysisToolNames=analysisTool
 					url: tool.result_file_url,
 					method: 'get'
 				},
-				// api.requestOptions.acceptJSON,
-				// api.requestOptions.contentTypeJSON,
 				api.requestOptions.crossDomain
 			);
 
