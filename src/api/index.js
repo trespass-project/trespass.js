@@ -17,15 +17,15 @@ function makeUrl(api, endpoint) {
 const requestOptions = module.exports.requestOptions = {
 	jquery: {
 		crossDomain: {
-			crossDomain: true
+			crossDomain: true,
 		},
 		withCredentials: { // to send session cookie
-			xhrFields: { withCredentials: true }
+			xhrFields: { withCredentials: true },
 		},
 		fileUpload: { // to upload files as FormData to tools API
 			method: 'post',
 			processData: false,
-			contentType: false
+			contentType: false,
 		},
 		contentTypeJSON: {
 			contentType: 'application/json',
@@ -67,19 +67,19 @@ const requestOptions = module.exports.requestOptions = {
 
 	fetch: {
 		contentTypeJSON: {
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
 		},
 		acceptJSON: {
-			headers: { 'Accept': 'application/json' }
+			headers: { 'Accept': 'application/json' },
 		},
 		crossDomain: {
 			mode: 'cors',
 		},
 		withCredentials: { // to send session cookie
-			credentials: 'include'
+			credentials: 'include',
 		},
 		fileUpload: { // to upload files as FormData to tools API
-			method: 'post'
-		}
+			method: 'post',
+		},
 	}
 };
