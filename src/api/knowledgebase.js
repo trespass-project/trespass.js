@@ -126,22 +126,20 @@ function createModel(ajax, desiredModelId) {
 };
 
 
-/**
- * @param {string} `modelId`
- * @returns {Promise} - model xml string
- */
-const getModelFile =
-module.exports.getModelFile =
-function getModelFile(ajax, modelId) {
+const getFile =
+module.exports.getFile =
+function getFile(ajax, modelId, fileName, gitFileId=undefined) {
 	const query = queryString.stringify({
 		model_id: modelId,
-		filename: 'model.xml',
+		filename: fileName,
+		file_id: gitFileId,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
 	const params = _.merge(
 		{
 			url,
-			contentType: 'text/xml',
+			method: 'get',
+			// contentType: 'text/xml',
 		},
 		api.requestOptions.jquery.acceptPlainText,
 		api.requestOptions.jquery.crossDomain
@@ -150,10 +148,14 @@ function getModelFile(ajax, modelId) {
 };
 
 
-const saveModelFile =
-module.exports.saveModelFile =
-function saveModelFile(ajax, modelId, modelXmlStr) {
-	return putFile(ajax, modelId, modelXmlStr, 'model.xml', 'model_file');
+/**
+ * @param {string} `modelId`
+ * @returns {Promise} - model xml string
+ */
+const getModelFile =
+module.exports.getModelFile =
+function getModelFile(ajax, modelId) {
+	return getFile(ajax, modelId, 'model.xml');
 };
 
 
@@ -177,6 +179,13 @@ function putFile(ajax, modelId, data, fileName, fileType) {
 		api.requestOptions.jquery.crossDomain
 	);
 	return ajax(params);
+};
+
+
+const saveModelFile =
+module.exports.saveModelFile =
+function saveModelFile(ajax, modelId, modelXmlStr) {
+	return putFile(ajax, modelId, modelXmlStr, 'model.xml', 'model_file');
 };
 
 
