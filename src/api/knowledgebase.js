@@ -140,12 +140,14 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 		{
 			url,
 			method: 'get',
-			// contentType: 'text/xml',
+			// responseType: 'text',
+			// headers: { 'Accept': 'application/xml' }
 		},
-		api.requestOptions.acceptPlainText,
+		// api.requestOptions.acceptPlainText,
 		api.requestOptions.crossDomain
 	);
-	return axios(params);
+	return axios(params)
+		.then((res) => res.data);
 };
 
 
@@ -166,7 +168,7 @@ function putFile(axios, modelId, data, fileName, fileType) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
-		filetype: fileType,
+		filetype: fileType, // model_file|scenario_file
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
 	const params = _.merge(
@@ -314,25 +316,29 @@ function getToolChains(axios, modelId) {
 
 const runToolChain =
 module.exports.runToolChain =
-function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks) {
+function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks={}) {
 	const callbacks = _.defaults(_callbacks, {
 		onToolChainStart: noop,
 		onToolChainEnd: noop,
 	});
 
-	const url = api.makeUrl(paths, `toolchain/${toolChainId}?model_id=${modelId}&attackerprofile_id=${attackerProfileId}`);
+	const query = queryString.stringify({
+		model_id: modelId,
+		attackerprofile_id: attackerProfileId,
+	});
+	const url = api.makeUrl(paths, `toolchain/${toolChainId}?${query}`);
 	const params = _.merge(
 		{
 			url,
 			method: 'post'
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 
 	callbacks.onToolChainStart();
-	return axios(params);
+	return axios(params)
+		.then((res) => res.data);
 };
 
 
@@ -343,10 +349,11 @@ function getTaskStatus(axios, taskUrl) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.contentTypeJSON,
+		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
-	return axios(params);
+	return axios(params)
+		.then((res) => res.data);
 };
 
 
