@@ -41,21 +41,21 @@ const retryRate = 1000;
 
 const listModels =
 module.exports.listModels =
-function listModels(ajax) {
+function listModels(axios) {
 	const url = api.makeUrl(paths, 'model');
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const getModel =
 module.exports.getModel =
-function getModel(ajax, modelId) {
+function getModel(axios, modelId) {
 	return new Promise((resolve, reject) => {
 		if (!modelId) {
 			return reject('no model id provided');
@@ -67,7 +67,7 @@ function getModel(ajax, modelId) {
 			api.requestOptions.crossDomain
 		);
 
-		ajax(params)
+		axios(params)
 			.then((res) => resolve(modelId))
 			.catch((err) => {
 				if (err.response.status === 404) {
@@ -86,7 +86,7 @@ function getModel(ajax, modelId) {
  */
 const createModel =
 module.exports.createModel =
-function createModel(ajax, desiredModelId) {
+function createModel(axios, desiredModelId) {
 	return new Promise((resolve, reject) => {
 		if (!desiredModelId) {
 			return reject(new Error('can\'t create model: no model id provided'));
@@ -102,7 +102,7 @@ function createModel(ajax, desiredModelId) {
 			api.requestOptions.crossDomain
 		);
 
-		ajax(params)
+		axios(params)
 			.then((res) => {
 				if (res.status === 200) {
 					return resolve({
@@ -129,7 +129,7 @@ function createModel(ajax, desiredModelId) {
 
 const getFile =
 module.exports.getFile =
-function getFile(ajax, modelId, fileName, gitFileId=undefined) {
+function getFile(axios, modelId, fileName, gitFileId=undefined) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
@@ -145,7 +145,7 @@ function getFile(ajax, modelId, fileName, gitFileId=undefined) {
 		api.requestOptions.acceptPlainText,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return axios(params);
 };
 
 
@@ -155,14 +155,14 @@ function getFile(ajax, modelId, fileName, gitFileId=undefined) {
  */
 const getModelFile =
 module.exports.getModelFile =
-function getModelFile(ajax, modelId) {
-	return getFile(ajax, modelId, 'model.xml');
+function getModelFile(axios, modelId) {
+	return getFile(axios, modelId, 'model.xml');
 };
 
 
 const putFile =
 module.exports.putFile =
-function putFile(ajax, modelId, data, fileName, fileType) {
+function putFile(axios, modelId, data, fileName, fileType) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
@@ -180,28 +180,28 @@ function putFile(ajax, modelId, data, fileName, fileType) {
 		},
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const saveModelFile =
 module.exports.saveModelFile =
-function saveModelFile(ajax, modelId, modelXmlStr) {
-	return putFile(ajax, modelId, modelXmlStr, 'model.xml', 'model_file');
+function saveModelFile(axios, modelId, modelXmlStr) {
+	return putFile(axios, modelId, modelXmlStr, 'model.xml', 'model_file');
 };
 
 
 const getTypes =
 module.exports.getTypes =
-function getTypes(ajax, modelId) {
+function getTypes(axios, modelId) {
 	const url = api.makeUrl(paths, `type?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
@@ -222,7 +222,7 @@ function getTypes(ajax, modelId) {
 
 const createItem =
 module.exports.createItem =
-function createItem(ajax, modelId, item) {
+function createItem(axios, modelId, item) {
 	return new Promise((resolve, reject) => {
 		if (!modelId) {
 			return reject(new Error('no model id provided'));
@@ -237,7 +237,7 @@ function createItem(ajax, modelId, item) {
 			},
 			api.requestOptions.crossDomain
 		);
-		ajax(params)
+		axios(params)
 			.then((res) => {
 				if (res.status !== 200) {
 					return reject(new Error(`something went wrong: ${res.status}`));
@@ -253,7 +253,7 @@ function createItem(ajax, modelId, item) {
 
 const renameItemId =
 module.exports.renameItemId =
-function renameItemId(ajax, modelId, itemId, newId) {
+function renameItemId(axios, modelId, itemId, newId) {
 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}/?rename_to=${newId}`);
 	const params = _.merge(
 		{
@@ -263,14 +263,14 @@ function renameItemId(ajax, modelId, itemId, newId) {
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const deleteItem =
 module.exports.deleteItem =
-function deleteItem(ajax, modelId, itemId) {
+function deleteItem(axios, modelId, itemId) {
 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
 	const params = _.merge(
 		{
@@ -279,42 +279,42 @@ function deleteItem(ajax, modelId, itemId) {
 		},
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const getAttackerProfiles =
 module.exports.getAttackerProfiles =
-function getAttackerProfiles(ajax, modelId) {
+function getAttackerProfiles(axios, modelId) {
 	const url = api.makeUrl(paths, `attackerprofile?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const getToolChains =
 module.exports.getToolChains =
-function getToolChains(ajax, modelId) {
+function getToolChains(axios, modelId) {
 	const url = api.makeUrl(paths, `toolchain?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params)
+	return axios(params)
 		.then((res) => res.data);
 };
 
 
 const runToolChain =
 module.exports.runToolChain =
-function runToolChain(ajax, modelId, toolChainId, attackerProfileId, _callbacks) {
+function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks) {
 	const callbacks = _.defaults(_callbacks, {
 		onToolChainStart: noop,
 		onToolChainEnd: noop,
@@ -332,13 +332,13 @@ function runToolChain(ajax, modelId, toolChainId, attackerProfileId, _callbacks)
 	);
 
 	callbacks.onToolChainStart();
-	return ajax(params);
+	return axios(params);
 };
 
 
 const getTaskStatus =
 module.exports.getTaskStatus =
-function getTaskStatus(ajax, taskUrl) {
+function getTaskStatus(axios, taskUrl) {
 	const url = taskUrl;
 	const params = _.merge(
 		{ url },
@@ -346,13 +346,13 @@ function getTaskStatus(ajax, taskUrl) {
 		api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return axios(params);
 };
 
 
 const getAnalysisResults =
 module.exports.getAnalysisResults =
-function getAnalysisResults(ajax, taskStatusData, analysisToolNames=analysisToolNames) {
+function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToolNames) {
 	const tools = taskStatusData.tool_status
 		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
 
@@ -367,7 +367,7 @@ function getAnalysisResults(ajax, taskStatusData, analysisToolNames=analysisTool
 			);
 
 			return new Promise((resolve, reject) => {
-				ajax(params)
+				axios(params)
 					// .done((blob, textStatus, xhr) => {
 					.then((blob) => {
 						// TODO: don't hard-code this
