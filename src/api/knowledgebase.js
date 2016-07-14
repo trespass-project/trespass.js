@@ -1,9 +1,12 @@
-'use strict';
-
 const _ = require('lodash');
 const R = require('ramda');
 const api = require('./index.js');
 const queryString = require('query-string');
+
+const analysisToolNames = [
+	'A.T. Analyzer',
+	'A.T. Evaluator',
+];
 
 
 /*
@@ -336,7 +339,7 @@ function getTaskStatus(ajax, taskUrl) {
 
 const getAnalysisResults =
 module.exports.getAnalysisResults =
-function getAnalysisResults(ajax, taskStatusData, analysisToolNames=['A.T. Analyzer', 'A.T. Evaluator']) {
+function getAnalysisResults(ajax, taskStatusData, analysisToolNames=analysisToolNames) {
 	const tools = taskStatusData.tool_status
 		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
 
