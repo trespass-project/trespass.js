@@ -38,6 +38,33 @@ const requestOptions = module.exports.requestOptions = {
 		},
 	},
 
+	axios: {
+		crossDomain: {
+			xDomain: true,
+		},
+
+		// to send session cookie
+		withCredentials: {
+			withCredentials: true,
+		},
+
+		fileUpload: {
+			method: 'post',
+		},
+
+		contentTypeJSON: {
+			headers: { 'Content-type': 'application/json' },
+		},
+
+		acceptJSON: {
+			responseType: 'json',
+		},
+
+		acceptPlainText: {
+			responseType: 'text',
+		},
+	},
+
 	fetch: {
 		contentTypeJSON: {
 			headers: { 'Content-Type': 'application/json' }
