@@ -45,9 +45,9 @@ function listModels(ajax) {
 	const url = api.makeUrl(paths, 'model');
 	const params = _.merge(
 		{ url },
-		api.requestOptions.jquery.acceptJSON,
-		// api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptJSON,
+		// api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -64,20 +64,19 @@ function getModel(ajax, modelId) {
 		const url = api.makeUrl(paths, `model/${modelId}`);
 		const params = _.merge(
 			{ url },
-			api.requestOptions.jquery.acceptJSON,
-			api.requestOptions.jquery.crossDomain
+			api.requestOptions.acceptJSON,
+			api.requestOptions.crossDomain
 		);
 
 		ajax(params)
-			.done((model, textStatus, xhr) => {
+			.then((res) => {
 				return resolve(modelId);
 			})
-			.fail((xhr, textStatus, err) => {
-				if (xhr.status === 404) {
-					return resolve(null); // model does not exist
-				} else {
-					return reject(`something went wrong: ${xhr.status}`);
+			.catch((err) => {
+				if (err.response.status === 404) {
+					return resolve(null);
 				}
+				return reject(err);
 			});
 	});
 };
@@ -101,26 +100,33 @@ function createModel(ajax, desiredModelId) {
 			{
 				url,
 				method: 'put',
-				dataType: 'text',
-				// apparently jquery complains about the response body
-				// of the OPTIONS request not being json — even if it is :[
 			},
-			// api.requestOptions.jquery.acceptJSON,
-			api.requestOptions.jquery.contentTypeJSON,
-			api.requestOptions.jquery.crossDomain
+			api.requestOptions.acceptJSON,
+			api.requestOptions.contentTypeJSON,
+			api.requestOptions.crossDomain
 		);
 
 		ajax(params)
-			// .fail((xhr, textStatus, err) => {
-			// 	return reject();
-			// })
-			.done((data, textStatus, xhr) => {
-				if (xhr.status === 200) {
+			.then((res) => {
+				if (res.status === 200) {
 					const isNew = true;
-					return resolve({ modelId: desiredModelId, isNew });
-				} else {
-					return reject(new Error(`something went wrong: ${xhr.status}`));
+					return resolve({
+						isNew,
+						modelId: desiredModelId,
+					});
 				}
+				return reject(new Error(`something went wrong: ${res.status}`));
+			})
+			.catch((err) => {
+				if (err.response.status === 420) {
+					// model already exists
+
+					// const data = JSON.parse(err.response.data);
+					// console.log(data.message);
+
+					return reject(new Error(`model '${desiredModelId}' already exists`))
+				}
+				return reject(err);
 			});
 	});
 };
@@ -141,8 +147,8 @@ function getFile(ajax, modelId, fileName, gitFileId=undefined) {
 			method: 'get',
 			// contentType: 'text/xml',
 		},
-		api.requestOptions.jquery.acceptPlainText,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptPlainText,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -173,11 +179,14 @@ function putFile(ajax, modelId, data, fileName, fileType) {
 			url,
 			data,
 			method: 'put',
-			contentType: 'text/xml',
+			// contentType: 'text/xml',
+			// headers: { 'Content-type': 'text/plain' },
+			headers: { 'Content-type': 'text/xml' },
 		},
-		api.requestOptions.jquery.acceptPlainText,
-		api.requestOptions.jquery.crossDomain
+		// api.requestOptions.acceptPlainText,
+		api.requestOptions.crossDomain
 	);
+	console.log(params);
 	return ajax(params);
 };
 
@@ -195,8 +204,8 @@ function getTypes(ajax, modelId) {
 	const url = api.makeUrl(paths, `type?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
-		api.requestOptions.jquery.crossDomain,
-		api.requestOptions.jquery.acceptJSON
+		api.requestOptions.crossDomain,
+		api.requestOptions.acceptJSON
 	);
 	return ajax(params);
 };
@@ -229,18 +238,23 @@ function createItem(ajax, modelId, item) {
 		{
 			url,
 			method: 'put',
-			data: JSON.stringify(data),
+			// data: JSON.stringify(data),
+			data,
 		},
-		// api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.acceptPlainText,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		// api.requestOptions.acceptJSON,
+		// api.requestOptions.acceptPlainText,
+		// api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params)
-		.done((data, textStatus, xhr) => {
-			if (xhr.status !== 200) {
-				return Promise.reject(new Error(`something went wrong: ${xhr.status}`));
+		.then((res) => {
+			if (res.status !== 200) {
+				return Promise.reject(new Error(`something went wrong: ${res.status}`));
 			}
+			return Promise.resolve(res);
+		})
+		.catch((err) => {
+			return Promise.reject(err);
 		});
 };
 
@@ -252,11 +266,11 @@ function renameItemId(ajax, modelId, itemId, newId) {
 	const params = _.merge(
 		{
 			url,
-			method: 'post'
+			method: 'post',
 		},
-		api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptJSON,
+		// api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -271,10 +285,10 @@ function deleteItem(ajax, modelId, itemId) {
 			url,
 			method: 'delete'
 		},
-		// api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.acceptPlainText,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		// api.requestOptions.acceptJSON,
+		// api.requestOptions.acceptPlainText,
+		// api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -286,9 +300,9 @@ function getAttackerProfiles(ajax, modelId) {
 	const url = api.makeUrl(paths, `attackerprofile?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
-		api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptJSON,
+		// api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -300,9 +314,9 @@ function getToolChains(ajax, modelId) {
 	const url = api.makeUrl(paths, `toolchain?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
-		api.requestOptions.jquery.crossDomain,
-		api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON
+		api.requestOptions.crossDomain,
+		api.requestOptions.acceptJSON
+		// api.requestOptions.contentTypeJSON
 	);
 	return ajax(params);
 };
@@ -322,9 +336,9 @@ function runToolChain(ajax, modelId, toolChainId, attackerProfileId, _callbacks)
 			url,
 			method: 'post'
 		},
-		api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptJSON,
+		api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 
 	callbacks.onToolChainStart();
@@ -338,9 +352,9 @@ function getTaskStatus(ajax, taskUrl) {
 	const url = taskUrl;
 	const params = _.merge(
 		{ url },
-		api.requestOptions.jquery.acceptJSON,
-		api.requestOptions.jquery.contentTypeJSON,
-		api.requestOptions.jquery.crossDomain
+		api.requestOptions.acceptJSON,
+		api.requestOptions.contentTypeJSON,
+		api.requestOptions.crossDomain
 	);
 	return ajax(params);
 };
@@ -359,9 +373,9 @@ function getAnalysisResults(ajax, taskStatusData, analysisToolNames=analysisTool
 					url: tool.result_file_url,
 					method: 'get'
 				},
-				// api.requestOptions.jquery.acceptJSON,
-				// api.requestOptions.jquery.contentTypeJSON,
-				api.requestOptions.jquery.crossDomain
+				// api.requestOptions.acceptJSON,
+				// api.requestOptions.contentTypeJSON,
+				api.requestOptions.crossDomain
 			);
 
 			return new Promise((resolve, reject) => {
