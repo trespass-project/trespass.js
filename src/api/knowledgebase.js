@@ -48,7 +48,8 @@ function listModels(ajax) {
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -63,14 +64,11 @@ function getModel(ajax, modelId) {
 		const url = api.makeUrl(paths, `model/${modelId}`);
 		const params = _.merge(
 			{ url },
-			api.requestOptions.acceptJSON,
 			api.requestOptions.crossDomain
 		);
 
 		ajax(params)
-			.then((res) => {
-				return resolve(modelId);
-			})
+			.then((res) => resolve(modelId))
 			.catch((err) => {
 				if (err.response.status === 404) {
 					return resolve(null);
@@ -101,16 +99,14 @@ function createModel(ajax, desiredModelId) {
 				method: 'put',
 			},
 			api.requestOptions.acceptJSON,
-			api.requestOptions.contentTypeJSON,
 			api.requestOptions.crossDomain
 		);
 
 		ajax(params)
 			.then((res) => {
 				if (res.status === 200) {
-					const isNew = true;
 					return resolve({
-						isNew,
+						isNew: true,
 						modelId: desiredModelId,
 					});
 				}
@@ -178,14 +174,14 @@ function putFile(ajax, modelId, data, fileName, fileType) {
 			url,
 			data,
 			method: 'put',
-			// contentType: 'text/xml',
+			// TODO:
 			// headers: { 'Content-type': 'text/plain' },
 			headers: { 'Content-type': 'text/xml' },
 		},
 		api.requestOptions.crossDomain
 	);
-	console.log(params);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -202,10 +198,11 @@ function getTypes(ajax, modelId) {
 	const url = api.makeUrl(paths, `type?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
-		api.requestOptions.crossDomain,
-		api.requestOptions.acceptJSON
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -226,31 +223,31 @@ function getTypes(ajax, modelId) {
 const createItem =
 module.exports.createItem =
 function createItem(ajax, modelId, item) {
-	if (!modelId) {
-		return Promise.reject(new Error('no model id provided'));
-	}
+	return new Promise((resolve, reject) => {
+		if (!modelId) {
+			return reject(new Error('no model id provided'));
+		}
 
-	const url = api.makeUrl(paths, `model/${modelId}/${item.id}`);
-	const data = R.omit(['id'], item);
-	const params = _.merge(
-		{
-			url,
-			method: 'put',
-			// data: JSON.stringify(data),
-			data,
-		},
-		api.requestOptions.crossDomain
-	);
-	return ajax(params)
-		.then((res) => {
-			if (res.status !== 200) {
-				return Promise.reject(new Error(`something went wrong: ${res.status}`));
-			}
-			return Promise.resolve(res);
-		})
-		.catch((err) => {
-			return Promise.reject(err);
-		});
+		const url = api.makeUrl(paths, `model/${modelId}/${item.id}`);
+		const params = _.merge(
+			{
+				url,
+				method: 'put',
+				data: R.omit(['id'], item),
+			},
+			api.requestOptions.crossDomain
+		);
+		ajax(params)
+			.then((res) => {
+				if (res.status !== 200) {
+					return reject(new Error(`something went wrong: ${res.status}`));
+				}
+				return resolve(res.data);
+			})
+			.catch((err) => {
+				return reject(err);
+			});
+	});
 };
 
 
@@ -266,7 +263,8 @@ function renameItemId(ajax, modelId, itemId, newId) {
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -281,7 +279,8 @@ function deleteItem(ajax, modelId, itemId) {
 		},
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -294,7 +293,8 @@ function getAttackerProfiles(ajax, modelId) {
 		api.requestOptions.acceptJSON,
 		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
@@ -304,10 +304,11 @@ function getToolChains(ajax, modelId) {
 	const url = api.makeUrl(paths, `toolchain?model_id=${modelId}`);
 	const params = _.merge(
 		{ url },
-		api.requestOptions.crossDomain,
-		api.requestOptions.acceptJSON
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
 	);
-	return ajax(params);
+	return ajax(params)
+		.then((res) => res.data);
 };
 
 
