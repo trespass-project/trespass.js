@@ -250,3 +250,10 @@ function getAllPaths(nodes, childrenKey=childElemName) {
 	recurse(nodes, [], allPaths);
 	return allPaths;
 };
+
+
+const subtreeFromLeafLabels =
+module.exports.subtreeFromLeafLabels =
+function subtreeFromLeafLabels(tree, leafLabels) {
+
+};

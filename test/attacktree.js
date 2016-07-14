@@ -272,3 +272,60 @@ test.group('getAllPaths()', (test) => {
 		t.true(R.contains('root, b, bb', labelPaths));
 	});
 });
+
+
+test.group('subtreeFromLeafNodes()', (test) => {
+	test('should return a subtree of the original tree from a list of leaf nodes', (t) => {
+		const attacktree = {
+			node: [
+				{
+					label: 'root',
+					node: [
+						{
+							label: 'child-1',
+							node: [
+								{ label: 'grand-child-1' }
+							],
+						},
+						{
+							label: 'child-2',
+							node: [],
+						},
+						{
+							label: 'child-3',
+							node: [
+								{ label: 'grand-child-2' },
+								{ label: 'grand-child-3' },
+							],
+						},
+					],
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+		const rootNode = trespass.attacktree.getRootNode(prepared);
+		const leafLabels = ['child-2', 'grand-child-2'];
+		const subtree = trespass.attacktree.subtreeFromLeafLabels(rootNode, leafLabels);
+
+		const expected = {
+			node: [
+				{
+					label: 'root',
+					node: [
+						{
+							label: 'child-2',
+							node: [],
+						},
+						{
+							label: 'child-3',
+							node: [
+								{ label: 'grand-child-2' },
+							],
+						},
+					],
+				}
+			]
+		};
+		t.true(R.equals(subtree, expected));
+	});
+});
