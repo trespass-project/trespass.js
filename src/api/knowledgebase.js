@@ -136,14 +136,20 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 		file_id: gitFileId,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
+
+	const extension = R.last(fileName.split('.'));
+	const fileType = api.fileTypes[extension] || {
+		mimeType: 'text/plain',
+		responseType: 'text',
+	};
+
 	const params = _.merge(
 		{
 			url,
 			method: 'get',
-			// responseType: 'text',
-			// headers: { 'Accept': 'application/xml' }
+			responseType: fileType.responseType,
+			headers: { 'Accept': fileType.mimeType }
 		},
-		// api.requestOptions.acceptPlainText,
 		api.requestOptions.crossDomain
 	);
 	return axios(params)

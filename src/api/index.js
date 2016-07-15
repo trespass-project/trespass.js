@@ -1,9 +1,27 @@
-'use strict';
-
 const urljoin = require('url-join');
 
 module.exports.tools = require('./tools.js');
 module.exports.knowledgebase = require('./knowledgebase.js');
+
+
+const fileTypes = module.exports.fileTypes = {
+	txt: {
+		mimeType: 'text/plain',
+		responseType: 'text',
+	},
+	xml: {
+		mimeType: 'application/xml',
+		responseType: 'text',
+	},
+	json: {
+		mimeType: 'application/json',
+		responseType: 'json',
+	},
+	zip: {
+		mimeType: 'application/zip',
+		responseType: 'blob',
+	},
+};
 
 
 const makeUrl = module.exports.makeUrl =
@@ -29,7 +47,19 @@ const requestOptions = module.exports.requestOptions = {
 	},
 
 	contentTypeJSON: {
-		headers: { 'Content-type': 'application/json' },
+		headers: { 'Content-type': fileTypes.json.mimeType },
+	},
+
+	contentTypePlainText: {
+		headers: { 'Content-type': fileTypes.txt.mimeType },
+	},
+
+	contentTypeXML: {
+		headers: { 'Content-type': fileTypes.xml.mimeType },
+	},
+
+	contentTypeZip: {
+		headers: { 'Content-type': fileTypes.zip.mimeType },
 	},
 
 	acceptJSON: {
@@ -38,6 +68,10 @@ const requestOptions = module.exports.requestOptions = {
 
 	acceptPlainText: {
 		responseType: 'text',
+	},
+
+	acceptBlob: {
+		responseType: 'blob',
 	},
 };
 
