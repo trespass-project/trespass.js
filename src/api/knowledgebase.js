@@ -2,6 +2,7 @@ const _ = require('lodash');
 const R = require('ramda');
 const api = require('./index.js');
 const queryString = require('query-string');
+const moment = require('moment');
 
 const analysisTools = {
 	'A.T. Analyzer': {
@@ -106,6 +107,14 @@ function getAnalysisResultsSnapshots(axios, modelId) {
 
 	const reduceGrouped = (pair) => {
 		const prefix = pair[0];
+		// (toolchain_run_1468575416.093705)
+		const unixTimestampStr = R.last(
+			prefix
+				.replace(')', '')
+				.split('_')
+		);
+		const unixTimestamp = parseFloat(unixTimestampStr, 10);
+
 		const commits = pair[1];
 		return commits
 			// newest first
@@ -121,6 +130,8 @@ function getAnalysisResultsSnapshots(axios, modelId) {
 				return acc;
 			}, {
 				prefix,
+				formattedToolchainRunDate: moment.unix(unixTimestamp)
+					.format('YYYY-MM-DD HH:mm:ss'),
 				tree: {},
 			});
 	};

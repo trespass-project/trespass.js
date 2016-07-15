@@ -39,7 +39,7 @@
     "form-data": "^1.0.0-rc3",
     "immutability-helper": "^2.0.0",
     "lodash": "^3.10.1",
-    "moment": "^2.11.1",
+    "moment": "^2.14.1",
     "mout": "^1.0.0",
     "pretty-data": "^0.40.0",
     "query-string": "^4.2.2",
