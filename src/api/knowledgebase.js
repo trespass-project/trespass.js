@@ -39,6 +39,18 @@ const noop = () => {};
 const retryRate = 1000;
 
 
+const fileTypeFromName =
+module.exports.fileTypeFromName =
+function fileTypeFromName(fileName) {
+	const extension = R.last(fileName.split('.'));
+	const fileType = api.fileTypes[extension] || {
+		mimeType: 'text/plain',
+		responseType: 'text',
+	};
+	return fileType;
+};
+
+
 const listModels =
 module.exports.listModels =
 function listModels(axios) {
@@ -136,13 +148,7 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 		file_id: gitFileId,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
-
-	const extension = R.last(fileName.split('.'));
-	const fileType = api.fileTypes[extension] || {
-		mimeType: 'text/plain',
-		responseType: 'text',
-	};
-
+	const fileType = fileTypeFromName(fileName);
 	const params = _.merge(
 		{
 			url,
