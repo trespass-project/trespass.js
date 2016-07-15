@@ -181,21 +181,20 @@ function getModelFile(axios, modelId) {
 
 const putFile =
 module.exports.putFile =
-function putFile(axios, modelId, data, fileName, fileType) {
+function putFile(axios, modelId, data, fileName, type) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
-		filetype: fileType, // model_file|scenario_file
+		filetype: type, // model_file|scenario_file
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
+	const fileType = fileTypeFromName(fileName);
 	const params = _.merge(
 		{
 			url,
 			data,
 			method: 'put',
-			// TODO:
-			// headers: { 'Content-type': 'text/plain' },
-			headers: { 'Content-type': 'text/xml' },
+			headers: { 'Content-type': fileType.mimeType },
 		},
 		api.requestOptions.crossDomain
 	);
