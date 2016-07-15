@@ -56,6 +56,31 @@ function fileTypeFromName(fileName) {
 };
 
 
+const listCommits =
+module.exports.listCommits =
+function listCommits(axios, modelId) {
+	return new Promise((resolve, reject) => {
+		if (!modelId) {
+			return reject('no model id provided');
+		}
+
+		const query = queryString.stringify({
+			model_id: modelId,
+		});
+		const url = `${api.makeUrl(paths, 'files/listcommits')}?${query}`;
+		const params = _.merge(
+			{ url },
+			api.requestOptions.acceptJSON,
+			api.requestOptions.crossDomain
+		);
+
+		axios(params)
+			.then((res) => resolve(res.data))
+			.catch(reject);
+	});
+};
+
+
 const listModels =
 module.exports.listModels =
 function listModels(axios) {
