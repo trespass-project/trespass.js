@@ -3,10 +3,15 @@ const R = require('ramda');
 const api = require('./index.js');
 const queryString = require('query-string');
 
-const analysisToolNames = [
-	'A.T. Analyzer',
-	'A.T. Evaluator',
-];
+const analysisTools = {
+	'A.T. Analyzer': {
+		outputFileName: 'ata_output.zip',
+	},
+	'A.T. Evaluator': {
+		outputFileName: 'ate_output.txt',
+	},
+};
+const analysisToolNames = module.exports.analysisToolNames = R.keys(analysisTools);
 
 
 /*
@@ -379,28 +384,29 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToo
 		.map((tool) => {
 			const params = _.merge(
 				{
+					method: 'get',
 					url: tool.result_file_url,
-					method: 'get'
 				},
+				api.requestOptions.acceptBlob,
 				api.requestOptions.crossDomain
 			);
 
 			return new Promise((resolve, reject) => {
 				axios(params)
-					// .done((blob, textStatus, xhr) => {
+					.then((res) => res.data)
 					.then((blob) => {
-						// TODO: don't hard-code this
-						const type = (tool.name === 'A.T. Analyzer')
-							? 'application/zip'
-							: 'text/plain';
+						// const tool = analysisTools[tool.name];
+						// const fileName = (!!tool)
+						// 	? tool.outputFileName
+						// 	: 'unknown.txt';
+						// const fileType = fileTypeFromName(fileName);
 
 						// jquery doesn't return blobs (fetch() does)
-						// const realBlob = new Blob([blob], { type });
-						const realBlob = blob;
+						// const realBlob = new Blob([blob], { type: fileType.mimeType });
 
 						return resolve({
 							name: tool.name,
-							blob: realBlob,
+							blob,
 						});
 					});
 			});
