@@ -136,7 +136,7 @@ function createModel(axios, desiredModelId) {
 					// const data = JSON.parse(err.response.data);
 					// console.log(data.message);
 
-					return reject(new Error(`model '${desiredModelId}' already exists`))
+					return reject(new Error(`model '${desiredModelId}' already exists`));
 				}
 				return reject(err);
 			});
@@ -366,7 +366,6 @@ function getTaskStatus(axios, taskUrl) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		// api.requestOptions.contentTypeJSON,
 		api.requestOptions.crossDomain
 	);
 	return axios(params)
