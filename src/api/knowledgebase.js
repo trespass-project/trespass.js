@@ -81,6 +81,70 @@ function listCommits(axios, modelId) {
 };
 
 
+const getAnalysisResultsSnapshots =
+module.exports.getAnalysisResultsSnapshots =
+function getAnalysisResultsSnapshots(axios, modelId) {
+	const toolchainPrefixPattern = /^\(toolchain_run_\d+\.\d+\)/i;
+
+	const markToolchainFiles = (commit) => {
+		if (toolchainPrefixPattern.test(commit.message)) {
+			const prefix = commit.message.match(toolchainPrefixPattern)[0];
+			return Object.assign(
+				{},
+				commit,
+				{ _toolchainPrefix: prefix }
+			);
+		}
+		return commit;
+	};
+
+	const toolchainFilesOnly = (commit) => {
+		return !!commit._toolchainPrefix;
+	};
+
+	const byToolchainRun = R.groupBy((commit) => `${commit._toolchainPrefix}`);
+
+	const reduceGrouped = (pair) => {
+		const prefix = pair[0];
+		const commits = pair[1];
+		return commits
+			// newest first
+			.sort((a, b) => b.timestamp - a.timestamp)
+			.reduce((acc, commit) => {
+				// for each file, take the most recent file id
+				commit.tree
+					.forEach((file) => {
+						if (!acc.tree[file.path]) {
+							acc.tree[file.path] = file.file_id;
+						}
+					});
+				return acc;
+			}, {
+				prefix,
+				tree: {},
+			});
+	};
+
+	return listCommits(axios, modelId)
+		.then((commits) => {
+			// only take the commits that are part of a toolchain run
+			const filtered = commits
+				.map(markToolchainFiles)
+				.filter(toolchainFilesOnly);
+
+			// group them by commit message prefix
+			const grouped = byToolchainRun(filtered);
+
+			// reduce down to a single object, with a tree that only
+			// contains the most recent file ids
+			const results = R.toPairs(grouped)
+				.map(reduceGrouped);
+
+			return results;
+		});
+};
+
+
 const listModels =
 module.exports.listModels =
 function listModels(axios) {
