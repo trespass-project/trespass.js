@@ -10,7 +10,6 @@ const xml2jsOptions = {
 	trim: true,
 	explicitArray: false, // we'll take care of `node` elems ourselves
 };
-
 const rootElemName = module.exports.rootElemName = 'adtree';
 const childElemName = module.exports.childElemName = 'node';
 const parameterElemName = module.exports.parameterElemName = 'parameter';
@@ -65,7 +64,7 @@ function prepareParameter(param) {
 };
 
 
-// const parseXml =
+const parseXml =
 module.exports.parseXml =
 function parseXml(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
@@ -145,7 +144,7 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 };
 
 
-// const toXml =
+const toXml =
 module.exports.toXml =
 function toXml(rootNode, opts=xml2jsOptions) {
 	const builder = new xml2js.Builder(opts);
@@ -156,7 +155,7 @@ function toXml(rootNode, opts=xml2jsOptions) {
 };
 
 
-// const findLeafNodes =
+const findLeafNodes =
 module.exports.findLeafNodes =
 function findLeafNodes(nodes, childrenKey=childElemName) {
 	const leafNodes = [];
@@ -177,7 +176,7 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 };
 
 
-// const getAllPaths =
+const getAllPaths =
 module.exports.getAllPaths =
 function getAllPaths(tree, childrenKey=childElemName) {
 	// returns a list of all the paths in a tree.

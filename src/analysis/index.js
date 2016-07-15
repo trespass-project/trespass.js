@@ -47,6 +47,5 @@ function parse(str) {
 		// return structured data
 		.map(parseLine);
 
-
 	return lines;
 };
