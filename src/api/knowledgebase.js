@@ -224,18 +224,21 @@ function getTypes(axios, modelId) {
 };
 
 
-// const getItem =
-// module.exports.getItem =
-// function getItem(fetch, modelId, itemId) {
-// 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
-// 	const params = _.merge(
-// 		{ method: 'get' },
-// 		api.requestOptions.fetch.acceptJSON,
-// 		api.requestOptions.fetch.contentTypeJSON,
-// 		api.requestOptions.fetch.crossDomain
-// 	);
-// 	return fetch(url, params);
-// };
+const getItem =
+module.exports.getItem =
+function getItem(axios, modelId, itemId) {
+	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
+	const params = _.merge(
+		{
+			url,
+			method: 'get',
+		},
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
 
 
 const createItem =
