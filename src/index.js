@@ -8,23 +8,15 @@ const analysis = require('./analysis');
 const api = require('./api');
 
 module.exports = {
-	/**
-	 * [trespass/model]{@link module:trespass/model}
-	 */
+	/** [trespass/model]{@link module:trespass/model} */
 	model,
 
-	/**
-	 * [trespass/attacktree]{@link module:trespass/attacktree}
-	 */
+	/** [trespass/attacktree]{@link module:trespass/attacktree} */
 	attacktree,
 
-	/**
-	 * [trespass/analysis]{@link module:trespass/analysis}
-	 */
+	/** [trespass/analysis]{@link module:trespass/analysis} */
 	analysis,
 
-	/**
-	 * [trespass/api]{@link module:trespass/api}
-	 */
+	/** [trespass/api]{@link module:trespass/api} */
 	api,
 };

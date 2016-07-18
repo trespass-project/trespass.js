@@ -5,7 +5,9 @@
 
 const urljoin = require('url-join');
 
+/** [trespass/api/tools]{@link module:trespass/api/tools} */
 module.exports.tools = require('./tools.js');
+/** [trespass/api/knowledgebase]{@link module:trespass/api/knowledgebase} */
 module.exports.knowledgebase = require('./knowledgebase.js');
 
 

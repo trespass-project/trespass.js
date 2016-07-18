@@ -47,7 +47,7 @@ const paths = { host, prefix };
 // ———
 
 const noop = () => {};
-const retryRate = 1000;
+// const retryRate = 1000;
 
 
 // TODO: move to trespass.api
