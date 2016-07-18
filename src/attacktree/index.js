@@ -3,7 +3,6 @@
  * @module trespass/attacktree
  */
 
-
 const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
@@ -22,6 +21,11 @@ const parameterElemName = module.exports.parameterElemName = 'parameter';
 
 
 const stringToNumber =
+/**
+ * converts a string to a number, if possible. otherwise returns original string.
+ * @param {String} str
+ * @returns {Number|String}
+ */
 module.exports.stringToNumber =
 function stringToNumber(str) {
 	const trimmed = str.trim();
@@ -40,6 +44,11 @@ function stringToNumber(str) {
 
 
 const toArrayIfNotAlready =
+/**
+ * converts the parameter to an array, if it isn't one already.
+ * @param {} list - possibly a list
+ * @returns {Array}
+ */
 module.exports.toArrayIfNotAlready =
 function toArrayIfNotAlready(list) {
 	return (_.isArray(list))
@@ -49,6 +58,12 @@ function toArrayIfNotAlready(list) {
 
 
 const toHashMap =
+/**
+ * turns an array into an object, with `key` as property name.
+ * @param {String} key - property name to use as key
+ * @param {Array} list - the list to transform
+ * @returns {Object}
+ */
 module.exports.toHashMap =
 function toHashMap(key='id', list) {
 	return list
@@ -60,6 +75,11 @@ function toHashMap(key='id', list) {
 
 
 const prepareParameter =
+/**
+ * transforms the shape of an annotation parameter to s.th. more useful
+ * @param {Object} param - annotation parameter
+ * @returns {Object}
+ */
 module.exports.prepareParameter =
 function prepareParameter(param) {
 	return {
@@ -71,6 +91,11 @@ function prepareParameter(param) {
 
 
 const parseXml =
+/**
+ * parses an attack tree xml string
+ * @param {String} xmlStr - attack tree xml string
+ * @returns {Promise} resolves to attack tree object
+ */
 module.exports.parseXml =
 function parseXml(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
@@ -96,6 +121,11 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 
 
 const getRootNode =
+/**
+ * returns the rood node of an attack tree
+ * @param {Object} attacktree - attack tree object
+ * @returns {Object} root node
+ */
 module.exports.getRootNode =
 function getRootNode(attacktree, childrenKey=childElemName) {
 	return attacktree[childrenKey][0];
@@ -103,6 +133,13 @@ function getRootNode(attacktree, childrenKey=childElemName) {
 
 
 const prepareTree =
+/**
+ * prepares an attack tree object.
+ * - conversion from strings to numbers
+ * - ensure all children are arrays
+ * @param {Object} rootNode - root node of an attack tree
+ * @returns {Object} root node
+ */
 module.exports.prepareTree =
 function prepareTree(rootNode, childrenKey=childElemName) {
 	function recurse(item) {
@@ -129,6 +166,11 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 
 
 const prepareAnnotatedTree =
+/**
+ * prepares an annotated attack tree object.
+ * @param {Object} rootNode - root node of an attack tree
+ * @returns {Object} root node
+ */
 module.exports.prepareAnnotatedTree =
 function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 	function recurse(item) {
@@ -150,7 +192,13 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 };
 
 
+// TODO: test with annotated tree
 const toXml =
+/**
+ * renders an attack tree as xml string.
+ * @param {Object} rootNode - root node of an attack tree
+ * @returns {String} attack tree xml string
+ */
 module.exports.toXml =
 function toXml(rootNode, opts=xml2jsOptions) {
 	const builder = new xml2js.Builder(opts);
@@ -161,7 +209,13 @@ function toXml(rootNode, opts=xml2jsOptions) {
 };
 
 
+// TODO: take rootNode as first param?
 const findLeafNodes =
+/**
+ * given a list of nodes, returns all leaf nodes.
+ * @param {Array} nodes - list of nodes
+ * @returns {Array} list of leaf nodes
+ */
 module.exports.findLeafNodes =
 function findLeafNodes(nodes, childrenKey=childElemName) {
 	const leafNodes = [];
@@ -183,13 +237,16 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 
 
 const getAllPaths =
+/**
+ * given a list of nodes, returns a list of all the paths in a tree,
+ * ending in leaf nodes. — does not take conjunctive-ness into account.
+ * @param {Array} nodes - list of nodes
+ * @returns {Array} list of paths (path: array of nodes)
+ */
 module.exports.getAllPaths =
-function getAllPaths(tree, childrenKey=childElemName) {
-	// returns a list of all the paths in a tree.
-	// does not take conjunctive-ness into account.
-
-	function recurse(tree, currentPath, allPaths) {
-		tree.forEach((node) => {
+function getAllPaths(nodes, childrenKey=childElemName) {
+	function recurse(nodes, currentPath, allPaths) {
+		nodes.forEach((node) => {
 			const children = node[childrenKey];
 			const newCurrentPath = [...currentPath, node];
 			if (children && children.length > 0) {
@@ -207,6 +264,6 @@ function getAllPaths(tree, childrenKey=childElemName) {
 	}
 
 	const allPaths = [];
-	recurse(tree, [], allPaths);
+	recurse(nodes, [], allPaths);
 	return allPaths;
 };
