@@ -16,7 +16,8 @@ const analysisTools = {
 		outputFileName: 'ate_output.txt',
 	},
 };
-const analysisToolNames = module.exports.analysisToolNames = R.keys(analysisTools);
+const analysisToolNames =
+module.exports.analysisToolNames = R.keys(analysisTools);
 
 
 /*
