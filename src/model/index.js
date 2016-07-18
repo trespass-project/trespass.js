@@ -1,4 +1,7 @@
-'use strict';
+/**
+ * Functions to work with the TREsPASS model format.
+ * @module trespass/model
+ */
 
 import update from 'immutability-helper';
 const _ = require('lodash');

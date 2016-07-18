@@ -1,6 +1,7 @@
-// const R = require('ramda');
-// const _ = require('lodash');
-
+/**
+ * Functions for parsing analysis results.
+ * @module trespass/analysis
+ */
 
 // attack tree evaluator
 module.exports.ate = {};

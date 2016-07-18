@@ -1,25 +1,30 @@
-// `trespass.js` is the core library used in the node.js or web-based tools in the [TREsPASS project](https://www.trespass-project.eu/).
+/**
+ * @module trespass
+ */
 
 const model = require('./model');
 const attacktree = require('./attacktree');
 const analysis = require('./analysis');
 const api = require('./api');
 
-// It is divided into the following sub-modules:
 module.exports = {
-	// ## [trespass.model](model.html)
-	// Functions to work with the TREsPASS model format.
+	/**
+	 * [trespass/model]{@link module:trespass/model}
+	 */
 	model,
 
-	// ## [trespass.attacktree](attacktree.html)
-	// Functions to process attack trees.
+	/**
+	 * [trespass/attacktree]{@link module:trespass/attacktree}
+	 */
 	attacktree,
 
-	// ## [trespass.analysis](analysis.html)
-	// Functions for parsing analysis results.
+	/**
+	 * [trespass/analysis]{@link module:trespass/analysis}
+	 */
 	analysis,
 
-	// ## [trespass.api](api.html)
-	// Functions for using a number of APIs.
+	/**
+	 * [trespass/api]{@link module:trespass/api}
+	 */
 	api,
 };

@@ -8,6 +8,7 @@
     "build": "make build",
     "prepublish": "npm run build",
     "lint": "make lint",
+    "docs": "make docs",
     "test": "make test",
     "test-watch": "make test-watch"
   },
@@ -33,6 +34,7 @@
     "async": "^0.9.2",
     "form-data": "^1.0.0-rc3",
     "immutability-helper": "^2.0.0",
+    "jsdoc": "^3.4.0",
     "lodash": "^3.10.1",
     "moment": "^2.14.1",
     "mout": "^1.0.0",

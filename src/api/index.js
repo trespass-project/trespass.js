@@ -1,3 +1,8 @@
+/**
+ * Functions for using a number of APIs.
+ * @module trespass/api
+ */
+
 const urljoin = require('url-join');
 
 module.exports.tools = require('./tools.js');

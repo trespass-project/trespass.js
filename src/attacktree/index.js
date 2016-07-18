@@ -1,3 +1,9 @@
+/**
+ * Functions to process attack trees.
+ * @module trespass/attacktree
+ */
+
+
 const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');

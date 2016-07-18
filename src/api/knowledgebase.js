@@ -1,3 +1,7 @@
+/**
+ * @module trespass/api/knowledgebase
+ */
+
 const _ = require('lodash');
 const R = require('ramda');
 const api = require('./index.js');
