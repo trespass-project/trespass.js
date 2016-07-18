@@ -9,7 +9,10 @@
 
 ```
 # at the moment:
-npm install gitlab:freder/trespass.js
+git checkout [repo-url] trespass.js
+cd trespass.js
+npm install
+npm link
 
 # in the future:
 npm install trespass.js
