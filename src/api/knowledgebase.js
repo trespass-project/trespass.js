@@ -1,4 +1,5 @@
 /**
+ * knowledgebase api helpers
  * @module trespass/api/knowledgebase
  */
 
@@ -8,6 +9,8 @@ const api = require('./index.js');
 const queryString = require('query-string');
 const moment = require('moment');
 
+
+// TODO: move to trespass.analysis
 const analysisTools = {
 	'A.T. Analyzer': {
 		outputFileName: 'ata_output.zip',
@@ -20,10 +23,7 @@ const analysisToolNames =
 module.exports.analysisToolNames = R.keys(analysisTools);
 
 
-/*
-knowledgebase API
-http://localhost:8080/tkb/
-*/
+// default is `http://localhost:8080/tkb/`, but there are exceptions
 const hostExceptions = [
 	{
 		check: () => (window.location.toString().indexOf('itrust') > -1),
@@ -50,7 +50,14 @@ const noop = () => {};
 const retryRate = 1000;
 
 
+// TODO: move to trespass.api
 const fileTypeFromName =
+/**
+ * infer mime type and response type from file extension.
+ *
+ * @param {String} fileName - file name
+ * @returns {Object}
+ */
 module.exports.fileTypeFromName =
 function fileTypeFromName(fileName) {
 	const extension = R.last(fileName.split('.'));
@@ -63,6 +70,13 @@ function fileTypeFromName(fileName) {
 
 
 const listCommits =
+/**
+ * gets a list of all git commits for a specific model.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to list of commits
+ */
 module.exports.listCommits =
 function listCommits(axios, modelId) {
 	return new Promise((resolve, reject) => {
@@ -88,6 +102,15 @@ function listCommits(axios, modelId) {
 
 
 const getAnalysisResultsSnapshots =
+/**
+ * gets a list of snapshots. each snapshot represents a toolchain run.
+ * the `tree` property of each items maps filenames to file ids, which can
+ * be used to get the file contents at that point in time.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to list of snapshot objects
+ */
 module.exports.getAnalysisResultsSnapshots =
 function getAnalysisResultsSnapshots(axios, modelId) {
 	const toolchainPrefixPattern = /^\(toolchain_run_\d+\.\d+\)/i;
@@ -162,6 +185,12 @@ function getAnalysisResultsSnapshots(axios, modelId) {
 
 
 const listModels =
+/**
+ * gets the list of models, currently stored in the kb.
+ *
+ * @param {axios}
+ * @returns {Promise} resolves to list of model objects
+ */
 module.exports.listModels =
 function listModels(axios) {
 	const url = api.makeUrl(paths, 'model');
@@ -176,6 +205,13 @@ function listModels(axios) {
 
 
 const getModel =
+/**
+ * checks if a model exists.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves model id or `null`
+ */
 module.exports.getModel =
 function getModel(axios, modelId) {
 	return new Promise((resolve, reject) => {
@@ -201,12 +237,14 @@ function getModel(axios, modelId) {
 };
 
 
-/**
- * creates a new model
- * @param {string} `desiredModelId`
- * @returns {Promise} - `{ modelId, isNew }`
- */
 const createModel =
+/**
+ * creates a new model. will fail if model with that id already exists.
+ *
+ * @param {axios}
+ * @param {String} desiredModelId - the desired model id
+ * @returns {Promise} resolves to object `{ modelId, isNew }`
+ */
 module.exports.createModel =
 function createModel(axios, desiredModelId) {
 	return new Promise((resolve, reject) => {
@@ -249,7 +287,18 @@ function createModel(axios, desiredModelId) {
 };
 
 
+// TODO: test gitFileId
 const getFile =
+/**
+ * retrieve a file. returns latest version by default. use `gitFileId`
+ * argument to get a previous version of the file.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} fileName - file name
+ * @param {String} [gitFileId] - git file id
+ * @returns {Promise} resolves to file content, but type depends on file extension.
+ */
 module.exports.getFile =
 function getFile(axios, modelId, fileName, gitFileId=undefined) {
 	const query = queryString.stringify({
@@ -274,8 +323,11 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 
 
 /**
- * @param {string} `modelId`
- * @returns {Promise} - model xml string
+ * get the latest model file.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to model xml string
  */
 const getModelFile =
 module.exports.getModelFile =
@@ -284,13 +336,24 @@ function getModelFile(axios, modelId) {
 };
 
 
+// TODO: type of `data`?
 const putFile =
+/**
+ * store a file in kb.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {?} data - file content
+ * @param {String} fileName - file name
+ * @param {String} [type] - file type: `model_file` or `scenario_file`
+ * @returns {Promise}
+ */
 module.exports.putFile =
-function putFile(axios, modelId, data, fileName, type) {
+function putFile(axios, modelId, data, fileName, type=undefined) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
-		filetype: type, // model_file|scenario_file
+		filetype: type,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
 	const fileType = fileTypeFromName(fileName);
@@ -309,6 +372,14 @@ function putFile(axios, modelId, data, fileName, type) {
 
 
 const saveModelFile =
+/**
+ * save model to file.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} modelXmlStr - model xml string
+ * @returns {Promise}
+ */
 module.exports.saveModelFile =
 function saveModelFile(axios, modelId, modelXmlStr) {
 	return putFile(axios, modelId, modelXmlStr, 'model.xml', 'model_file');
@@ -316,6 +387,13 @@ function saveModelFile(axios, modelId, modelXmlStr) {
 
 
 const getTypes =
+/**
+ * get list of model component types.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to array of type objects
+ */
 module.exports.getTypes =
 function getTypes(axios, modelId) {
 	const url = api.makeUrl(paths, `type?model_id=${modelId}`);
@@ -330,6 +408,14 @@ function getTypes(axios, modelId) {
 
 
 const getItem =
+/**
+ * get a single item by id.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} itemId - item id
+ * @returns {Promise} resolves to item object
+ */
 module.exports.getItem =
 function getItem(axios, modelId, itemId) {
 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
@@ -347,6 +433,14 @@ function getItem(axios, modelId, itemId) {
 
 
 const createItem =
+/**
+ * creates a new item.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {Object} item - item data
+ * @returns {Promise} resolves to item object
+ */
 module.exports.createItem =
 function createItem(axios, modelId, item) {
 	return new Promise((resolve, reject) => {
@@ -378,6 +472,15 @@ function createItem(axios, modelId, item) {
 
 
 const renameItemId =
+/**
+ * change the id of an item.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} itemId - item id
+ * @param {String} newId - new item id
+ * @returns {Promise}
+ */
 module.exports.renameItemId =
 function renameItemId(axios, modelId, itemId, newId) {
 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}/?rename_to=${newId}`);
@@ -395,6 +498,14 @@ function renameItemId(axios, modelId, itemId, newId) {
 
 
 const deleteItem =
+/**
+ * deletes an item.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} itemId - item id
+ * @returns {Promise}
+ */
 module.exports.deleteItem =
 function deleteItem(axios, modelId, itemId) {
 	const url = api.makeUrl(paths, `model/${modelId}/${itemId}`);
@@ -411,6 +522,13 @@ function deleteItem(axios, modelId, itemId) {
 
 
 const getAttackerProfiles =
+/**
+ * gets the list of attacker profiles.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to array of attacker profile objects
+ */
 module.exports.getAttackerProfiles =
 function getAttackerProfiles(axios, modelId) {
 	const url = api.makeUrl(paths, `attackerprofile?model_id=${modelId}`);
@@ -425,6 +543,13 @@ function getAttackerProfiles(axios, modelId) {
 
 
 const getToolChains =
+/**
+ * gets the list of toolchains.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to array of toolchain objects
+ */
 module.exports.getToolChains =
 function getToolChains(axios, modelId) {
 	const url = api.makeUrl(paths, `toolchain?model_id=${modelId}`);
@@ -438,9 +563,22 @@ function getToolChains(axios, modelId) {
 };
 
 
+// TODO: what's the return value
 const runToolChain =
+/**
+ * runs a toolchain.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} toolchainId - toolchain id
+ * @param {String} attackerProfileId - attacker profile id
+ * @param {String} [_callbacks] - callbacks for different toolchain events.
+	 * - onToolChainStart
+	 * - onToolChainEnd
+ * @returns {Promise}
+ */
 module.exports.runToolChain =
-function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks={}) {
+function runToolChain(axios, modelId, toolchainId, attackerProfileId, _callbacks={}) {
 	const callbacks = _.defaults(_callbacks, {
 		onToolChainStart: noop,
 		onToolChainEnd: noop,
@@ -450,7 +588,7 @@ function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks
 		model_id: modelId,
 		attackerprofile_id: attackerProfileId,
 	});
-	const url = api.makeUrl(paths, `toolchain/${toolChainId}?${query}`);
+	const url = api.makeUrl(paths, `toolchain/${toolchainId}?${query}`);
 	const params = _.merge(
 		{
 			url,
@@ -467,6 +605,13 @@ function runToolChain(axios, modelId, toolChainId, attackerProfileId, _callbacks
 
 
 const getTaskStatus =
+/**
+ * gets status of a task.
+ *
+ * @param {axios}
+ * @param {String} taskUrl - task url
+ * @returns {Promise} resolves to task status object
+ */
 module.exports.getTaskStatus =
 function getTaskStatus(axios, taskUrl) {
 	const url = taskUrl;
@@ -481,6 +626,14 @@ function getTaskStatus(axios, taskUrl) {
 
 
 const getAnalysisResults =
+/**
+ * retrieve analysis results from toolchain run.
+ *
+ * @param {axios}
+ * @param {Object} taskStatusData - task status object
+ * @param {Object} [analysisToolNames] - names of the analysis tools we're interested in
+ * @returns {Promise} resolves to array of `{ name, blob }`
+ */
 module.exports.getAnalysisResults =
 function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToolNames) {
 	const tools = taskStatusData.tool_status
