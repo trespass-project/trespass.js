@@ -1,6 +1,13 @@
+/**
+ * Functions for using a number of APIs.
+ * @module trespass/api
+ */
+
 const urljoin = require('url-join');
 
+/** [trespass/api/tools]{@link module:trespass/api/tools} */
 module.exports.tools = require('./tools.js');
+/** [trespass/api/knowledgebase]{@link module:trespass/api/knowledgebase} */
 module.exports.knowledgebase = require('./knowledgebase.js');
 
 
@@ -24,7 +31,17 @@ const fileTypes = module.exports.fileTypes = {
 };
 
 
-const makeUrl = module.exports.makeUrl =
+
+const makeUrl =
+/**
+ * contructs an api endpoint url
+ *
+ * @param {axios}
+ * @param {Object} api - api object (`{ host, prefix }`)
+ * @param {String} endpoint - name of the endpoint
+ * @returns {String} url
+ */
+module.exports.makeUrl =
 function makeUrl(api, endpoint) {
 	const url = urljoin(api.host, api.prefix, endpoint);
 	return url;
@@ -32,7 +49,8 @@ function makeUrl(api, endpoint) {
 
 
 // request options
-const requestOptions = module.exports.requestOptions = {
+const requestOptions =
+module.exports.requestOptions = {
 	crossDomain: {
 		xDomain: true,
 	},

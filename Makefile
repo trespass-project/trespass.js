@@ -4,6 +4,7 @@ jsSourceDir = ./src
 testsDir = ./test
 buildDir = ./dist
 babelOptions = --source-maps -d $(buildDir) $(jsSourceDir)
+docsDir = ./docs
 
 
 .PHONY: test
@@ -19,6 +20,12 @@ test-watch:
 .PHONY: lint
 lint:
 	$(npmBinDir)/eslint $(jsSourceDir)
+
+
+.PHONY: docs
+docs:
+	rm -rf $(docsDir)
+	$(npmBinDir)/jsdoc -c ./jsdoc.json --destination $(docsDir) --readme ./readme.md $(jsSourceDir)/*
 
 
 .DEFAULT_GOAL = build
