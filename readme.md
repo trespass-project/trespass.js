@@ -21,7 +21,7 @@ npm install trespass.js
 to generate the documentation, run:
 
 ```
-make docs
+make docs && open ./docs/index.html
 ```
 
 
