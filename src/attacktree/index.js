@@ -203,7 +203,7 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 // TODO: test with annotated tree
 const toXml =
 /**
- * renders an attack tree as xml string.
+ * renders an attack tree object as xml string.
  *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {String} attack tree xml string
