@@ -28,7 +28,13 @@ make docs && open ./docs/index.html
 ```
 
 
-
 ## development
 
 when using the package `npm link`ed, don't forget to run `make build-watch`.
+
+
+## tests
+
+```
+make test
+```
