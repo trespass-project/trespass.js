@@ -19,7 +19,7 @@ const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
 	trim: true,
-	explicitArray: /*true*/ false,
+	explicitArray: false,
 };
 
 
