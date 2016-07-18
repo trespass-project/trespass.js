@@ -25,11 +25,6 @@
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.9.2",
     "gulp": "^3.8.11",
-    "gulp-changed": "^1.1.1",
-    "gulp-docco": "0.0.4",
-    "gulp-sass": "^2.0.4",
-    "gulp-sequence": "^0.3.2",
-    "gulp-watch": "^4.1.1",
     "revalidator": "^0.3.1",
     "rimraf": "^2.3.2",
     "xmllint": "^0.1.0"
