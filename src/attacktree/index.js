@@ -23,6 +23,7 @@ const parameterElemName = module.exports.parameterElemName = 'parameter';
 const stringToNumber =
 /**
  * converts a string to a number, if possible. otherwise returns original string.
+ *
  * @param {String} str
  * @returns {Number|String}
  */
@@ -46,6 +47,7 @@ function stringToNumber(str) {
 const toArrayIfNotAlready =
 /**
  * converts the parameter to an array, if it isn't one already.
+ *
  * @param {} list - possibly a list
  * @returns {Array}
  */
@@ -60,6 +62,7 @@ function toArrayIfNotAlready(list) {
 const toHashMap =
 /**
  * turns an array into an object, with `key` as property name.
+ *
  * @param {String} key - property name to use as key
  * @param {Array} list - the list to transform
  * @returns {Object}
@@ -77,6 +80,7 @@ function toHashMap(key='id', list) {
 const prepareParameter =
 /**
  * transforms the shape of an annotation parameter to s.th. more useful
+ *
  * @param {Object} param - annotation parameter
  * @returns {Object}
  */
@@ -93,6 +97,7 @@ function prepareParameter(param) {
 const parseXml =
 /**
  * parses an attack tree xml string
+ *
  * @param {String} xmlStr - attack tree xml string
  * @returns {Promise} resolves to attack tree object
  */
@@ -123,6 +128,7 @@ function parseXml(xmlStr, opts=xml2jsOptions) {
 const getRootNode =
 /**
  * returns the rood node of an attack tree
+ *
  * @param {Object} attacktree - attack tree object
  * @returns {Object} root node
  */
@@ -137,6 +143,7 @@ const prepareTree =
  * prepares an attack tree object.
  * - conversion from strings to numbers
  * - ensure all children are arrays
+ *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {Object} root node
  */
@@ -168,6 +175,7 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 const prepareAnnotatedTree =
 /**
  * prepares an annotated attack tree object.
+ *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {Object} root node
  */
@@ -196,6 +204,7 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 const toXml =
 /**
  * renders an attack tree as xml string.
+ *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {String} attack tree xml string
  */
@@ -213,6 +222,7 @@ function toXml(rootNode, opts=xml2jsOptions) {
 const findLeafNodes =
 /**
  * given a list of nodes, returns all leaf nodes.
+ *
  * @param {Array} nodes - list of nodes
  * @returns {Array} list of leaf nodes
  */
@@ -240,6 +250,7 @@ const getAllPaths =
 /**
  * given a list of nodes, returns a list of all the paths in a tree,
  * ending in leaf nodes. — does not take conjunctive-ness into account.
+ *
  * @param {Array} nodes - list of nodes
  * @returns {Array} list of paths (path: array of nodes)
  */
