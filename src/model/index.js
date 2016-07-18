@@ -1,4 +1,7 @@
-'use strict';
+/**
+ * Functions to work with the TREsPASS model format.
+ * @module trespass/model
+ */
 
 import update from 'immutability-helper';
 const _ = require('lodash');
@@ -16,7 +19,7 @@ const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
 	trim: true,
-	explicitArray: /*true*/ false,
+	explicitArray: false,
 };
 
 
@@ -64,20 +67,23 @@ const singularPluralCollection = [
 ];
 
 // collectionNamesSingular['items'] = 'item'
-const collectionNamesSingular = module.exports.collectionNamesSingular =
+const collectionNamesSingular =
+module.exports.collectionNamesSingular =
 singularPluralCollection
 	.reduce((result, item) => {
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
-const collectionNames = module.exports.collectionNames =
+const collectionNames =
+module.exports.collectionNames =
 R.keys(collectionNamesSingular);
 
 
 // ---
 // ## `emptyModel`
 // > model default structure
-const emptyModel = module.exports.emptyModel =
+const emptyModel =
+module.exports.emptyModel =
 singularPluralCollection
 	.map(R.prop('plural'))
 	.reduce((result, collectionName) => {
@@ -99,10 +105,13 @@ singularPluralCollection
 	});
 
 
-// ---
-// ## `create`
-// > return a new, empty model object
-const create = module.exports.create =
+const create =
+/**
+ * creates new, empty model
+ *
+ * @returns {Object} model
+ */
+module.exports.create =
 function create() {
 	return _.merge({}, emptyModel);
 };
@@ -111,7 +120,8 @@ function create() {
 // ---
 // ## `emptyModel`
 // > model default structure
-const emptyScenario = module.exports.emptyScenario = {
+const emptyScenario =
+module.exports.emptyScenario = {
 	scenario: {
 		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_scenario',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -144,15 +154,26 @@ const emptyScenario = module.exports.emptyScenario = {
 };
 
 
-// ---
-// ## `createScenario`
-// > return a new, empty model object
-const createScenario = module.exports.createScenario =
+const createScenario =
+/**
+ * creates new, empty scenario
+ *
+ * @returns {Object} scenario
+ */
+module.exports.createScenario =
 function createScenario() {
 	return _.merge({}, emptyScenario);
 };
 
-const scenarioSetModel = module.exports.scenarioSetModel =
+const scenarioSetModel =
+/**
+ * sets scenario model file name
+ *
+ * @param {Object} scenario - scenario object
+ * @param {String} modelFileName - model file name
+ * @returns {Object} scenario
+ */
+module.exports.scenarioSetModel =
 function scenarioSetModel(scenario, modelFileName) {
 	return update(
 		scenario,
@@ -160,7 +181,17 @@ function scenarioSetModel(scenario, modelFileName) {
 	);
 };
 
-const scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
+const scenarioSetAssetGoal =
+/**
+ * sets asset goal in scenario
+ *
+ * @param {Object} scenario - scenario object
+ * @param {String} attackerId - attacker id
+ * @param {String} assetId - asset id
+ * @param {Number} [profit] - attacker profit
+ * @returns {Object} scenario
+ */
+module.exports.scenarioSetAssetGoal =
 function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 	const goal = {
 		profit,
@@ -173,7 +204,14 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 	);
 };
 
-const scenarioToXML = module.exports.scenarioToXML =
+const scenarioToXML =
+/**
+ * renders a scenario object as xml string.
+ *
+ * @param {Object} _scenario - scenario object
+ * @returns {String} scenario xml string
+ */
+module.exports.scenarioToXML =
 function scenarioToXML(_scenario) {
 	const scenario = _.merge({}, _scenario);
 
@@ -191,21 +229,32 @@ function scenarioToXML(_scenario) {
 };
 
 
-// ---
-// ## `singular`
-const singular = module.exports.singular =
+const singular =
+/**
+ * returns singular of given collection name.
+ *
+ * @param {String} plural
+ * @returns {String} singular
+ */
+module.exports.singular =
 function singular(plural) {
 	return collectionNamesSingular[plural];
 };
 
 
-// ---
-// ## `parse()`
-const parse = module.exports.parse =
-function parse(
-	xmlStr, /* String */
-	done /* Function */
-) {
+// TODO: rename to `parseXml` (for consistency)
+// TODO: how to properly document callbacks
+// TODO: maybe change everything in here to use promises
+const parse =
+/**
+ * parses a model xml string
+ *
+ * @param {String} xmlStr - attack tree xml string
+ * @param {Function} done - callback
+ * @returns {} callback signature is `(err, model)`
+ */
+module.exports.parse =
+function parse(xmlStr, done) {
 	function mergeAttributes(obj) {
 		const attributes = obj[attrKey];
 		const withoutAttributes = R.omit([attrKey], obj);
@@ -322,6 +371,10 @@ function parse(
 // 		}
 // 	}
 // };
+
+/**
+ * validation schemas for different model component types.
+ */
 const schemas = {};
 schemas.location = {
 	properties: {
@@ -522,6 +575,13 @@ const validationOptions = {
 
 
 const validateComponent =
+/**
+ * validates an object with a given schema.
+ *
+ * @param {Object} it
+ * @param {String} schemaName name of [schema]{@link module:trespass/model.schemas} to use
+ * @returns {Array} list of errors
+ */
 module.exports.validateComponent =
 function validateComponent(it, schemaName) {
 	const result = revalidator.validate(it, schemas[schemaName], validationOptions);
@@ -555,6 +615,12 @@ function validateComponent(it, schemaName) {
 
 
 const validateModel =
+/**
+ * validate model
+ *
+ * @param {Object} model - model
+ * @returns {Array} list of error objects
+ */
 module.exports.validateModel =
 function validateModel(model) {
 	let errors = [];
@@ -570,9 +636,11 @@ function validateModel(model) {
 };
 
 
-// ---
-// ## `add_`
-const add_ = module.exports.add_ =
+const add_ =
+/**
+ * @private
+ */
+module.exports.add_ =
 function add_(model, dest, item) {
 	const updateData = {
 		[dest]: {
@@ -585,27 +653,45 @@ function add_(model, dest, item) {
 };
 
 
-// ---
-// ## `addActor`
-const addActor = module.exports.addActor =
+const addActor =
+/**
+ * add actor to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - actor data
+ * @returns {Object} model
+ */
+module.exports.addActor =
 function addActor(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'actors', it);
 };
 
 
-// ---
-// ## `addItem`
-const addItem = module.exports.addItem =
+const addItem =
+/**
+ * add item to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - item data
+ * @returns {Object} model
+ */
+module.exports.addItem =
 function addItem(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'items', it);
 };
 
 
-// ---
-// ## `addData`
-const addData = module.exports.addData =
+const addData =
+/**
+ * add data to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - data data
+ * @returns {Object} model
+ */
+module.exports.addData =
 function addData(model, _it={}) {
 	const it = _.merge({}, _it);
 	if (!it.name) {
@@ -615,54 +701,86 @@ function addData(model, _it={}) {
 };
 
 
-// ---
-// ## `addEdge`
-const addEdge = module.exports.addEdge =
+const addEdge =
+/**
+ * add edge to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - edge data
+ * @returns {Object} model
+ */
+module.exports.addEdge =
 function addEdge(model, _it={}) {
 	const it = _.merge({ directed: true }, _it);
 	return add_(model, 'edges', it);
 };
 
 
-// ---
-// ## `addPolicy`
-const addPolicy = module.exports.addPolicy =
+const addPolicy =
+/**
+ * add policy to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - policy data
+ * @returns {Object} model
+ */
+module.exports.addPolicy =
 function addPolicy(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'policies', it);
 };
 
 
-// ---
-// ## `addPredicate`
-const addPredicate = module.exports.addPredicate =
+const addPredicate =
+/**
+ * add predicate to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - predicate data
+ * @returns {Object} model
+ */
+module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'predicates', it);
 };
 
 
-// ---
-// ## `addProcess`
-const addProcess = module.exports.addProcess =
+const addProcess =
+/**
+ * add process to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - process data
+ * @returns {Object} model
+ */
+module.exports.addProcess =
 function addProcess(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'processes', it);
 };
 
 
-// ---
-// ## `addLocation`
-const addLocation = module.exports.addLocation =
+const addLocation =
+/**
+ * add location to model.
+ *
+ * @param {Object} model - model
+ * @param {Object} _it - location data
+ * @returns {Object} model
+ */
+module.exports.addLocation =
 function addLocation(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'locations', it);
 };
 
 
-// ---
-// ## `addRoom`
-const addRoom = module.exports.addRoom =
+const addRoom =
+/**
+ * @deprecated use [addLocation]{@link module:trespass/model.addLocation} instead
+ */
+module.exports.addRoom =
 function addRoom(model, _it={}) {
 	const it = _.merge({}, _it);
 	console.warn('use addLocation() instead');
@@ -670,7 +788,15 @@ function addRoom(model, _it={}) {
 };
 
 
-const separateAttributeFromObject = module.exports.separateAttributeFromObject =
+const separateAttributeFromObject =
+/**
+ * returns object and its attributes separately.
+ *
+ * @param {Array} attrNames - attribute names to extract
+ * @param {Object} obj
+ * @returns {Object} `{ newObject, attrObject }`
+ */
+module.exports.separateAttributeFromObject =
 function separateAttributeFromObject(attrNames=[], obj) {
 	const attrObject = R.pick(attrNames, obj);
 	const newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
@@ -705,13 +831,28 @@ module.exports.knownAttributes = {
 };
 
 
-const toPrefixedObject = module.exports.toPrefixedObject =
+const toPrefixedObject =
+/**
+ * puts `it` into an object, with property `prefix`.
+ *
+ * @param {String} prefix - property name
+ * @param {} it - anything
+ * @returns {Object}
+ */
+module.exports.toPrefixedObject =
 function toPrefixedObject(prefix, it) {
 	return { [prefix]: it };
 };
 
 
-const prepareForXml = module.exports.prepareForXml =
+const prepareForXml =
+/**
+ * recursively prepare object structure for conversion to xml.
+ *
+ * @param {Object} o - object
+ * @returns {Object}
+ */
+module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
 		return o.map((item) => {
@@ -752,8 +893,17 @@ function prepareForXml(o, parentKey) {
 };
 
 
-const prepareModelForXml = module.exports.prepareModelForXml =
+const prepareModelForXml =
+/**
+ * prepares model object for conversion to xml.
+ *
+ * @param {Object} model - model object
+ * @returns {Object} model
+ */
+module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
+	// TODO: clone model?
+
 	const system = model.system;
 
 	const items = system.items || [];
@@ -796,18 +946,20 @@ function prepareModelForXml(model) {
 };
 
 
-// ---
-// ## `toXML()`
-// > takes a model `Object` and turns it back into XML.
-const toXML = module.exports.toXML =
-function toXML(
-	_model /* Object */
-) {
+const toXML =
+/**
+ * renders a model object as xml string.
+ *
+ * @param {Object} _model - model object
+ * @returns {String} model xml string
+ */
+module.exports.toXML =
+function toXML(_model) {
 	// duplicate model
 	const model = _.merge({}, _model);
 
 	if (!model.system.id) {
-		throw new Error('model.system needs an id');
+		throw new Error('`model.system` needs an id');
 	}
 
 	// set fill in the gaps with defaults

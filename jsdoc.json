@@ -1,0 +1,10 @@
+{
+	"opts": {
+		"template": "templates/default",
+		"encoding": "utf8"
+	},
+
+	"plugins": [
+		"plugins/markdown"
+	]
+}
