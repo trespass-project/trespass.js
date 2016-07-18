@@ -67,20 +67,23 @@ const singularPluralCollection = [
 ];
 
 // collectionNamesSingular['items'] = 'item'
-const collectionNamesSingular = module.exports.collectionNamesSingular =
+const collectionNamesSingular =
+module.exports.collectionNamesSingular =
 singularPluralCollection
 	.reduce((result, item) => {
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
-const collectionNames = module.exports.collectionNames =
+const collectionNames =
+module.exports.collectionNames =
 R.keys(collectionNamesSingular);
 
 
 // ---
 // ## `emptyModel`
 // > model default structure
-const emptyModel = module.exports.emptyModel =
+const emptyModel =
+module.exports.emptyModel =
 singularPluralCollection
 	.map(R.prop('plural'))
 	.reduce((result, collectionName) => {
@@ -105,7 +108,8 @@ singularPluralCollection
 // ---
 // ## `create`
 // > return a new, empty model object
-const create = module.exports.create =
+const create =
+module.exports.create =
 function create() {
 	return _.merge({}, emptyModel);
 };
@@ -114,7 +118,8 @@ function create() {
 // ---
 // ## `emptyModel`
 // > model default structure
-const emptyScenario = module.exports.emptyScenario = {
+const emptyScenario =
+module.exports.emptyScenario = {
 	scenario: {
 		xmlns: 'https://www.trespass-project.eu/schemas/TREsPASS_scenario',
 		'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -150,12 +155,14 @@ const emptyScenario = module.exports.emptyScenario = {
 // ---
 // ## `createScenario`
 // > return a new, empty model object
-const createScenario = module.exports.createScenario =
+const createScenario =
+module.exports.createScenario =
 function createScenario() {
 	return _.merge({}, emptyScenario);
 };
 
-const scenarioSetModel = module.exports.scenarioSetModel =
+const scenarioSetModel =
+module.exports.scenarioSetModel =
 function scenarioSetModel(scenario, modelFileName) {
 	return update(
 		scenario,
@@ -163,7 +170,8 @@ function scenarioSetModel(scenario, modelFileName) {
 	);
 };
 
-const scenarioSetAssetGoal = module.exports.scenarioSetAssetGoal =
+const scenarioSetAssetGoal =
+module.exports.scenarioSetAssetGoal =
 function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 	const goal = {
 		profit,
@@ -176,7 +184,8 @@ function scenarioSetAssetGoal(scenario, attackerId, assetId, profit=0) {
 	);
 };
 
-const scenarioToXML = module.exports.scenarioToXML =
+const scenarioToXML =
+module.exports.scenarioToXML =
 function scenarioToXML(_scenario) {
 	const scenario = _.merge({}, _scenario);
 
@@ -196,7 +205,8 @@ function scenarioToXML(_scenario) {
 
 // ---
 // ## `singular`
-const singular = module.exports.singular =
+const singular =
+module.exports.singular =
 function singular(plural) {
 	return collectionNamesSingular[plural];
 };
@@ -204,7 +214,8 @@ function singular(plural) {
 
 // ---
 // ## `parse()`
-const parse = module.exports.parse =
+const parse =
+module.exports.parse =
 function parse(
 	xmlStr, /* String */
 	done /* Function */
@@ -575,7 +586,8 @@ function validateModel(model) {
 
 // ---
 // ## `add_`
-const add_ = module.exports.add_ =
+const add_ =
+module.exports.add_ =
 function add_(model, dest, item) {
 	const updateData = {
 		[dest]: {
@@ -590,7 +602,8 @@ function add_(model, dest, item) {
 
 // ---
 // ## `addActor`
-const addActor = module.exports.addActor =
+const addActor =
+module.exports.addActor =
 function addActor(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'actors', it);
@@ -599,7 +612,8 @@ function addActor(model, _it={}) {
 
 // ---
 // ## `addItem`
-const addItem = module.exports.addItem =
+const addItem =
+module.exports.addItem =
 function addItem(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'items', it);
@@ -608,7 +622,8 @@ function addItem(model, _it={}) {
 
 // ---
 // ## `addData`
-const addData = module.exports.addData =
+const addData =
+module.exports.addData =
 function addData(model, _it={}) {
 	const it = _.merge({}, _it);
 	if (!it.name) {
@@ -620,7 +635,8 @@ function addData(model, _it={}) {
 
 // ---
 // ## `addEdge`
-const addEdge = module.exports.addEdge =
+const addEdge =
+module.exports.addEdge =
 function addEdge(model, _it={}) {
 	const it = _.merge({ directed: true }, _it);
 	return add_(model, 'edges', it);
@@ -629,7 +645,8 @@ function addEdge(model, _it={}) {
 
 // ---
 // ## `addPolicy`
-const addPolicy = module.exports.addPolicy =
+const addPolicy =
+module.exports.addPolicy =
 function addPolicy(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'policies', it);
@@ -638,7 +655,8 @@ function addPolicy(model, _it={}) {
 
 // ---
 // ## `addPredicate`
-const addPredicate = module.exports.addPredicate =
+const addPredicate =
+module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'predicates', it);
@@ -647,7 +665,8 @@ function addPredicate(model, _it={}) {
 
 // ---
 // ## `addProcess`
-const addProcess = module.exports.addProcess =
+const addProcess =
+module.exports.addProcess =
 function addProcess(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'processes', it);
@@ -656,7 +675,8 @@ function addProcess(model, _it={}) {
 
 // ---
 // ## `addLocation`
-const addLocation = module.exports.addLocation =
+const addLocation =
+module.exports.addLocation =
 function addLocation(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'locations', it);
@@ -665,7 +685,8 @@ function addLocation(model, _it={}) {
 
 // ---
 // ## `addRoom`
-const addRoom = module.exports.addRoom =
+const addRoom =
+module.exports.addRoom =
 function addRoom(model, _it={}) {
 	const it = _.merge({}, _it);
 	console.warn('use addLocation() instead');
@@ -673,7 +694,8 @@ function addRoom(model, _it={}) {
 };
 
 
-const separateAttributeFromObject = module.exports.separateAttributeFromObject =
+const separateAttributeFromObject =
+module.exports.separateAttributeFromObject =
 function separateAttributeFromObject(attrNames=[], obj) {
 	const attrObject = R.pick(attrNames, obj);
 	const newObject = R.pick(R.without(attrNames, R.keys(obj)), obj);
@@ -708,13 +730,15 @@ module.exports.knownAttributes = {
 };
 
 
-const toPrefixedObject = module.exports.toPrefixedObject =
+const toPrefixedObject =
+module.exports.toPrefixedObject =
 function toPrefixedObject(prefix, it) {
 	return { [prefix]: it };
 };
 
 
-const prepareForXml = module.exports.prepareForXml =
+const prepareForXml =
+module.exports.prepareForXml =
 function prepareForXml(o, parentKey) {
 	if (_.isArray(o)) {
 		return o.map((item) => {
@@ -755,7 +779,8 @@ function prepareForXml(o, parentKey) {
 };
 
 
-const prepareModelForXml = module.exports.prepareModelForXml =
+const prepareModelForXml =
+module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	const system = model.system;
 
@@ -802,7 +827,8 @@ function prepareModelForXml(model) {
 // ---
 // ## `toXML()`
 // > takes a model `Object` and turns it back into XML.
-const toXML = module.exports.toXML =
+const toXML =
+module.exports.toXML =
 function toXML(
 	_model /* Object */
 ) {
