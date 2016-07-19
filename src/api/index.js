@@ -31,6 +31,24 @@ const fileTypes = module.exports.fileTypes = {
 };
 
 
+const fileTypeFromName =
+/**
+ * infer mime type and response type from file extension.
+ *
+ * @param {String} fileName - file name
+ * @returns {Object}
+ */
+module.exports.fileTypeFromName =
+function fileTypeFromName(fileName) {
+	const extension = R.last(fileName.split('.'));
+	const fileType = fileTypes[extension] || {
+		mimeType: 'text/plain',
+		responseType: 'text',
+	};
+	return fileType;
+};
+
+
 const makeUrl =
 /**
  * contructs an api endpoint url
