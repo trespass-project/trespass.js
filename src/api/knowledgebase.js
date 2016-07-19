@@ -8,19 +8,7 @@ const R = require('ramda');
 const queryString = require('query-string');
 const moment = require('moment');
 const api = require('./index.js');
-
-
-// TODO: move to trespass.analysis
-const analysisTools = {
-	'A.T. Analyzer': {
-		outputFileName: 'ata_output.zip',
-	},
-	'A.T. Evaluator': {
-		outputFileName: 'ate_output.txt',
-	},
-};
-const analysisToolNames =
-module.exports.analysisToolNames = R.keys(analysisTools);
+const analysis = require('../analysis/index.js');
 
 
 // default is `http://localhost:8080/tkb/`, but there are exceptions
@@ -638,7 +626,7 @@ const getAnalysisResults =
  * @returns {Promise} resolves to array of `{ name, blob }`
  */
 module.exports.getAnalysisResults =
-function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToolNames) {
+function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.analysisToolNames) {
 	const tools = taskStatusData.tool_status
 		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
 
@@ -657,7 +645,7 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToo
 				axios(params)
 					.then((res) => res.data)
 					.then((blob) => {
-						// const tool = analysisTools[tool.name];
+						// const tool = analysis.analysisTools[tool.name];
 						// const fileName = (!!tool)
 						// 	? tool.outputFileName
 						// 	: 'unknown.txt';
