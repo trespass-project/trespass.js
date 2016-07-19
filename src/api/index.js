@@ -31,7 +31,6 @@ const fileTypes = module.exports.fileTypes = {
 };
 
 
-
 const makeUrl =
 /**
  * contructs an api endpoint url
