@@ -287,6 +287,30 @@ function createModel(axios, desiredModelId) {
 };
 
 
+const deleteModel =
+/**
+ * deletes a model.
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise}
+ */
+module.exports.deleteModel =
+function deleteModel(axios, modelId) {
+	const url = api.makeUrl(paths, `model/${modelId}`);
+	const params = _.merge(
+		{
+			url,
+			method: 'delete',
+		},
+		api.requestOptions.crossDomain
+	);
+
+	return axios(params)
+		.then((res) => res.data);
+};
+
+
 // TODO: test gitFileId
 const getFile =
 /**
