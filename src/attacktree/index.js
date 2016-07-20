@@ -93,6 +93,24 @@ function prepareParameter(param) {
 	};
 };
 
+const unprepareParameter =
+/**
+ * reverse [prepareParameter]{@link module:trespass/attacktree.prepareParameter}
+ *
+ * @param {Object} param
+ * @returns {Object}
+ */
+module.exports.unprepareParameter =
+function unprepareParameter(param) {
+	return {
+		[attrKey]: {
+			name: param.name,
+			class: param.class,
+		},
+		[charKey]: `${param.value}`,
+	};
+};
+
 
 const parse =
 /**

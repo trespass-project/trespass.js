@@ -112,6 +112,21 @@ test.group('prepareParameter()', (test) => {
 });
 
 
+test.group('unprepareParameter()', (test) => {
+	test('should work', (t) => {
+		const param = {
+			name: 'cost',
+			class: 'numeric',
+			value: 1000,
+		};
+		const unprepared = trespass.attacktree.unprepareParameter(param);
+		t.true(unprepared['_attr'].name === 'cost');
+		t.true(unprepared['_attr'].class === 'numeric');
+		t.true(unprepared['_text'] === '1000');
+	});
+});
+
+
 test.group('toHashMap()', (test) => {
 	const list = [
 		{ name: 'cost', value: 1 },
