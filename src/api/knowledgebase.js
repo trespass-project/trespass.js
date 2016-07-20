@@ -1,5 +1,5 @@
 /**
- * knowledgebase api helpers
+ * knowledgebase api
  * @module trespass/api/knowledgebase
  */
 
