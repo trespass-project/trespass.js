@@ -23,22 +23,6 @@ const parameters = [
 ];
 
 
-test.group('stringToNumber()', (test) => {
-	test('should work', (t) => {
-		const result1 = trespass.attacktree.stringToNumber('1234');
-		t.true(result1 === 1234);
-		const result2 = trespass.attacktree.stringToNumber('12xxx34');
-		t.true(result2 === '12xxx34');
-		const result3 = trespass.attacktree.stringToNumber('xxx');
-		t.true(result3 === 'xxx');
-		const result4 = trespass.attacktree.stringToNumber('0.50');
-		t.true(result4 === 0.5);
-		const result5 = trespass.attacktree.stringToNumber('.666');
-		t.true(result5 === 0.666);
-	});
-});
-
-
 test.group('parse()', (test) => {
 	/* eslint indent: 0 */
 	const xmlStr = [
@@ -127,21 +111,25 @@ test.group('unprepareParameter()', (test) => {
 });
 
 
-test.group('toHashMap()', (test) => {
-	const list = [
-		{ name: 'cost', value: 1 },
-		{ name: 'likelihood', value: 0.5 },
-		{ name: 'difficulty', value: 'M' },
-		{ name: 'time', value: 'D' },
-	];
-	const result = trespass.attacktree.toHashMap('name', list);
+test.group('toXml()', (test) => {
+	const rootNode = {
+		label: 'root',
+		node: [],
+	};
+	const preparedRootNode = trespass.attacktree.prepareForXml(rootNode);
+	const attributes = {
+		id: 'tree-id',
+		profit: 5000,
+	};
+	const tree = trespass.attacktree.nodeToTree(preparedRootNode, attributes);
 
-	test('should work', (t) => {
-		t.true(result['cost'].value === 1);
-		t.true(result['likelihood'].value === 0.5);
-		t.true(result['difficulty'].value === 'M');
-		t.true(result['time'].value === 'D');
-	});
+	return trespass.attacktree.toXml(tree/*, opts*/)
+		.then((xmlStr) => {
+			test('should work', (t) => {
+				console.log(xmlStr);
+				// t.true(tree._attr.id === 'tree-id');
+			});
+		});
 });
 
 

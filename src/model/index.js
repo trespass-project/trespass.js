@@ -11,6 +11,7 @@ const async = require('async');
 const moment = require('moment');
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
+const utils = require('../utils');
 
 
 const attrKey = '_attr';
@@ -830,20 +831,6 @@ module.exports.knownAttributes = {
 };
 
 
-const toPrefixedObject =
-/**
- * puts `it` into an object, with property `prefix`.
- *
- * @param {String} prefix - property name
- * @param {} it - anything
- * @returns {Object}
- */
-module.exports.toPrefixedObject =
-function toPrefixedObject(prefix, it) {
-	return { [prefix]: it };
-};
-
-
 const prepareForXml =
 /**
  * recursively prepare object structure for conversion to xml.
@@ -913,7 +900,7 @@ function prepareModelForXml(model) {
 	collectionNames
 		.forEach((collectionName) => {
 			if (system[collectionName]) {
-				system[collectionName] = toPrefixedObject(
+				system[collectionName] = utils.toPrefixedObject(
 					singular(collectionName),
 					system[collectionName]
 				);

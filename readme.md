@@ -7,6 +7,7 @@ modules:
 - `trespass.attacktree`
 - `trespass.analysis`
 - `trespass.api`
+- `trespass.utils`
 
 
 ## installation
