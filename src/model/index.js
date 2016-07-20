@@ -11,6 +11,7 @@ const async = require('async');
 const moment = require('moment');
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
+const utils = require('../utils');
 
 
 const attrKey = '_attr';
@@ -242,7 +243,6 @@ function singular(plural) {
 };
 
 
-// TODO: rename to `parseXml` (for consistency)
 // TODO: how to properly document callbacks
 // TODO: maybe change everything in here to use promises
 const parse =
@@ -831,31 +831,17 @@ module.exports.knownAttributes = {
 };
 
 
-const toPrefixedObject =
-/**
- * puts `it` into an object, with property `prefix`.
- *
- * @param {String} prefix - property name
- * @param {} it - anything
- * @returns {Object}
- */
-module.exports.toPrefixedObject =
-function toPrefixedObject(prefix, it) {
-	return { [prefix]: it };
-};
-
-
 const prepareForXml =
 /**
  * recursively prepare object structure for conversion to xml.
  *
- * @param {Object} o - object
+ * @param {Array|String|Object} it
  * @returns {Object}
  */
 module.exports.prepareForXml =
-function prepareForXml(o, parentKey) {
-	if (_.isArray(o)) {
-		return o.map((item) => {
+function prepareForXml(it, parentKey) {
+	if (_.isArray(it)) {
+		return it.map((item) => {
 			// put things back together
 			if (parentKey === 'value' && _.isArray(item)) {
 				item = item.join(' ');
@@ -863,24 +849,24 @@ function prepareForXml(o, parentKey) {
 
 			return prepareForXml(item, parentKey);
 		});
-	} else if (_.isString(o) || _.isNumber(o)) {
-		return o;
-	} else if (_.isObject(o)) {
+	} else if (_.isString(it) || _.isNumber(it)) {
+		return it;
+	} else if (_.isObject(it)) {
 		// handle attributes
 		if (parentKey && knownAttributes[parentKey]) {
 			const { newObject, attrObject } =
-				separateAttributeFromObject(knownAttributes[parentKey], o);
-			o = _.merge(newObject, { [attrKey]: attrObject });
+				separateAttributeFromObject(knownAttributes[parentKey], it);
+			it = _.merge(newObject, { [attrKey]: attrObject });
 		}
 
-		return R.keys(o)
+		return R.keys(it)
 			.reduce((result, key) => {
 				if (key === attrKey) {
-					result[key] = o[key];
+					result[key] = it[key];
 					return result;
 				}
 
-				result[key] = prepareForXml(o[key], key);
+				result[key] = prepareForXml(it[key], key);
 
 				// put things back together
 				if (key === 'atLocations') {
@@ -914,7 +900,7 @@ function prepareModelForXml(model) {
 	collectionNames
 		.forEach((collectionName) => {
 			if (system[collectionName]) {
-				system[collectionName] = toPrefixedObject(
+				system[collectionName] = utils.toPrefixedObject(
 					singular(collectionName),
 					system[collectionName]
 				);

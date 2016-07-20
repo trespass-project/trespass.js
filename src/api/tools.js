@@ -1,8 +1,8 @@
 /**
+ * tools api
+ * TODO: this file is not up to date
  * @module trespass/api/tools
  */
-
-// TODO: this file is not up to date
 
 const R = require('ramda');
 const _ = require('lodash');

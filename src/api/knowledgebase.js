@@ -1,26 +1,14 @@
 /**
- * knowledgebase api helpers
+ * knowledgebase api
  * @module trespass/api/knowledgebase
  */
 
 const _ = require('lodash');
 const R = require('ramda');
-const api = require('./index.js');
 const queryString = require('query-string');
 const moment = require('moment');
-
-
-// TODO: move to trespass.analysis
-const analysisTools = {
-	'A.T. Analyzer': {
-		outputFileName: 'ata_output.zip',
-	},
-	'A.T. Evaluator': {
-		outputFileName: 'ate_output.txt',
-	},
-};
-const analysisToolNames =
-module.exports.analysisToolNames = R.keys(analysisTools);
+const api = require('./index.js');
+const analysis = require('../analysis/index.js');
 
 
 // default is `http://localhost:8080/tkb/`, but there are exceptions
@@ -48,25 +36,6 @@ const paths = { host, prefix };
 
 const noop = () => {};
 // const retryRate = 1000;
-
-
-// TODO: move to trespass.api
-const fileTypeFromName =
-/**
- * infer mime type and response type from file extension.
- *
- * @param {String} fileName - file name
- * @returns {Object}
- */
-module.exports.fileTypeFromName =
-function fileTypeFromName(fileName) {
-	const extension = R.last(fileName.split('.'));
-	const fileType = api.fileTypes[extension] || {
-		mimeType: 'text/plain',
-		responseType: 'text',
-	};
-	return fileType;
-};
 
 
 const listCommits =
@@ -331,7 +300,7 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 		file_id: gitFileId,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
-	const fileType = fileTypeFromName(fileName);
+	const fileType = api.fileTypeFromName(fileName);
 	const params = _.merge(
 		{
 			url,
@@ -360,17 +329,16 @@ function getModelFile(axios, modelId) {
 };
 
 
-// TODO: type of `data`?
 const putFile =
 /**
  * store a file in kb.
  *
  * @param {axios}
  * @param {String} modelId - model id
- * @param {?} data - file content
+ * @param {String} data - file content
  * @param {String} fileName - file name
  * @param {String} [type] - file type: `model_file` or `scenario_file`
- * @returns {Promise}
+ * @returns {Promise} (empty)
  */
 module.exports.putFile =
 function putFile(axios, modelId, data, fileName, type=undefined) {
@@ -380,7 +348,7 @@ function putFile(axios, modelId, data, fileName, type=undefined) {
 		filetype: type,
 	});
 	const url = `${api.makeUrl(paths, 'files')}?${query}`;
-	const fileType = fileTypeFromName(fileName);
+	const fileType = api.fileTypeFromName(fileName);
 	const params = _.merge(
 		{
 			url,
@@ -587,7 +555,6 @@ function getToolChains(axios, modelId) {
 };
 
 
-// TODO: what's the return value
 const runToolChain =
 /**
  * runs a toolchain.
@@ -599,7 +566,7 @@ const runToolChain =
  * @param {String} [_callbacks] - callbacks for different toolchain events.
 	 * - onToolChainStart
 	 * - onToolChainEnd
- * @returns {Promise}
+ * @returns {Promise} `{ task_url }`
  */
 module.exports.runToolChain =
 function runToolChain(axios, modelId, toolchainId, attackerProfileId, _callbacks={}) {
@@ -659,7 +626,7 @@ const getAnalysisResults =
  * @returns {Promise} resolves to array of `{ name, blob }`
  */
 module.exports.getAnalysisResults =
-function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToolNames) {
+function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.analysisToolNames) {
 	const tools = taskStatusData.tool_status
 		.filter(toolStatus => R.contains(toolStatus.name, analysisToolNames));
 
@@ -678,11 +645,11 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysisToo
 				axios(params)
 					.then((res) => res.data)
 					.then((blob) => {
-						// const tool = analysisTools[tool.name];
+						// const tool = analysis.analysisTools[tool.name];
 						// const fileName = (!!tool)
 						// 	? tool.outputFileName
 						// 	: 'unknown.txt';
-						// const fileType = fileTypeFromName(fileName);
+						// const fileType = api.fileTypeFromName(fileName);
 
 						// jquery doesn't return blobs (fetch() does)
 						// const realBlob = new Blob([blob], { type: fileType.mimeType });
