@@ -3,6 +3,7 @@
  * @module trespass/api
  */
 
+const R = require('ramda');
 const urljoin = require('url-join');
 
 
