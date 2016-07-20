@@ -218,16 +218,16 @@ function toXml(rootNode, opts=xml2jsOptions) {
 };
 
 
-// TODO: take rootNode as first param?
 const findLeafNodes =
 /**
  * given a list of nodes, returns all leaf nodes.
  *
- * @param {Array} nodes - list of nodes
+ * @param {Object|Array} nodes - node or list of nodes
  * @returns {Array} list of leaf nodes
  */
 module.exports.findLeafNodes =
-function findLeafNodes(nodes, childrenKey=childElemName) {
+function findLeafNodes(_nodes, childrenKey=childElemName) {
+	const nodes = ensureArray(_nodes);
 	const leafNodes = [];
 
 	function recurse(item) {

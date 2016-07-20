@@ -166,46 +166,51 @@ test.group('prepareAnnotatedTree()', (test) => {
 
 
 test.group('findLeafNodes()', (test) => {
-	test('should find all leaf nodes', (t) => {
-		const NOT_A_LEAF = 'not-a-leaf-node';
-		const tree = {
-			label: NOT_A_LEAF,
-			node: [
-				{
-					label: NOT_A_LEAF,
-					node: [{ label: 'leaf-1' }]
-				},
-				{
-					label: NOT_A_LEAF,
-					node: [
-						{ label: 'leaf-2' },
-						{ label: 'leaf-3' },
-					]
-				},
-				{
-					label: NOT_A_LEAF,
-					node: [
-						{
-							label: NOT_A_LEAF,
-							node: [
-								{ label: 'leaf-4' },
-							]
-						},
-						{ label: 'leaf-5' },
-					]
-				},
-				{
-					label: 'leaf-6',
-					node: [],
-				},
-			]
-		};
+	const NOT_A_LEAF = 'not-a-leaf-node';
+	const tree = {
+		label: NOT_A_LEAF,
+		node: [
+			{
+				label: NOT_A_LEAF,
+				node: [{ label: 'leaf-1' }]
+			},
+			{
+				label: NOT_A_LEAF,
+				node: [
+					{ label: 'leaf-2' },
+					{ label: 'leaf-3' },
+				]
+			},
+			{
+				label: NOT_A_LEAF,
+				node: [
+					{
+						label: NOT_A_LEAF,
+						node: [
+							{ label: 'leaf-4' },
+						]
+					},
+					{ label: 'leaf-5' },
+				]
+			},
+			{
+				label: 'leaf-6',
+				node: [],
+			},
+		]
+	};
 
+	test('should find all leaf nodes', (t) => {
 		const leafNodes = trespass.attacktree.findLeafNodes([tree]);
 		t.true(leafNodes.length === 6);
 
 		const labels = leafNodes.map(R.prop('label'));
 		t.true(!R.contains(NOT_A_LEAF, labels));
+	});
+
+	test('should work with non-array argument', (t) => {
+		const leafNodes = trespass.attacktree.findLeafNodes(tree);
+		t.true(leafNodes.length === 6);
 	});
 });
 
