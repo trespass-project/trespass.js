@@ -848,13 +848,13 @@ const prepareForXml =
 /**
  * recursively prepare object structure for conversion to xml.
  *
- * @param {Object} o - object
+ * @param {Array|String|Object} it
  * @returns {Object}
  */
 module.exports.prepareForXml =
-function prepareForXml(o, parentKey) {
-	if (_.isArray(o)) {
-		return o.map((item) => {
+function prepareForXml(it, parentKey) {
+	if (_.isArray(it)) {
+		return it.map((item) => {
 			// put things back together
 			if (parentKey === 'value' && _.isArray(item)) {
 				item = item.join(' ');
@@ -862,24 +862,24 @@ function prepareForXml(o, parentKey) {
 
 			return prepareForXml(item, parentKey);
 		});
-	} else if (_.isString(o) || _.isNumber(o)) {
-		return o;
-	} else if (_.isObject(o)) {
+	} else if (_.isString(it) || _.isNumber(it)) {
+		return it;
+	} else if (_.isObject(it)) {
 		// handle attributes
 		if (parentKey && knownAttributes[parentKey]) {
 			const { newObject, attrObject } =
-				separateAttributeFromObject(knownAttributes[parentKey], o);
-			o = _.merge(newObject, { [attrKey]: attrObject });
+				separateAttributeFromObject(knownAttributes[parentKey], it);
+			it = _.merge(newObject, { [attrKey]: attrObject });
 		}
 
-		return R.keys(o)
+		return R.keys(it)
 			.reduce((result, key) => {
 				if (key === attrKey) {
-					result[key] = o[key];
+					result[key] = it[key];
 					return result;
 				}
 
-				result[key] = prepareForXml(o[key], key);
+				result[key] = prepareForXml(it[key], key);
 
 				// put things back together
 				if (key === 'atLocations') {
