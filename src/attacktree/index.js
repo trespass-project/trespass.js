@@ -94,15 +94,15 @@ function prepareParameter(param) {
 };
 
 
-const parseXml =
+const parse =
 /**
  * parses an attack tree xml string
  *
  * @param {String} xmlStr - attack tree xml string
  * @returns {Promise} resolves to attack tree object
  */
-module.exports.parseXml =
-function parseXml(xmlStr, opts=xml2jsOptions) {
+module.exports.parse =
+function parse(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
 		xml2js.parseString(xmlStr, opts, (err, parsedTree) => {
 			if (err) {

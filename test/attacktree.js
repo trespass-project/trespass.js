@@ -39,7 +39,7 @@ test.group('stringToNumber()', (test) => {
 });
 
 
-test.group('parseXml()', (test) => {
+test.group('parse()', (test) => {
 	/* eslint indent: 0 */
 	const xmlStr = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
@@ -63,7 +63,7 @@ test.group('parseXml()', (test) => {
 		'</adtree>',
 	].join('\n');
 
-	return trespass.attacktree.parseXml(xmlStr/*, opts*/)
+	return trespass.attacktree.parse(xmlStr/*, opts*/)
 		.then((tree) => {
 			test('should work', (t) => {
 				t.true(tree._attr.id === 'tree-id');

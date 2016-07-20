@@ -242,7 +242,6 @@ function singular(plural) {
 };
 
 
-// TODO: rename to `parseXml` (for consistency)
 // TODO: how to properly document callbacks
 // TODO: maybe change everything in here to use promises
 const parse =
