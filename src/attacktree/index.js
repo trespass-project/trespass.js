@@ -44,15 +44,15 @@ function stringToNumber(str) {
 };
 
 
-const toArrayIfNotAlready =
+const ensureArray =
 /**
  * converts the parameter to an array, if it isn't one already.
  *
  * @param {} list - possibly a list
  * @returns {Array}
  */
-module.exports.toArrayIfNotAlready =
-function toArrayIfNotAlready(list) {
+module.exports.ensureArray =
+function ensureArray(list) {
 	return (_.isArray(list))
 		? list
 		: [list];
@@ -158,7 +158,7 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 
 		// make sure children are array
 		if (item[childrenKey]) {
-			item[childrenKey] = toArrayIfNotAlready(item[childrenKey]);
+			item[childrenKey] = ensureArray(item[childrenKey]);
 		}
 
 		const children = item[childrenKey];
@@ -235,7 +235,6 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
-			// TODO: make sure this is always an array, already when parsing
 			const children = item[childrenKey];
 			children.forEach(node => recurse(node));
 		}
