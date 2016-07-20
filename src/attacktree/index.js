@@ -6,6 +6,8 @@
 const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
+const utils = require('../utils');
+
 
 const attrKey = module.exports.attrKey = '_attr';
 const charKey = module.exports.charKey = '_text';
@@ -20,63 +22,6 @@ const childElemName = module.exports.childElemName = 'node';
 const parameterElemName = module.exports.parameterElemName = 'parameter';
 
 
-const stringToNumber =
-/**
- * converts a string to a number, if possible. otherwise returns original string.
- *
- * @param {String} str
- * @returns {Number|String}
- */
-module.exports.stringToNumber =
-function stringToNumber(str) {
-	const trimmed = str.trim();
-
-	const intPattern = /^\d+$/ig;
-	const floatPattern = /^\d*\.\d+$/ig;
-	if (!intPattern.test(trimmed) && !floatPattern.test(trimmed)) {
-		return str;
-	}
-
-	const parsed = parseFloat(trimmed, 10);
-	return (!_.isNaN(parsed))
-		? parsed
-		: str;
-};
-
-
-const toArrayIfNotAlready =
-/**
- * converts the parameter to an array, if it isn't one already.
- *
- * @param {} list - possibly a list
- * @returns {Array}
- */
-module.exports.toArrayIfNotAlready =
-function toArrayIfNotAlready(list) {
-	return (_.isArray(list))
-		? list
-		: [list];
-};
-
-
-const toHashMap =
-/**
- * turns an array into an object, with `key` as property name.
- *
- * @param {String} key - property name to use as key
- * @param {Array} list - the list to transform
- * @returns {Object}
- */
-module.exports.toHashMap =
-function toHashMap(key='id', list) {
-	return list
-		.reduce((acc, item) => {
-			acc[item[key]] = item;
-			return acc;
-		}, {});
-};
-
-
 const prepareParameter =
 /**
  * transforms the shape of an annotation parameter to s.th. more useful
@@ -89,20 +34,38 @@ function prepareParameter(param) {
 	return {
 		name: param[attrKey].name,
 		class: param[attrKey].class,
-		value: stringToNumber(param[charKey]),
+		value: utils.stringToNumber(param[charKey]),
+	};
+};
+
+const unprepareParameter =
+/**
+ * reverse [prepareParameter]{@link module:trespass/attacktree.prepareParameter}
+ *
+ * @param {Object} param
+ * @returns {Object}
+ */
+module.exports.unprepareParameter =
+function unprepareParameter(param) {
+	return {
+		[attrKey]: {
+			name: param.name,
+			class: param.class,
+		},
+		[charKey]: `${param.value}`,
 	};
 };
 
 
-const parseXml =
+const parse =
 /**
  * parses an attack tree xml string
  *
  * @param {String} xmlStr - attack tree xml string
  * @returns {Promise} resolves to attack tree object
  */
-module.exports.parseXml =
-function parseXml(xmlStr, opts=xml2jsOptions) {
+module.exports.parse =
+function parse(xmlStr, opts=xml2jsOptions) {
 	return new Promise((resolve, reject) => {
 		xml2js.parseString(xmlStr, opts, (err, parsedTree) => {
 			if (err) {
@@ -153,12 +116,12 @@ function prepareTree(rootNode, childrenKey=childElemName) {
 		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
 			.forEach((key) => {
-				item[attrKey][key] = stringToNumber(item[attrKey][key]);
+				item[attrKey][key] = utils.stringToNumber(item[attrKey][key]);
 			});
 
 		// make sure children are array
 		if (item[childrenKey]) {
-			item[childrenKey] = toArrayIfNotAlready(item[childrenKey]);
+			item[childrenKey] = utils.ensureArray(item[childrenKey]);
 		}
 
 		const children = item[childrenKey];
@@ -183,7 +146,7 @@ module.exports.prepareAnnotatedTree =
 function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
-			item[parameterElemName] = toHashMap(
+			item[parameterElemName] = utils.toHashMap(
 				'name',
 				item[parameterElemName].map(prepareParameter)
 			);
@@ -218,16 +181,16 @@ function toXml(rootNode, opts=xml2jsOptions) {
 };
 
 
-// TODO: take rootNode as first param?
 const findLeafNodes =
 /**
  * given a list of nodes, returns all leaf nodes.
  *
- * @param {Array} nodes - list of nodes
+ * @param {Object|Array} nodes - node or list of nodes
  * @returns {Array} list of leaf nodes
  */
 module.exports.findLeafNodes =
-function findLeafNodes(nodes, childrenKey=childElemName) {
+function findLeafNodes(_nodes, childrenKey=childElemName) {
+	const nodes = utils.ensureArray(_nodes);
 	const leafNodes = [];
 
 	function recurse(item) {
@@ -235,7 +198,6 @@ function findLeafNodes(nodes, childrenKey=childElemName) {
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
-			// TODO: make sure this is always an array, already when parsing
 			const children = item[childrenKey];
 			children.forEach(node => recurse(node));
 		}

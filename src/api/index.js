@@ -5,8 +5,10 @@
 
 const urljoin = require('url-join');
 
+
 /** [trespass/api/tools]{@link module:trespass/api/tools} */
 module.exports.tools = require('./tools.js');
+
 /** [trespass/api/knowledgebase]{@link module:trespass/api/knowledgebase} */
 module.exports.knowledgebase = require('./knowledgebase.js');
 
@@ -28,6 +30,24 @@ const fileTypes = module.exports.fileTypes = {
 		mimeType: 'application/zip',
 		responseType: 'blob',
 	},
+};
+
+
+const fileTypeFromName =
+/**
+ * infer mime type and response type from file extension.
+ *
+ * @param {String} fileName - file name
+ * @returns {Object}
+ */
+module.exports.fileTypeFromName =
+function fileTypeFromName(fileName) {
+	const extension = R.last(fileName.split('.'));
+	const fileType = fileTypes[extension] || {
+		mimeType: 'text/plain',
+		responseType: 'text',
+	};
+	return fileType;
 };
 
 

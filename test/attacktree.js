@@ -23,23 +23,7 @@ const parameters = [
 ];
 
 
-test.group('stringToNumber()', (test) => {
-	test('should work', (t) => {
-		const result1 = trespass.attacktree.stringToNumber('1234');
-		t.true(result1 === 1234);
-		const result2 = trespass.attacktree.stringToNumber('12xxx34');
-		t.true(result2 === '12xxx34');
-		const result3 = trespass.attacktree.stringToNumber('xxx');
-		t.true(result3 === 'xxx');
-		const result4 = trespass.attacktree.stringToNumber('0.50');
-		t.true(result4 === 0.5);
-		const result5 = trespass.attacktree.stringToNumber('.666');
-		t.true(result5 === 0.666);
-	});
-});
-
-
-test.group('parseXml()', (test) => {
+test.group('parse()', (test) => {
 	/* eslint indent: 0 */
 	const xmlStr = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
@@ -63,7 +47,7 @@ test.group('parseXml()', (test) => {
 		'</adtree>',
 	].join('\n');
 
-	return trespass.attacktree.parseXml(xmlStr/*, opts*/)
+	return trespass.attacktree.parse(xmlStr/*, opts*/)
 		.then((tree) => {
 			test('should work', (t) => {
 				t.true(tree._attr.id === 'tree-id');
@@ -112,20 +96,17 @@ test.group('prepareParameter()', (test) => {
 });
 
 
-test.group('toHashMap()', (test) => {
-	const list = [
-		{ name: 'cost', value: 1 },
-		{ name: 'likelihood', value: 0.5 },
-		{ name: 'difficulty', value: 'M' },
-		{ name: 'time', value: 'D' },
-	];
-	const result = trespass.attacktree.toHashMap('name', list);
-
+test.group('unprepareParameter()', (test) => {
 	test('should work', (t) => {
-		t.true(result['cost'].value === 1);
-		t.true(result['likelihood'].value === 0.5);
-		t.true(result['difficulty'].value === 'M');
-		t.true(result['time'].value === 'D');
+		const param = {
+			name: 'cost',
+			class: 'numeric',
+			value: 1000,
+		};
+		const unprepared = trespass.attacktree.unprepareParameter(param);
+		t.true(unprepared['_attr'].name === 'cost');
+		t.true(unprepared['_attr'].class === 'numeric');
+		t.true(unprepared['_text'] === '1000');
 	});
 });
 
@@ -166,46 +147,51 @@ test.group('prepareAnnotatedTree()', (test) => {
 
 
 test.group('findLeafNodes()', (test) => {
-	test('should find all leaf nodes', (t) => {
-		const NOT_A_LEAF = 'not-a-leaf-node';
-		const tree = {
-			label: NOT_A_LEAF,
-			node: [
-				{
-					label: NOT_A_LEAF,
-					node: [{ label: 'leaf-1' }]
-				},
-				{
-					label: NOT_A_LEAF,
-					node: [
-						{ label: 'leaf-2' },
-						{ label: 'leaf-3' },
-					]
-				},
-				{
-					label: NOT_A_LEAF,
-					node: [
-						{
-							label: NOT_A_LEAF,
-							node: [
-								{ label: 'leaf-4' },
-							]
-						},
-						{ label: 'leaf-5' },
-					]
-				},
-				{
-					label: 'leaf-6',
-					node: [],
-				},
-			]
-		};
+	const NOT_A_LEAF = 'not-a-leaf-node';
+	const tree = {
+		label: NOT_A_LEAF,
+		node: [
+			{
+				label: NOT_A_LEAF,
+				node: [{ label: 'leaf-1' }]
+			},
+			{
+				label: NOT_A_LEAF,
+				node: [
+					{ label: 'leaf-2' },
+					{ label: 'leaf-3' },
+				]
+			},
+			{
+				label: NOT_A_LEAF,
+				node: [
+					{
+						label: NOT_A_LEAF,
+						node: [
+							{ label: 'leaf-4' },
+						]
+					},
+					{ label: 'leaf-5' },
+				]
+			},
+			{
+				label: 'leaf-6',
+				node: [],
+			},
+		]
+	};
 
+	test('should find all leaf nodes', (t) => {
 		const leafNodes = trespass.attacktree.findLeafNodes([tree]);
 		t.true(leafNodes.length === 6);
 
 		const labels = leafNodes.map(R.prop('label'));
 		t.true(!R.contains(NOT_A_LEAF, labels));
+	});
+
+	test('should work with non-array argument', (t) => {
+		const leafNodes = trespass.attacktree.findLeafNodes(tree);
+		t.true(leafNodes.length === 6);
 	});
 });
 

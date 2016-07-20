@@ -13,3 +13,6 @@ module.exports.analysis = require('./analysis');
 
 /** [trespass/api]{@link module:trespass/api} */
 module.exports.api = require('./api');
+
+/** [trespass/api]{@link module:trespass/api} */
+module.exports.utils = require('./utils');
