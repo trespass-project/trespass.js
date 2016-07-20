@@ -111,28 +111,6 @@ test.group('unprepareParameter()', (test) => {
 });
 
 
-test.group('toXml()', (test) => {
-	const rootNode = {
-		label: 'root',
-		node: [],
-	};
-	const preparedRootNode = trespass.attacktree.prepareForXml(rootNode);
-	const attributes = {
-		id: 'tree-id',
-		profit: 5000,
-	};
-	const tree = trespass.attacktree.nodeToTree(preparedRootNode, attributes);
-
-	return trespass.attacktree.toXml(tree/*, opts*/)
-		.then((xmlStr) => {
-			test('should work', (t) => {
-				console.log(xmlStr);
-				// t.true(tree._attr.id === 'tree-id');
-			});
-		});
-});
-
-
 test.group('prepareAnnotatedTree()', (test) => {
 	const attacktree = {
 		node: [
