@@ -3,6 +3,8 @@
  * @module trespass/attacktree
  */
 
+// TODO: define `attacktree`, `tree`, `rootNode`
+
 const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
@@ -20,6 +22,7 @@ const xml2jsOptions = {
 const rootElemName = module.exports.rootElemName = 'adtree';
 const childElemName = module.exports.childElemName = 'node';
 const parameterElemName = module.exports.parameterElemName = 'parameter';
+const parentKey = module.exports.parentKey = 'parent';
 
 
 const prepareParameter =
@@ -111,27 +114,36 @@ const prepareTree =
  * @returns {Object} root node
  */
 module.exports.prepareTree =
-function prepareTree(rootNode, childrenKey=childElemName) {
-	function recurse(item) {
+function prepareTree(attacktree, childrenKey=childElemName) {
+	function recurse(item, depth=0) {
+		item.depth = depth;
+
 		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
 			.forEach((key) => {
 				item[attrKey][key] = utils.stringToNumber(item[attrKey][key]);
 			});
 
-		// make sure children are array
+		// make sure children are an array
 		if (item[childrenKey]) {
 			item[childrenKey] = utils.ensureArray(item[childrenKey]);
 		}
 
 		const children = item[childrenKey];
 		if (!!children) {
-			children.forEach(node => recurse(node));
+			// set parent
+			children.forEach((node) => {
+				node[parentKey] = (depth > 0)
+					? item
+					: null;
+			});
+
+			children.forEach(node => recurse(node, depth + 1));
 		}
 	}
 
-	[rootNode].forEach(node => recurse(node));
-	return rootNode;
+	[attacktree].forEach(node => recurse(node));
+	return attacktree;
 };
 
 
@@ -143,7 +155,7 @@ const prepareAnnotatedTree =
  * @returns {Object} root node
  */
 module.exports.prepareAnnotatedTree =
-function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
+function prepareAnnotatedTree(attacktree, childrenKey=childElemName) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
 			item[parameterElemName] = utils.toHashMap(
@@ -158,8 +170,8 @@ function prepareAnnotatedTree(rootNode, childrenKey=childElemName) {
 		}
 	}
 
-	[rootNode].forEach(node => recurse(node));
-	return rootNode;
+	[attacktree].forEach(node => recurse(node));
+	return attacktree;
 };
 
 
@@ -239,4 +251,142 @@ function getAllPaths(nodes, childrenKey=childElemName) {
 	const allPaths = [];
 	recurse(nodes, [], allPaths);
 	return allPaths;
+};
+
+
+const findNode =
+/**
+ * find node in tree by property value.
+ *
+ * @param {Object} rootNode - tree root
+ * @param {String} key - name of property
+ * @param {} value - the value to find
+ * @returns {Object} node or `null`
+ */
+module.exports.findNode =
+function findNode(rootNode, key, value) {
+	let result = null;
+
+	function recurse(nodes) {
+		nodes.forEach((node) => {
+			if (node[key] === value) {
+				result = node;
+			} else {
+				recurse(node[childElemName] || []);
+			}
+		});
+	}
+
+	recurse([rootNode]);
+	return result;
+};
+
+
+const pathToRoot =
+/**
+ * finds the path from given node to the root node.
+ *
+ * @param {Object} node - tree node
+ * @returns {Array} path (= list of nodes)
+ */
+module.exports.pathToRoot =
+function pathToRoot(node) {
+	let p = [];
+	let current = node;
+	while (true) {
+		p = [current, ...p];
+		const parent = current[parentKey];
+		if (!parent) {
+			break;
+		} else {
+			current = parent;
+		}
+	}
+	return p;
+};
+
+
+const treeFromPaths =
+/**
+ * constructs a tree from multiple paths (= lists of nodes).
+ *
+ * @param {Array} paths - list of paths
+ * @returns {Object} root node of tree
+ */
+module.exports.treeFromPaths =
+function treeFromPaths(paths) {
+	if (paths.length === 0) {
+		throw new Error('empty list');
+	}
+
+	function duplicateNode(node) {
+		const omittedKeys = [
+			childElemName,
+			parentKey,
+			'depth',
+		];
+		return _.merge(
+			{},
+			R.omit(omittedKeys, node),
+			{ [childElemName]: [] }
+		);
+	}
+
+	function compactList(list) {
+		return list.filter((sublist) => (sublist.length > 0));
+	}
+
+	function withoutFirstElements(list) {
+		return list.map(R.tail);
+	}
+
+	function recurse(parentNode, paths) {
+		if (!paths || !paths.length) {
+			return;
+		}
+
+		const groupByFirstLabel = R.compose(R.prop('label'), R.head);
+		const grouped = R.groupBy(groupByFirstLabel, paths);
+		R.toPairs(grouped)
+			.forEach((group) => {
+				const paths = group[1];
+				// all paths share the same head
+				const node = duplicateNode(paths[0][0]);
+				parentNode.node = [...parentNode.node, node];
+
+				// cut off head
+				// compacting removes empty items
+				const newPaths = compactList(
+					withoutFirstElements(paths)
+				);
+				recurse(node, newPaths);
+			});
+	}
+
+	const rootNode = duplicateNode(paths[0][0]);
+	const pathsTails = withoutFirstElements(paths);
+	recurse(rootNode, pathsTails);
+
+	return rootNode;
+};
+
+
+const subtreeFromLeafLabels =
+/**
+ * given a tree and a list of labels, returns a new tree,
+ * which is a subset of the original tree, whose leaf nodes
+ * are the ones with the corresponding labels.
+ *
+ *
+ * @param {Object} rootNode - tree root
+ * @returns {Object} root node of subtree
+ */
+module.exports.subtreeFromLeafLabels =
+function subtreeFromLeafLabels(rootNode, leafLabels) {
+	const paths = leafLabels
+		// labels to nodes
+		.map((label) => findNode(rootNode, 'label', label))
+		// nodes to paths
+		.map((node) => pathToRoot(node));
+	return treeFromPaths(paths);
 };
