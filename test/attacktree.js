@@ -68,19 +68,53 @@ test.group('parse()', (test) => {
 
 
 test.group('prepareTree()', (test) => {
-	const attacktree = {
-		_attr: { profit: '5000' },
-		node: [
-			{
-				_attr: { profit: '6000' },
-			}
-		]
-	};
-	const prepared = trespass.attacktree.prepareTree(attacktree);
 
 	test('should convert strings to numbers', (t) => {
+		const attacktree = {
+			_attr: { profit: '5000' },
+			node: [
+				{
+					_attr: { profit: '6000' },
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+
 		t.true(prepared._attr.profit === 5000);
 		t.true(prepared.node[0]._attr.profit === 6000);
+	});
+
+	test('should add reference to node parent', (t) => {
+		const attacktree = {
+			node: [
+				{
+					label: 'root',
+					node: [
+						{
+							label: 'child-1',
+							node: [
+								{ label: 'grand-child-1' }
+							],
+						},
+						{
+							label: 'child-2',
+							node: [],
+						},
+					],
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+
+		const root = prepared.node[0];
+		const child1 = root.node[0];
+		const grandchild1 = child1.node[0];
+		const child2 = root.node[1];
+		t.true(grandchild1.parent.label === 'child-1');
+		t.true(child1.parent.label === 'root');
+		t.true(child2.parent.label === 'root');
+		t.true(!root.parent);
+		t.true(!prepared.parent);
 	});
 });
 
@@ -236,5 +270,61 @@ test.group('getAllPaths()', (test) => {
 		t.true(R.contains('root, a, ab', labelPaths));
 		t.true(R.contains('root, b, ba', labelPaths));
 		t.true(R.contains('root, b, bb', labelPaths));
+	});
+});
+
+
+test.group('subtreeFromLeafNodes()', (test) => {
+	test('should return a subtree of the original tree from a list of leaf nodes', (t) => {
+		const attacktree = {
+			node: [
+				{
+					label: 'root',
+					node: [
+						{
+							label: 'child-1',
+							node: [
+								{ label: 'grand-child-1' }
+							],
+						},
+						{
+							label: 'child-2',
+							node: [],
+						},
+						{
+							label: 'child-3',
+							node: [
+								{ label: 'grand-child-2' },
+								{ label: 'grand-child-3' },
+							],
+						},
+					],
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+		const rootNode = trespass.attacktree.getRootNode(prepared);
+		const leafLabels = ['child-1', 'grand-child-2'];
+		const subtree = trespass.attacktree.subtreeFromLeafLabels(rootNode, leafLabels);
+
+		const expected = {
+			label: 'root',
+			node: [
+				{
+					label: 'child-1',
+					node: [],
+				},
+				{
+					label: 'child-3',
+					node: [
+						{
+							label: 'grand-child-2',
+							node: [],
+						},
+					],
+				},
+			],
+		};
+		t.true(R.equals(subtree, expected));
 	});
 });
