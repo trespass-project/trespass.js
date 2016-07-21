@@ -3,6 +3,8 @@
  * @module trespass/attacktree
  */
 
+// TODO: define `attacktree`, `tree`, `rootNode`
+
 const R = require('ramda');
 const _ = require('lodash');
 const xml2js = require('xml2js');
@@ -252,8 +254,114 @@ function getAllPaths(nodes, childrenKey=childElemName) {
 };
 
 
+function findNode(rootNode, key, value) {
+	let result = null;
+
+	function recurse(nodes) {
+		nodes.forEach((node) => {
+			if (node[key] === value) {
+				result = node;
+			} else {
+				recurse(node[childElemName] || []);
+			}
+		});
+	}
+
+	recurse([rootNode]);
+	return result;
+}
+
+
+function pathToRoot(node) {
+	let p = [];
+	let current = node;
+	while (true) {
+		p = [current, ...p];
+		const parent = current[parentKey];
+		if (!parent) {
+			break;
+		} else {
+			current = parent;
+		}
+	}
+	return p;
+}
+
+
+function treeFromPaths(paths) {
+	if (paths.length === 0) {
+		throw new Error('empty list');
+	}
+
+	function duplicateNode(node) {
+		const omittedKeys = [
+			childElemName,
+			parentKey,
+			'depth',
+		];
+		return _.merge(
+			{},
+			// R.pick(['label'], node),
+			R.omit(omittedKeys, node),
+			{ [childElemName]: [] }
+		);
+	}
+
+	function compactPathList(list) {
+		return list
+			.filter((sublist) => {
+				return (sublist.length > 0);
+			});
+	}
+
+	function withoutFirstElements(list) {
+		return list.map(R.tail);
+	}
+
+	function onlyFirstElements(list) {
+		return list.map(R.head);
+	}
+
+	function recurse(parentNode, paths) {
+		if (!paths || !paths.length) {
+			return;
+		}
+
+		const groupByFirstLabel = R.compose(R.prop('label'), R.head);
+		const grouped = R.groupBy(groupByFirstLabel, paths);
+		R.toPairs(grouped)
+			.forEach((group) => {
+				// const label = group[0];
+				const paths = group[1];
+
+				const node = duplicateNode(paths[0][0]);
+				parentNode.node = [...parentNode.node, node];
+
+				const newPaths = compactPathList(
+					withoutFirstElements(paths)
+				);
+				recurse(node, newPaths);
+			});
+	}
+
+	const rootNode = duplicateNode(paths[0][0]);
+	const pathsTails = withoutFirstElements(paths);
+	recurse(rootNode, pathsTails);
+
+	return rootNode;
+}
+
+
 const subtreeFromLeafLabels =
 module.exports.subtreeFromLeafLabels =
-function subtreeFromLeafLabels(tree, leafLabels) {
-
+function subtreeFromLeafLabels(rootNode, leafLabels) {
+	const leafNodes = leafLabels
+		.map((label) => {
+			return findNode(rootNode, 'label', label);
+		});
+	const paths = leafNodes
+		.map((node) => {
+			return pathToRoot(node);
+		});
+	return treeFromPaths(paths);
 };

@@ -304,27 +304,26 @@ test.group('subtreeFromLeafNodes()', (test) => {
 		};
 		const prepared = trespass.attacktree.prepareTree(attacktree);
 		const rootNode = trespass.attacktree.getRootNode(prepared);
-		const leafLabels = ['child-2', 'grand-child-2'];
+		const leafLabels = ['child-1', 'grand-child-2'];
 		const subtree = trespass.attacktree.subtreeFromLeafLabels(rootNode, leafLabels);
 
 		const expected = {
+			label: 'root',
 			node: [
 				{
-					label: 'root',
+					label: 'child-1',
+					node: [],
+				},
+				{
+					label: 'child-3',
 					node: [
 						{
-							label: 'child-2',
+							label: 'grand-child-2',
 							node: [],
 						},
-						{
-							label: 'child-3',
-							node: [
-								{ label: 'grand-child-2' },
-							],
-						},
 					],
-				}
-			]
+				},
+			],
 		};
 		t.true(R.equals(subtree, expected));
 	});
