@@ -254,6 +254,16 @@ function getAllPaths(nodes, childrenKey=childElemName) {
 };
 
 
+const findNode =
+/**
+ * find node in tree by property value.
+ *
+ * @param {Object} rootNode - tree root
+ * @param {String} key - name of property
+ * @param {} value - the value to find
+ * @returns {Object} node or `null`
+ */
+module.exports.findNode =
 function findNode(rootNode, key, value) {
 	let result = null;
 
@@ -269,9 +279,17 @@ function findNode(rootNode, key, value) {
 
 	recurse([rootNode]);
 	return result;
-}
+};
 
 
+const pathToRoot =
+/**
+ * finds the path from given node to the root node.
+ *
+ * @param {Object} node - tree node
+ * @returns {Array} path (= list of nodes)
+ */
+module.exports.pathToRoot =
 function pathToRoot(node) {
 	let p = [];
 	let current = node;
@@ -285,9 +303,17 @@ function pathToRoot(node) {
 		}
 	}
 	return p;
-}
+};
 
 
+const treeFromPaths =
+/**
+ * constructs a tree from multiple paths (= lists of nodes).
+ *
+ * @param {Array} paths - list of paths
+ * @returns {Object} root node of tree
+ */
+module.exports.treeFromPaths =
 function treeFromPaths(paths) {
 	if (paths.length === 0) {
 		throw new Error('empty list');
@@ -301,25 +327,17 @@ function treeFromPaths(paths) {
 		];
 		return _.merge(
 			{},
-			// R.pick(['label'], node),
 			R.omit(omittedKeys, node),
 			{ [childElemName]: [] }
 		);
 	}
 
-	function compactPathList(list) {
-		return list
-			.filter((sublist) => {
-				return (sublist.length > 0);
-			});
+	function compactList(list) {
+		return list.filter((sublist) => (sublist.length > 0));
 	}
 
 	function withoutFirstElements(list) {
 		return list.map(R.tail);
-	}
-
-	function onlyFirstElements(list) {
-		return list.map(R.head);
 	}
 
 	function recurse(parentNode, paths) {
@@ -331,13 +349,14 @@ function treeFromPaths(paths) {
 		const grouped = R.groupBy(groupByFirstLabel, paths);
 		R.toPairs(grouped)
 			.forEach((group) => {
-				// const label = group[0];
 				const paths = group[1];
-
+				// all paths share the same head
 				const node = duplicateNode(paths[0][0]);
 				parentNode.node = [...parentNode.node, node];
 
-				const newPaths = compactPathList(
+				// cut off head
+				// compacting removes empty items
+				const newPaths = compactList(
 					withoutFirstElements(paths)
 				);
 				recurse(node, newPaths);
@@ -349,19 +368,25 @@ function treeFromPaths(paths) {
 	recurse(rootNode, pathsTails);
 
 	return rootNode;
-}
+};
 
 
 const subtreeFromLeafLabels =
+/**
+ * given a tree and a list of labels, returns a new tree,
+ * which is a subset of the original tree, whose leaf nodes
+ * are the ones with the corresponding labels.
+ *
+ *
+ * @param {Object} rootNode - tree root
+ * @returns {Object} root node of subtree
+ */
 module.exports.subtreeFromLeafLabels =
 function subtreeFromLeafLabels(rootNode, leafLabels) {
-	const leafNodes = leafLabels
-		.map((label) => {
-			return findNode(rootNode, 'label', label);
-		});
-	const paths = leafNodes
-		.map((node) => {
-			return pathToRoot(node);
-		});
+	const paths = leafLabels
+		// labels to nodes
+		.map((label) => findNode(rootNode, 'label', label))
+		// nodes to paths
+		.map((node) => pathToRoot(node));
 	return treeFromPaths(paths);
 };
