@@ -1,6 +1,6 @@
 # about
 
-`trespass.js` is the core library used in the node.js or web-based tools in the [TREsPASS project](https://www.trespass-project.eu/).
+`trespass.js` is the core library used in the node.js or web-based tools developed for the [TREsPASS project](https://www.trespass-project.eu/).
 
 modules:
 - `trespass.model`
