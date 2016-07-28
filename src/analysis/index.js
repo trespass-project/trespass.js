@@ -14,15 +14,23 @@ module.exports.analysisTools = {
 	'A.T. Evaluator': {
 		outputFileName: 'ate_output.txt',
 	},
+	'ATtop': {
+		// TODO:
+	}
 };
 
 const analysisToolNames =
 module.exports.analysisToolNames = R.keys(analysisTools);
 
 
+/* eslint global-require: 0 */
 module.exports = {
 	/**
 	 * [trespass/analysis/ate]{@link module:trespass/analysis/ate}
 	 */
-	ate: require('./ate.js')
+	ate: require('./ate.js'),
+	/**
+	 * [trespass/analysis/attop]{@link module:trespass/analysis/attop}
+	 */
+	attop: require('./attop.js'),
 };
