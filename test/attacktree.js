@@ -358,6 +358,7 @@ test.group('detectFlavor()', (test) => {
 	const files = {
 		treemaker: path.join(testDataPath, 'attacktree-treemaker.xml'),
 		ata: path.join(testDataPath, 'attacktree-cyb.xml'),
+		apl: path.join(testDataPath, 'attacktree-apl.xml'),
 		adtool: path.join(testDataPath, 'attacktree-adtool.xml'),
 	};
 
@@ -386,6 +387,14 @@ test.group('detectFlavor()', (test) => {
 			.then((tree) => {
 				const flavor = trespass.attacktree.detectFlavor(tree);
 				t.true(flavor === 'ata');
+			});
+	});
+
+	test('should detect apl', (t) => {
+		return getTree(files.apl)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				t.true(flavor === 'apl');
 			});
 	});
 
