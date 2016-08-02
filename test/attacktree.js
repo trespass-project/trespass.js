@@ -1,7 +1,13 @@
 import { test } from 'ava-spec';
+const fs = require('fs');
+const path = require('path');
 const _ = require('lodash');
 const R = require('ramda');
 const trespass = require('../');
+
+const rootDir = path.join(__dirname, '..');
+const testDataPath = path.join(rootDir, 'test', 'data');
+
 
 const parameters = [
 	{
@@ -68,7 +74,6 @@ test.group('parse()', (test) => {
 
 
 test.group('prepareTree()', (test) => {
-
 	test('should convert strings to numbers', (t) => {
 		const attacktree = {
 			_attr: { profit: '5000' },
@@ -326,5 +331,50 @@ test.group('subtreeFromLeafNodes()', (test) => {
 			],
 		};
 		t.true(R.equals(subtree, expected));
+	});
+});
+
+
+test.group('detectFlavor()', (test) => {
+	const files = {
+		treemaker: path.join(testDataPath, 'attacktree-treemaker.xml'),
+		ata: path.join(testDataPath, 'attacktree-cyb.xml'),
+		adtool: path.join(testDataPath, 'attacktree-adtool.xml'),
+	};
+
+	function getTree(filePath) {
+		return new Promise((resolve, reject) => {
+			fs.readFile(filePath, (err, content) => {
+				if (err) { return reject(err); }
+				return resolve(content.toString());
+			});
+		})
+			.then((xmlStr) => {
+				return trespass.attacktree.parse(xmlStr);
+			});
+	}
+
+	test('should detect treemaker', (t) => {
+		return getTree(files.treemaker)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				t.true(flavor.treemaker);
+			});
+	});
+
+	test('should detect ata', (t) => {
+		return getTree(files.ata)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				t.true(flavor.ata);
+			});
+	});
+
+	test('should detect adtool', (t) => {
+		return getTree(files.adtool)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				return t.true(flavor.adtool);
+			});
 	});
 });

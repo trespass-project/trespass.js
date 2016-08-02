@@ -60,6 +60,45 @@ function unprepareParameter(param) {
 };
 
 
+const detectFlavor =
+/**
+ * detects the flavor of the attacktree:
+ * - treemaker
+ * - ata
+ * - adtool
+ *
+ * @param {Object} tree - attack tree
+ * @returns {Object} object of booleans, `{ treemaker, ata, adtool }`
+ */
+module.exports.detectFlavor =
+function detectFlavor(tree) {
+	function checkTreemaker(tree) {
+		return !!tree[attrKey].profit && !!tree[attrKey].id;
+	}
+
+	function checkATA(tree) {
+		return !!tree[attrKey].utility;
+	}
+
+	function checkADtool(tree) {
+		return !!tree.domain;
+	}
+
+	const result = {
+		adtool: false,
+		ata: false,
+		treemaker: false,
+	};
+
+	result.adtool = checkADtool(tree);
+	if (!result.adtool) {
+		result.treemaker = checkTreemaker(tree);
+		result.ata = checkATA(tree);
+	}
+	return result;
+};
+
+
 const parse =
 /**
  * parses an attack tree xml string
