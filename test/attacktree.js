@@ -129,6 +129,28 @@ test.group('prepareTree()', (test) => {
 		t.true(!root.parent);
 		t.true(!prepared.parent);
 	});
+
+	test('should set left and right conjunctive sibling', (t) => {
+		const attacktree = {
+			node: [
+				{
+					_attr: { refinement: 'conjunctive' },
+					label: 'conjunctive-node',
+					node: [
+						{ label: 'sibling-0' },
+						{ label: 'sibling-1' },
+						{ label: 'sibling-2' },
+					],
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+		const siblings = prepared.node[0].node;
+		t.true(siblings[0].conjunctiveSiblingRight.label === siblings[1].label);
+		t.true(siblings[1].conjunctiveSiblingLeft.label === siblings[0].label);
+		t.true(siblings[1].conjunctiveSiblingRight.label === siblings[2].label);
+		t.true(siblings[2].conjunctiveSiblingLeft.label === siblings[1].label);
+	});
 });
 
 
