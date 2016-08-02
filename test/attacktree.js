@@ -358,7 +358,7 @@ test.group('detectFlavor()', (test) => {
 		return getTree(files.treemaker)
 			.then((tree) => {
 				const flavor = trespass.attacktree.detectFlavor(tree);
-				t.true(flavor.treemaker);
+				t.true(flavor === 'treemaker');
 			});
 	});
 
@@ -366,7 +366,7 @@ test.group('detectFlavor()', (test) => {
 		return getTree(files.ata)
 			.then((tree) => {
 				const flavor = trespass.attacktree.detectFlavor(tree);
-				t.true(flavor.ata);
+				t.true(flavor === 'ata');
 			});
 	});
 
@@ -374,7 +374,7 @@ test.group('detectFlavor()', (test) => {
 		return getTree(files.adtool)
 			.then((tree) => {
 				const flavor = trespass.attacktree.detectFlavor(tree);
-				return t.true(flavor.adtool);
+				return t.true(flavor === 'adtool');
 			});
 	});
 });

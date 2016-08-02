@@ -63,12 +63,12 @@ function unprepareParameter(param) {
 const detectFlavor =
 /**
  * detects the flavor of the attacktree:
- * - treemaker
- * - ata
- * - adtool
+ * - `treemaker`
+ * - `ata`
+ * - `adtool`
  *
  * @param {Object} tree - attack tree
- * @returns {Object} object of booleans, `{ treemaker, ata, adtool }`
+ * @returns {String} name of flavor
  */
 module.exports.detectFlavor =
 function detectFlavor(tree) {
@@ -95,7 +95,13 @@ function detectFlavor(tree) {
 		result.treemaker = checkTreemaker(tree);
 		result.ata = checkATA(tree);
 	}
-	return result;
+
+	return R.keys(result)
+		.reduce((acc, key) => {
+			return (result[key])
+				? key
+				: acc;
+		});
 };
 
 
@@ -124,10 +130,10 @@ function parse(xmlStr, opts=xml2jsOptions) {
 			attacktree = prepareTree(attacktree);
 
 			const flavor = detectFlavor(attacktree);
-			if (flavor.ata) {
+			if (flavor === 'ata') {
 				attacktree = prepareAnnotatedTree(attacktree);
 			}
-			if (flavor.adtool) {
+			else if (flavor === 'adtool') {
 				// TODO: properly prepare tree
 				// attacktree = prepareAnnotatedTree(attacktree);
 			}
