@@ -9,7 +9,7 @@ const rootDir = path.join(__dirname, '..');
 const testDataPath = path.join(rootDir, 'test', 'data');
 
 
-const parameters = [
+const ataParameters = [
 	{
 		_attr: { 'class': 'numeric', 'name': 'cost' },
 		_text: '1000',
@@ -25,6 +25,14 @@ const parameters = [
 	{
 		_attr: { 'class': 'ordinal', 'name': 'time' },
 		_text: 'D',
+	},
+];
+
+
+const adtoolParameters = [
+	{
+		_attr: { 'domainId': 'cost', 'category': 'basic' },
+		_text: '1000',
 	},
 ];
 
@@ -125,11 +133,21 @@ test.group('prepareTree()', (test) => {
 
 
 test.group('prepareParameter()', (test) => {
-	test('should work', (t) => {
-		const param = parameters[0];
-		const prepared = trespass.attacktree.prepareParameter(param);
+	test('should work with ata-style parameters', (t) => {
+		const param = ataParameters[0];
+		const flavor = 'ata';
+		const prepared = trespass.attacktree.prepareParameter(param, flavor);
 		t.true(prepared.name === 'cost');
 		t.true(prepared.class === 'numeric');
+		t.true(prepared.value === 1000);
+	});
+
+	test('should work with adtool-style parameters', (t) => {
+		const param = adtoolParameters[0];
+		const flavor = 'adtool';
+		const prepared = trespass.attacktree.prepareParameter(param, flavor);
+		t.true(prepared.name === 'cost');
+		t.true(prepared.class === undefined);
 		t.true(prepared.value === 1000);
 	});
 });
@@ -161,16 +179,17 @@ test.group('prepareAnnotatedTree()', (test) => {
 				]
 			},
 			{
-				parameter: parameters,
+				parameter: ataParameters,
 				node: [
 					{
-						parameter: parameters,
+						parameter: ataParameters,
 					},
 				]
 			},
 		]
 	};
-	const prepared = trespass.attacktree.prepareAnnotatedTree(attacktree);
+	const flavor = 'ata';
+	const prepared = trespass.attacktree.prepareAnnotatedTree(attacktree, flavor);
 
 	test('should transform all parameters to hash maps', (t) => {
 		t.true(!prepared.node[0].parameter);

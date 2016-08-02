@@ -30,10 +30,24 @@ const prepareParameter =
  * transforms the shape of an annotation parameter to s.th. more useful
  *
  * @param {Object} param - annotation parameter
+ * @param {String} flavor - attack tree flavor name
  * @returns {Object}
  */
 module.exports.prepareParameter =
-function prepareParameter(param) {
+function prepareParameter(param, flavor) {
+	if (flavor === 'adtool') {
+		param = ((param) => {
+			// make it look like the `ata` variant
+			const transformed = {
+				[attrKey]: {
+					name: param[attrKey].domainId,
+					class: undefined,
+				},
+				[charKey]: param[charKey],
+			};
+			return transformed;
+		})(param);
+	}
 	return {
 		name: param[attrKey].name,
 		class: param[attrKey].class,
@@ -130,13 +144,10 @@ function parse(xmlStr, opts=xml2jsOptions) {
 			attacktree = prepareTree(attacktree);
 
 			const flavor = detectFlavor(attacktree);
-			if (flavor === 'ata') {
-				attacktree = prepareAnnotatedTree(attacktree);
+			if (flavor === 'ata' || flavor === 'adtool') {
+				attacktree = prepareAnnotatedTree(attacktree, flavor);
 			}
-			else if (flavor === 'adtool') {
-				// TODO: properly prepare tree
-				// attacktree = prepareAnnotatedTree(attacktree);
-			}
+			attacktree.flavor = flavor || 'vanilla';
 
 			return resolve(attacktree);
 		});
@@ -205,15 +216,17 @@ const prepareAnnotatedTree =
  * prepares an annotated attack tree object.
  *
  * @param {Object} rootNode - root node of an attack tree
+ * @param {String} flavor - attack tree flavor name
  * @returns {Object} root node
  */
 module.exports.prepareAnnotatedTree =
-function prepareAnnotatedTree(attacktree) {
+function prepareAnnotatedTree(attacktree, flavor) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
+			item[parameterElemName] = utils.ensureArray(item[parameterElemName]);
 			item[parameterElemName] = utils.toHashMap(
 				'name',
-				item[parameterElemName].map(prepareParameter)
+				item[parameterElemName].map(prepareParameter, flavor)
 			);
 		}
 
