@@ -90,7 +90,7 @@ function detectFlavor(tree) {
 	function checkTreemaker(tree) {
 		return !!tree[attrKey]
 			&& !!tree[attrKey].profit
-			&& !!tree[attrKey].id;
+			/*&& !!tree[attrKey].id*/;
 	}
 
 	function checkATA(tree) {
@@ -220,9 +220,24 @@ function prepareTree(attacktree) {
 					: null;
 			});
 
+			// set left / right conjunctive sibling
+			if (item[attrKey]
+				&& item[attrKey].refinement === 'conjunctive') {
+				R.tail(children)
+					.forEach((node, i) => {
+						node.conjunctiveSiblingLeft = children[i];
+					});
+				R.init(children)
+					.forEach((node, i) => {
+						node.conjunctiveSiblingRight = children[i + 1];
+					});
+			}
+
 			children.forEach(node => recurse(node, depth + 1));
 		}
 	}
+
+	attacktree[attrKey] = attacktree[attrKey] || {};
 
 	[attacktree].forEach(node => recurse(node));
 	return attacktree;
