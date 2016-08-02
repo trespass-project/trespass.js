@@ -137,7 +137,7 @@ function detectFlavor(tree) {
 			return (result[key])
 				? key
 				: acc;
-		});
+		}, 'vanilla');
 };
 
 
