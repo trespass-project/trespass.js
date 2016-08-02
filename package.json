@@ -3,7 +3,7 @@
   "description": "TREsPASS javascript / node library",
   "author": "freder.code@gmail.com",
   "main": "./dist",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "scripts": {
     "build": "make build",
     "prepublish": "npm run build",
