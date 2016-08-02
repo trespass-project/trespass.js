@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="disjunctive">
+    <label>Get user data</label>
+    <node refinement="conjunctive">
+      <label>From user PC</label>
+      <node refinement="conjunctive">
+        <label>Infect user PC with malware</label>
+        <node refinement="disjunctive">
+          <label>Exploit persistent XSS vulnerability</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Plant exploit pack</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Collect user data</label>
+      </node>
+    </node>
+  </node>
+</adtree>

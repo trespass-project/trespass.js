@@ -133,7 +133,7 @@ function detectFlavor(tree) {
 			return (result[key])
 				? key
 				: acc;
-		});
+		}, 'vanilla');
 };
 
 
@@ -165,7 +165,7 @@ function parse(xmlStr, opts=xml2jsOptions) {
 			if (flavor === 'ata' || flavor === 'apl' || flavor === 'adtool') {
 				attacktree = prepareAnnotatedTree(attacktree, flavor);
 			}
-			attacktree.flavor = flavor || 'vanilla';
+			attacktree.flavor = flavor;
 
 			return resolve(attacktree);
 		});
