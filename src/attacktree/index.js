@@ -90,7 +90,7 @@ function detectFlavor(tree) {
 	function checkTreemaker(tree) {
 		return !!tree[attrKey]
 			&& !!tree[attrKey].profit
-			&& !!tree[attrKey].id;
+			/*&& !!tree[attrKey].id*/;
 	}
 
 	function checkATA(tree) {

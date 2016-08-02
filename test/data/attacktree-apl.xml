@@ -1,0 +1,467 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<adtree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://research.cyber.ee/~antonc/adtree.xsd" profit="5000" id="id-NJ-4Px_DwAl-model" idsonly="true">
+	<node refinement="conjunctive">
+		<label>get item entity_vim.VirtualMachine_vm-51 get fileX</label>
+		<node refinement="disjunctive">
+			<label>get  entity_vim.VirtualMachine_vm-51</label>
+			<node refinement="conjunctive">
+				<label>get item entity_vim.Datastore_datastore-41 get entity_vim.VirtualMachine_vm-51</label>
+				<node refinement="conjunctive">
+					<label>goto RoomDatacenter and get entity_vim.Datastore_datastore-41</label>
+					<node refinement="disjunctive">
+						<label>attacker cleo get ids for some policy at DoorDatacenter</label>
+						<node refinement="conjunctive">
+							<label>attacker cleo get all ids card pin</label>
+							<node refinement="disjunctive">
+								<label>get card</label>
+								<node refinement="disjunctive">
+									<label>make some actor get card</label>
+									<node refinement="disjunctive">
+										<label>MAKE cleo terry IN terry card sydney</label>
+										<node refinement="disjunctive">
+											<label>cleo threatens terry to execute IN terry card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo blackmails terry</label>
+											<node refinement="disjunctive">
+												<label>cleo collects some intel about terry</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo blackmails terry to execute IN terry card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo bribes terry to execute IN terry card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo socially engineers terry</label>
+											<node refinement="conjunctive">
+												<label>authority attack</label>
+												<node refinement="disjunctive">
+													<label>cleo impersonates authority</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo orders terry to execute IN terry card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+											<node refinement="conjunctive">
+												<label>phishing attack</label>
+												<node refinement="disjunctive">
+													<label>cleo collects information about terry</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo launches a phishing attack targeted at terry to execute IN terry card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo acquires terry trust and tricks him into executing IN terry card sydney</label>
+											<node refinement="disjunctive">
+												<label>cleo becomes friends with terry</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo tricks terry into executing IN terry card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+									</node>
+									<node refinement="disjunctive">
+										<label>MAKE cleo big IN big card sydney</label>
+										<node refinement="disjunctive">
+											<label>cleo threatens big to execute IN big card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo blackmails big</label>
+											<node refinement="disjunctive">
+												<label>cleo collects some intel about big</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo blackmails big to execute IN big card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo bribes big to execute IN big card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo socially engineers big</label>
+											<node refinement="conjunctive">
+												<label>authority attack</label>
+												<node refinement="disjunctive">
+													<label>cleo impersonates authority</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo orders big to execute IN big card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+											<node refinement="conjunctive">
+												<label>phishing attack</label>
+												<node refinement="disjunctive">
+													<label>cleo collects information about big</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo launches a phishing attack targeted at big to execute IN big card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo acquires big trust and tricks him into executing IN big card sydney</label>
+											<node refinement="disjunctive">
+												<label>cleo becomes friends with big</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo tricks big into executing IN big card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+									</node>
+									<node refinement="disjunctive">
+										<label>MAKE cleo grey IN grey card sydney</label>
+										<node refinement="disjunctive">
+											<label>cleo threatens grey to execute IN grey card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo blackmails grey</label>
+											<node refinement="disjunctive">
+												<label>cleo collects some intel about grey</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo blackmails grey to execute IN grey card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo bribes grey to execute IN grey card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo socially engineers grey</label>
+											<node refinement="conjunctive">
+												<label>authority attack</label>
+												<node refinement="disjunctive">
+													<label>cleo impersonates authority</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo orders grey to execute IN grey card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+											<node refinement="conjunctive">
+												<label>phishing attack</label>
+												<node refinement="disjunctive">
+													<label>cleo collects information about grey</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo launches a phishing attack targeted at grey to execute IN grey card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo acquires grey trust and tricks him into executing IN grey card sydney</label>
+											<node refinement="disjunctive">
+												<label>cleo becomes friends with grey</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo tricks grey into executing IN grey card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+									</node>
+									<node refinement="disjunctive">
+										<label>MAKE cleo administrator IN administrator card sydney</label>
+										<node refinement="disjunctive">
+											<label>cleo threatens administrator to execute IN administrator card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo blackmails administrator</label>
+											<node refinement="disjunctive">
+												<label>cleo collects some intel about administrator</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo blackmails administrator to execute IN administrator card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo bribes administrator to execute IN administrator card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo socially engineers administrator</label>
+											<node refinement="conjunctive">
+												<label>authority attack</label>
+												<node refinement="disjunctive">
+													<label>cleo impersonates authority</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo orders administrator to execute IN administrator card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+											<node refinement="conjunctive">
+												<label>phishing attack</label>
+												<node refinement="disjunctive">
+													<label>cleo collects information about administrator</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo launches a phishing attack targeted at administrator to execute IN administrator card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo acquires administrator trust and tricks him into executing IN administrator card sydney</label>
+											<node refinement="disjunctive">
+												<label>cleo becomes friends with administrator</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo tricks administrator into executing IN administrator card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+									</node>
+									<node refinement="disjunctive">
+										<label>MAKE cleo administrators IN administrators card sydney</label>
+										<node refinement="disjunctive">
+											<label>cleo threatens administrators to execute IN administrators card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo blackmails administrators</label>
+											<node refinement="disjunctive">
+												<label>cleo collects some intel about administrators</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo blackmails administrators to execute IN administrators card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo bribes administrators to execute IN administrators card sydney</label>
+											<parameter class="numeric" name="cost">1000</parameter>
+											<parameter class="ordinal" name="likelihood">0.5</parameter>
+											<parameter class="ordinal" name="difficulty">M</parameter>
+											<parameter class="ordinal" name="time">D</parameter>
+										</node>
+										<node refinement="disjunctive">
+											<label>cleo socially engineers administrators</label>
+											<node refinement="conjunctive">
+												<label>authority attack</label>
+												<node refinement="disjunctive">
+													<label>cleo impersonates authority</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo orders administrators to execute IN administrators card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+											<node refinement="conjunctive">
+												<label>phishing attack</label>
+												<node refinement="disjunctive">
+													<label>cleo collects information about administrators</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+												<node refinement="disjunctive">
+													<label>cleo launches a phishing attack targeted at administrators to execute IN administrators card sydney</label>
+													<parameter class="numeric" name="cost">1000</parameter>
+													<parameter class="ordinal" name="likelihood">0.5</parameter>
+													<parameter class="ordinal" name="difficulty">M</parameter>
+													<parameter class="ordinal" name="time">D</parameter>
+												</node>
+											</node>
+										</node>
+										<node refinement="conjunctive">
+											<label>cleo acquires administrators trust and tricks him into executing IN administrators card sydney</label>
+											<node refinement="disjunctive">
+												<label>cleo becomes friends with administrators</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+											<node refinement="disjunctive">
+												<label>cleo tricks administrators into executing IN administrators card sydney</label>
+												<parameter class="numeric" name="cost">1000</parameter>
+												<parameter class="ordinal" name="likelihood">0.5</parameter>
+												<parameter class="ordinal" name="difficulty">M</parameter>
+												<parameter class="ordinal" name="time">D</parameter>
+											</node>
+										</node>
+									</node>
+								</node>
+							</node>
+						</node>
+					</node>
+				</node>
+			</node>
+		</node>
+	</node>
+</adtree>
