@@ -152,8 +152,8 @@ const getRootNode =
  * @returns {Object} root node
  */
 module.exports.getRootNode =
-function getRootNode(attacktree, childrenKey=childElemName) {
-	return attacktree[childrenKey][0];
+function getRootNode(attacktree) {
+	return attacktree[childElemName][0];
 };
 
 
@@ -167,7 +167,7 @@ const prepareTree =
  * @returns {Object} root node
  */
 module.exports.prepareTree =
-function prepareTree(attacktree, childrenKey=childElemName) {
+function prepareTree(attacktree) {
 	function recurse(item, depth=0) {
 		item.depth = depth;
 
@@ -178,11 +178,11 @@ function prepareTree(attacktree, childrenKey=childElemName) {
 			});
 
 		// make sure children are an array
-		if (item[childrenKey]) {
-			item[childrenKey] = utils.ensureArray(item[childrenKey]);
+		if (item[childElemName]) {
+			item[childElemName] = utils.ensureArray(item[childElemName]);
 		}
 
-		const children = item[childrenKey];
+		const children = item[childElemName];
 		if (!!children) {
 			// set parent
 			children.forEach((node) => {
@@ -208,7 +208,7 @@ const prepareAnnotatedTree =
  * @returns {Object} root node
  */
 module.exports.prepareAnnotatedTree =
-function prepareAnnotatedTree(attacktree, childrenKey=childElemName) {
+function prepareAnnotatedTree(attacktree) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
 			item[parameterElemName] = utils.toHashMap(
@@ -217,7 +217,7 @@ function prepareAnnotatedTree(attacktree, childrenKey=childElemName) {
 			);
 		}
 
-		const children = item[childrenKey];
+		const children = item[childElemName];
 		if (!!children) {
 			children.forEach(node => recurse(node));
 		}
@@ -254,16 +254,16 @@ const findLeafNodes =
  * @returns {Array} list of leaf nodes
  */
 module.exports.findLeafNodes =
-function findLeafNodes(_nodes, childrenKey=childElemName) {
+function findLeafNodes(_nodes) {
 	const nodes = utils.ensureArray(_nodes);
 	const leafNodes = [];
 
 	function recurse(item) {
-		const isLeaf = _.isEmpty(item[childrenKey]);
+		const isLeaf = _.isEmpty(item[childElemName]);
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
-			const children = item[childrenKey];
+			const children = item[childElemName];
 			children.forEach(node => recurse(node));
 		}
 	}
@@ -282,10 +282,10 @@ const getAllPaths =
  * @returns {Array} list of paths (path: array of nodes)
  */
 module.exports.getAllPaths =
-function getAllPaths(nodes, childrenKey=childElemName) {
+function getAllPaths(nodes) {
 	function recurse(nodes, currentPath, allPaths) {
 		nodes.forEach((node) => {
-			const children = node[childrenKey];
+			const children = node[childElemName];
 			const newCurrentPath = [...currentPath, node];
 			if (children && children.length > 0) {
 				recurse(
