@@ -382,6 +382,7 @@ test.group('detectFlavor()', (test) => {
 		ata: path.join(testDataPath, 'attacktree-cyb.xml'),
 		apl: path.join(testDataPath, 'attacktree-apl.xml'),
 		adtool: path.join(testDataPath, 'attacktree-adtool.xml'),
+		vanilla: path.join(testDataPath, 'attacktree-vanilla.xml'),
 	};
 
 	function getTree(filePath) {
@@ -425,6 +426,14 @@ test.group('detectFlavor()', (test) => {
 			.then((tree) => {
 				const flavor = trespass.attacktree.detectFlavor(tree);
 				return t.true(flavor === 'adtool');
+			});
+	});
+
+	test('should detect vanilla', (t) => {
+		return getTree(files.vanilla)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				return t.true(flavor === 'vanilla');
 			});
 	});
 });
