@@ -122,7 +122,15 @@ function parse(xmlStr, opts=xml2jsOptions) {
 
 			let attacktree = parsedTree[rootElemName];
 			attacktree = prepareTree(attacktree);
-			attacktree = prepareAnnotatedTree(attacktree);
+
+			const flavor = detectFlavor(attacktree);
+			if (flavor.ata) {
+				attacktree = prepareAnnotatedTree(attacktree);
+			}
+			if (flavor.adtool) {
+				// TODO: properly prepare tree
+				// attacktree = prepareAnnotatedTree(attacktree);
+			}
 
 			return resolve(attacktree);
 		});
