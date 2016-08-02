@@ -476,7 +476,6 @@ const subtreeFromLeafLabels =
  * which is a subset of the original tree, whose leaf nodes
  * are the ones with the corresponding labels.
  *
- *
  * @param {Object} rootNode - tree root
  * @returns {Object} root node of subtree
  */
