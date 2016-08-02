@@ -30,10 +30,24 @@ const prepareParameter =
  * transforms the shape of an annotation parameter to s.th. more useful
  *
  * @param {Object} param - annotation parameter
+ * @param {String} flavor - attack tree flavor name
  * @returns {Object}
  */
 module.exports.prepareParameter =
-function prepareParameter(param) {
+function prepareParameter(param, flavor) {
+	if (flavor === 'adtool') {
+		param = ((param) => {
+			// make it look like the `ata` variant
+			const transformed = {
+				[attrKey]: {
+					name: param[attrKey].domainId,
+					class: undefined,
+				},
+				[charKey]: param[charKey],
+			};
+			return transformed;
+		})(param);
+	}
 	return {
 		name: param[attrKey].name,
 		class: param[attrKey].class,
@@ -60,6 +74,51 @@ function unprepareParameter(param) {
 };
 
 
+const detectFlavor =
+/**
+ * detects the flavor of the attacktree:
+ * - `treemaker`
+ * - `ata`
+ * - `adtool`
+ *
+ * @param {Object} tree - attack tree
+ * @returns {String} name of flavor
+ */
+module.exports.detectFlavor =
+function detectFlavor(tree) {
+	function checkTreemaker(tree) {
+		return !!tree[attrKey].profit && !!tree[attrKey].id;
+	}
+
+	function checkATA(tree) {
+		return !!tree[attrKey].utility;
+	}
+
+	function checkADtool(tree) {
+		return !!tree.domain;
+	}
+
+	const result = {
+		adtool: false,
+		ata: false,
+		treemaker: false,
+	};
+
+	result.adtool = checkADtool(tree);
+	if (!result.adtool) {
+		result.treemaker = checkTreemaker(tree);
+		result.ata = checkATA(tree);
+	}
+
+	return R.keys(result)
+		.reduce((acc, key) => {
+			return (result[key])
+				? key
+				: acc;
+		});
+};
+
+
 const parse =
 /**
  * parses an attack tree xml string
@@ -83,7 +142,12 @@ function parse(xmlStr, opts=xml2jsOptions) {
 
 			let attacktree = parsedTree[rootElemName];
 			attacktree = prepareTree(attacktree);
-			attacktree = prepareAnnotatedTree(attacktree);
+
+			const flavor = detectFlavor(attacktree);
+			if (flavor === 'ata' || flavor === 'adtool') {
+				attacktree = prepareAnnotatedTree(attacktree, flavor);
+			}
+			attacktree.flavor = flavor || 'vanilla';
 
 			return resolve(attacktree);
 		});
@@ -99,8 +163,8 @@ const getRootNode =
  * @returns {Object} root node
  */
 module.exports.getRootNode =
-function getRootNode(attacktree, childrenKey=childElemName) {
-	return attacktree[childrenKey][0];
+function getRootNode(attacktree) {
+	return attacktree[childElemName][0];
 };
 
 
@@ -114,7 +178,7 @@ const prepareTree =
  * @returns {Object} root node
  */
 module.exports.prepareTree =
-function prepareTree(attacktree, childrenKey=childElemName) {
+function prepareTree(attacktree) {
 	function recurse(item, depth=0) {
 		item.depth = depth;
 
@@ -125,11 +189,11 @@ function prepareTree(attacktree, childrenKey=childElemName) {
 			});
 
 		// make sure children are an array
-		if (item[childrenKey]) {
-			item[childrenKey] = utils.ensureArray(item[childrenKey]);
+		if (item[childElemName]) {
+			item[childElemName] = utils.ensureArray(item[childElemName]);
 		}
 
-		const children = item[childrenKey];
+		const children = item[childElemName];
 		if (!!children) {
 			// set parent
 			children.forEach((node) => {
@@ -152,19 +216,21 @@ const prepareAnnotatedTree =
  * prepares an annotated attack tree object.
  *
  * @param {Object} rootNode - root node of an attack tree
+ * @param {String} flavor - attack tree flavor name
  * @returns {Object} root node
  */
 module.exports.prepareAnnotatedTree =
-function prepareAnnotatedTree(attacktree, childrenKey=childElemName) {
+function prepareAnnotatedTree(attacktree, flavor) {
 	function recurse(item) {
 		if (item[parameterElemName]) {
+			item[parameterElemName] = utils.ensureArray(item[parameterElemName]);
 			item[parameterElemName] = utils.toHashMap(
 				'name',
-				item[parameterElemName].map(prepareParameter)
+				item[parameterElemName].map(prepareParameter, flavor)
 			);
 		}
 
-		const children = item[childrenKey];
+		const children = item[childElemName];
 		if (!!children) {
 			children.forEach(node => recurse(node));
 		}
@@ -201,16 +267,16 @@ const findLeafNodes =
  * @returns {Array} list of leaf nodes
  */
 module.exports.findLeafNodes =
-function findLeafNodes(_nodes, childrenKey=childElemName) {
+function findLeafNodes(_nodes) {
 	const nodes = utils.ensureArray(_nodes);
 	const leafNodes = [];
 
 	function recurse(item) {
-		const isLeaf = _.isEmpty(item[childrenKey]);
+		const isLeaf = _.isEmpty(item[childElemName]);
 		if (isLeaf) {
 			leafNodes.push(item);
 		} else {
-			const children = item[childrenKey];
+			const children = item[childElemName];
 			children.forEach(node => recurse(node));
 		}
 	}
@@ -229,10 +295,10 @@ const getAllPaths =
  * @returns {Array} list of paths (path: array of nodes)
  */
 module.exports.getAllPaths =
-function getAllPaths(nodes, childrenKey=childElemName) {
+function getAllPaths(nodes) {
 	function recurse(nodes, currentPath, allPaths) {
 		nodes.forEach((node) => {
-			const children = node[childrenKey];
+			const children = node[childElemName];
 			const newCurrentPath = [...currentPath, node];
 			if (children && children.length > 0) {
 				recurse(

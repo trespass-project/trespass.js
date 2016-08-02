@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adtree profit="5000" id="ATM_model" idsonly="true" >
+	<node refinement="conjunctive">
+		<label>get item Cashbox get money</label>
+		<node refinement="conjunctive">
+			<label>get item ATM get Cashbox</label>
+			<node refinement="conjunctive">
+				<label>goto GasStation and get ATM</label>
+				<node refinement="disjunctive">
+					<label>attacker Attacker get ids for any path to GasStation</label>
+					<node refinement="disjunctive">
+						<label>attacker Attacker get ids for some policy at Door</label>
+						<node refinement="disjunctive">
+							<label>get keyG</label>
+							<node refinement="disjunctive">
+								<label>make some actor get keyG</label>
+								<node refinement="disjunctive">
+									<label>make Maintainer get keyG</label>
+									<node refinement="disjunctive">
+										<label>MAKE Attacker Maintainer IN Maintainer keyG Owner</label>
+									</node>
+								</node>
+								<node refinement="disjunctive">
+									<label>make Customer get keyG</label>
+									<node refinement="disjunctive">
+										<label>MAKE Attacker Customer IN Customer keyG Owner</label>
+									</node>
+								</node>
+							</node>
+							<node refinement="disjunctive">
+								<label>IN Attacker keyG Owner</label>
+							</node>
+						</node>
+						<node refinement="disjunctive">
+							<label>FORCE Attacker Door</label>
+						</node>
+					</node>
+					<node refinement="disjunctive">
+						<label>FORCE Attacker Window</label>
+					</node>
+				</node>
+				<node refinement="disjunctive">
+					<label>IN Attacker ATM GasStation</label>
+				</node>
+			</node>
+			<node refinement="disjunctive">
+				<label>IN Attacker Cashbox ATM</label>
+			</node>
+		</node>
+		<node refinement="disjunctive">
+			<label>IN Attacker money Cashbox</label>
+		</node>
+	</node>
+</adtree>

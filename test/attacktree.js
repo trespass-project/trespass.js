@@ -1,9 +1,15 @@
 import { test } from 'ava-spec';
+const fs = require('fs');
+const path = require('path');
 const _ = require('lodash');
 const R = require('ramda');
 const trespass = require('../');
 
-const parameters = [
+const rootDir = path.join(__dirname, '..');
+const testDataPath = path.join(rootDir, 'test', 'data');
+
+
+const ataParameters = [
 	{
 		_attr: { 'class': 'numeric', 'name': 'cost' },
 		_text: '1000',
@@ -19,6 +25,14 @@ const parameters = [
 	{
 		_attr: { 'class': 'ordinal', 'name': 'time' },
 		_text: 'D',
+	},
+];
+
+
+const adtoolParameters = [
+	{
+		_attr: { 'domainId': 'cost', 'category': 'basic' },
+		_text: '1000',
 	},
 ];
 
@@ -68,7 +82,6 @@ test.group('parse()', (test) => {
 
 
 test.group('prepareTree()', (test) => {
-
 	test('should convert strings to numbers', (t) => {
 		const attacktree = {
 			_attr: { profit: '5000' },
@@ -120,11 +133,21 @@ test.group('prepareTree()', (test) => {
 
 
 test.group('prepareParameter()', (test) => {
-	test('should work', (t) => {
-		const param = parameters[0];
-		const prepared = trespass.attacktree.prepareParameter(param);
+	test('should work with ata-style parameters', (t) => {
+		const param = ataParameters[0];
+		const flavor = 'ata';
+		const prepared = trespass.attacktree.prepareParameter(param, flavor);
 		t.true(prepared.name === 'cost');
 		t.true(prepared.class === 'numeric');
+		t.true(prepared.value === 1000);
+	});
+
+	test('should work with adtool-style parameters', (t) => {
+		const param = adtoolParameters[0];
+		const flavor = 'adtool';
+		const prepared = trespass.attacktree.prepareParameter(param, flavor);
+		t.true(prepared.name === 'cost');
+		t.true(prepared.class === undefined);
 		t.true(prepared.value === 1000);
 	});
 });
@@ -156,16 +179,17 @@ test.group('prepareAnnotatedTree()', (test) => {
 				]
 			},
 			{
-				parameter: parameters,
+				parameter: ataParameters,
 				node: [
 					{
-						parameter: parameters,
+						parameter: ataParameters,
 					},
 				]
 			},
 		]
 	};
-	const prepared = trespass.attacktree.prepareAnnotatedTree(attacktree);
+	const flavor = 'ata';
+	const prepared = trespass.attacktree.prepareAnnotatedTree(attacktree, flavor);
 
 	test('should transform all parameters to hash maps', (t) => {
 		t.true(!prepared.node[0].parameter);
@@ -326,5 +350,50 @@ test.group('subtreeFromLeafNodes()', (test) => {
 			],
 		};
 		t.true(R.equals(subtree, expected));
+	});
+});
+
+
+test.group('detectFlavor()', (test) => {
+	const files = {
+		treemaker: path.join(testDataPath, 'attacktree-treemaker.xml'),
+		ata: path.join(testDataPath, 'attacktree-cyb.xml'),
+		adtool: path.join(testDataPath, 'attacktree-adtool.xml'),
+	};
+
+	function getTree(filePath) {
+		return new Promise((resolve, reject) => {
+			fs.readFile(filePath, (err, content) => {
+				if (err) { return reject(err); }
+				return resolve(content.toString());
+			});
+		})
+			.then((xmlStr) => {
+				return trespass.attacktree.parse(xmlStr);
+			});
+	}
+
+	test('should detect treemaker', (t) => {
+		return getTree(files.treemaker)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				t.true(flavor === 'treemaker');
+			});
+	});
+
+	test('should detect ata', (t) => {
+		return getTree(files.ata)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				t.true(flavor === 'ata');
+			});
+	});
+
+	test('should detect adtool', (t) => {
+		return getTree(files.adtool)
+			.then((tree) => {
+				const flavor = trespass.attacktree.detectFlavor(tree);
+				return t.true(flavor === 'adtool');
+			});
 	});
 });

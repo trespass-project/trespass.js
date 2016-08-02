@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+<adtree>
+	<node refinement="conjunctive">
+		<label>root</label>
+		<node refinement="conjunctive">
+			<label>N_1</label>
+			<parameter domainId="MinCost1" category="basic">200</parameter>
+		</node>
+	</node>
+	<domain id="MinCost1">
+		<class>lu.uni.adtool.domains.adtpredefined.MinCost</class>
+		<tool>ADTool2</tool>
+	</domain>
+</adtree>
