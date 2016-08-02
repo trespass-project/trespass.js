@@ -3,6 +3,13 @@
  * @module trespass/attacktree
  */
 
+
+/** [trespass/attacktree/adtool]{@link module:trespass/attacktree/adtool} */
+const adtool = module.exports.adtool = require('./adtool.js');
+/** [trespass/attacktree/apl]{@link module:trespass/attacktree/apl} */
+const apl = module.exports.apl = require('./apl.js');
+
+
 // TODO: define `attacktree`, `tree`, `rootNode`
 
 const R = require('ramda');
@@ -24,6 +31,13 @@ const childElemName = module.exports.childElemName = 'node';
 const parameterElemName = module.exports.parameterElemName = 'parameter';
 const parentKey = module.exports.parentKey = 'parent';
 
+const annotatedFlavors =
+module.exports.annotatedFlavors = [
+	'ata',
+	'apl',
+	'adtool',
+];
+
 
 const prepareParameter =
 /**
@@ -31,22 +45,12 @@ const prepareParameter =
  *
  * @param {Object} param - annotation parameter
  * @param {String} flavor - attack tree flavor name
- * @returns {Object}
+ * @returns {Object} transformed parameter
  */
 module.exports.prepareParameter =
 function prepareParameter(param, flavor) {
 	if (flavor === 'adtool') {
-		param = ((param) => {
-			// make it look like the `ata` variant
-			const transformed = {
-				[attrKey]: {
-					name: param[attrKey].domainId,
-					class: undefined,
-				},
-				[charKey]: param[charKey],
-			};
-			return transformed;
-		})(param);
+		param = adtool.prepareParameter(param, { attrKey, charKey });
 	}
 	return {
 		name: param[attrKey].name,
@@ -161,11 +165,11 @@ function parse(xmlStr, opts=xml2jsOptions) {
 			let attacktree = parsedTree[rootElemName];
 			attacktree = prepareTree(attacktree);
 
-			const flavor = detectFlavor(attacktree);
-			if (flavor === 'ata' || flavor === 'apl' || flavor === 'adtool') {
+			const flavor = detectFlavor(attacktree) || 'vanilla';
+			if (R.contains(flavor, annotatedFlavors)) {
 				attacktree = prepareAnnotatedTree(attacktree, flavor);
 			}
-			attacktree.flavor = flavor || 'vanilla';
+			attacktree.flavor = flavor;
 
 			return resolve(attacktree);
 		});
