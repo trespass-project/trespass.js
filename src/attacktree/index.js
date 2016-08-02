@@ -78,8 +78,9 @@ const detectFlavor =
 /**
  * detects the flavor of the attacktree:
  * - `treemaker`
- * - `ata`
  * - `adtool`
+ * - `apl`
+ * - `ata`
  *
  * @param {Object} tree - attack tree
  * @returns {String} name of flavor
@@ -87,27 +88,44 @@ const detectFlavor =
 module.exports.detectFlavor =
 function detectFlavor(tree) {
 	function checkTreemaker(tree) {
-		return !!tree[attrKey].profit && !!tree[attrKey].id;
+		return !!tree[attrKey]
+			&& !!tree[attrKey].profit
+			&& !!tree[attrKey].id;
 	}
 
 	function checkATA(tree) {
-		return !!tree[attrKey].utility;
+		return !!tree[attrKey]
+			&& !!tree[attrKey].utility;
 	}
 
 	function checkADtool(tree) {
 		return !!tree.domain;
 	}
 
+	function treeHasLeafParameters(tree) {
+		function hasParams(node) {
+			return !!node[parameterElemName];
+		}
+		const leafNodes = findLeafNodes([getRootNode(tree)]);
+		return R.any(hasParams)(leafNodes);
+	}
+
 	const result = {
 		adtool: false,
 		ata: false,
+		apl: false,
 		treemaker: false,
 	};
 
 	result.adtool = checkADtool(tree);
 	if (!result.adtool) {
-		result.treemaker = checkTreemaker(tree);
 		result.ata = checkATA(tree);
+	}
+	if (!result.ata) {
+		result.apl = checkTreemaker(tree) && treeHasLeafParameters(tree);
+	}
+	if (!result.apl) {
+		result.treemaker = checkTreemaker(tree);
 	}
 
 	return R.keys(result)
@@ -144,7 +162,7 @@ function parse(xmlStr, opts=xml2jsOptions) {
 			attacktree = prepareTree(attacktree);
 
 			const flavor = detectFlavor(attacktree);
-			if (flavor === 'ata' || flavor === 'adtool') {
+			if (flavor === 'ata' || flavor === 'apl' || flavor === 'adtool') {
 				attacktree = prepareAnnotatedTree(attacktree, flavor);
 			}
 			attacktree.flavor = flavor || 'vanilla';
