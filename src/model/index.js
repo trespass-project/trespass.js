@@ -14,6 +14,10 @@ const pd = require('pretty-data').pd;
 const utils = require('../utils');
 
 
+/** [trespass/model/validation]{@link module:trespass/model/validation} */
+const validation = require('./validation.js');
+
+
 const attrKey = '_attr';
 const charKey = '_text';
 const xml2jsOptions = {
@@ -362,218 +366,6 @@ function parse(xmlStr, done) {
 };
 
 
-// element schema definitions for input validation
-// const options = {
-// 	atLocations: {
-// 		language: {
-// 			// label: ' ',
-// 			any: { required: 'must be located somewhere' }
-// 		}
-// 	}
-// };
-
-/**
- * validation schemas for different model component types.
- */
-const schemas = {};
-schemas.location = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				// anyOf: [{ type: 'string' }],
-				type: 'string',
-			},
-			required: false,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-	}
-};
-schemas.edge = {
-	properties: {
-		source: {
-			type: 'string',
-			required: true,
-		},
-		target: {
-			type: 'string',
-			required: true,
-		},
-		kind: {
-			type: 'string',
-			required: false,
-		},
-		directed: {
-			type: 'boolean',
-			required: false,
-		},
-	}
-};
-schemas.item = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		name: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.data = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		name: {
-			type: 'string',
-			required: true,
-		},
-		value: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.actor = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.policy = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		enabled: {
-			type: 'object',
-			required: true,
-		},
-		credentials: {
-			type: 'object',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.process = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		actions: {
-			type: 'object',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.predicate = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		arity: {
-			type: 'number',
-			required: true,
-		},
-		value: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.metric = {
-	properties: {
-		name: {
-			type: 'string',
-			required: true,
-		},
-		value: {
-			type: 'string',
-			required: true,
-		},
-		namespace: {
-			type: 'string',
-			required: false,
-		},
-	}
-};
-
-const validationOptions = {
-	additionalProperties: true,
-};
-
-
 const validateComponent =
 /**
  * validates an object with a given schema.
@@ -584,7 +376,7 @@ const validateComponent =
  */
 module.exports.validateComponent =
 function validateComponent(it, schemaName) {
-	const result = revalidator.validate(it, schemas[schemaName], validationOptions);
+	const result = revalidator.validate(it, validation.schemas[schemaName], validation.options);
 	/*
 	{ valid: false,
 	  errors:
