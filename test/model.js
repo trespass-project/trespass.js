@@ -342,20 +342,25 @@ test.group('.prepareForXml()', (test) => {
 		const model = {
 			system: {
 				predicates: [
-					{ arity: 2, id: 'isUserId', value: [
-						'user1 userId1',
-						'user2 userId2',
-						'user3 userId3'
-					]}
+					{
+						arity: 2,
+						id: 'isUserId',
+						value: [
+							'user1 userId1',
+							'user2 userId2',
+							'user3 userId3'
+						]
+					}
 				]
 			}
 		};
 		let preparedModel = trespass.model.prepareModelForXml(model);
 		preparedModel = trespass.model.prepareForXml(preparedModel);
 
-		t.true(preparedModel.system.predicates.predicate.length === 1);
-		t.true(preparedModel.system.predicates.predicate[0].value.length === 3);
-		t.true(preparedModel.system.predicates.predicate[0][attrKey].arity === 2);
+		const predicates = preparedModel.system.predicates;
+		t.true(predicates.predicate.length === 1);
+		t.true(predicates.predicate[0].value.length === 3);
+		t.true(predicates.predicate[0][attrKey].arity === 2);
 	});
 
 	// TODO: what else?
