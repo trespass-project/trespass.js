@@ -534,6 +534,17 @@ const addPredicate =
 module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
+
+	// check if predicate with that id exists already.
+	// if so, only add the values to existing one, instead
+	// of creating an entirely new predicate
+	const existingOne = R.find(R.propEq('id', it.id), model.system.predicates);
+	if (!!existingOne) {
+		existingOne.value = R.uniq(
+			[...existingOne.value, ...it.value]
+		);
+		return model;
+	}
 	return add_(model, 'predicates', it);
 };
 

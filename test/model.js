@@ -178,6 +178,25 @@ test.group('.add*()', (test) => {
 	// });
 });
 
+test.group('.addPredicate()', (test) => {
+	let model = trespass.model.create();
+	const relationType = 'contracted-by';
+	const basePred = {
+		id: relationType,
+		arity: 2,
+	};
+	const pred1 = _.extend({}, basePred, { value: ['node-1 node-2'] });
+	const pred2 = _.extend({}, basePred, { value: ['node-2 node-3'] });
+	model = trespass.model.addPredicate(model, pred1);
+	model = trespass.model.addPredicate(model, pred2);
+	const predicates = model.system.predicates;
+
+	test('should use existing predicate', (t) => {
+		t.true(predicates.length === 1); // not 2
+		t.true(predicates[0].value.length === 2);
+	});
+});
+
 test.group('.singular()', (test) => {
 	test('should return known singular', (t) => {
 		const s = trespass.model.singular('policies');
