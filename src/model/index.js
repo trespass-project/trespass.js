@@ -79,6 +79,7 @@ singularPluralCollection
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
+
 const collectionNames =
 module.exports.collectionNames =
 R.keys(collectionNamesSingular);
@@ -336,9 +337,7 @@ function parse(xmlStr, done) {
 						coll = [];
 					}
 					if (coll) {
-						if (!_.isArray(coll[item.singular])) {
-							coll[item.singular] = [coll[item.singular]];
-						}
+						coll[item.singular] = utils.ensureArray(coll[item.singular]);
 
 						// filter, because for some reason
 						// `coll[item.singular]` is [undefined] in some cases
