@@ -91,6 +91,7 @@ test.group('.parse()', (test) => {
 			const predicates = model.system.predicates;
 			t.true(predicates.length === 3);
 			t.true(predicates[0].value.length === 26);
+			t.true(predicates[0].value[0].length === 2);
 
 			const data = model.system.data;
 			t.true(data.length === 1);
@@ -194,6 +195,11 @@ test.group('.addPredicate()', (test) => {
 	test('should use existing predicate', (t) => {
 		t.true(predicates.length === 1); // not 2
 		t.true(predicates[0].value.length === 2);
+	});
+
+	test('should split up values', (t) => {
+		t.true(predicates[0].value[0].length === 2);
+		t.true(predicates[0].value[1].length === 2);
 	});
 });
 
