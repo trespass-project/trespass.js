@@ -5,21 +5,12 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const diff = require('deep-diff').diff;
-
+const common = require('./common.js');
 const trespass = require('../');
 
 const rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, 'test', 'data', 'vsphere_export.xml');
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
-
-const attrKey = '_attr';
-
-const cheerioOptions = {
-	xmlMode: true,
-	normalizeWhitespace: false,
-	lowerCaseTags: true,
-	// lowerCaseAttributeNames: true
-};
 
 
 // const validateXML = require('xmllint').validateXML;
@@ -373,13 +364,13 @@ test.group('.prepareForXml()', (test) => {
 		};
 		const preparedData = trespass.model.prepareForXml(data);
 		const system = preparedData.system;
-		const attributes = preparedData.system[attrKey];
+		const attributes = preparedData.system[common.attrKey];
 		t.true(!!attributes);
 		t.true(R.keys(attributes).length === 2);
 		t.true(attributes.date === 'date');
 		t.true(attributes.author === 'author');
 		t.true(system.title === 'title');
-		t.true(system.locations.location[0][attrKey].id === 'location');
+		t.true(system.locations.location[0][common.attrKey].id === 'location');
 	});
 
 	test('should work', (t) => {
@@ -404,7 +395,7 @@ test.group('.prepareForXml()', (test) => {
 		const predicates = preparedModel.system.predicates;
 		t.true(predicates.predicate.length === 1);
 		t.true(predicates.predicate[0].value.length === 3);
-		t.true(predicates.predicate[0][attrKey].arity === 2);
+		t.true(predicates.predicate[0][common.attrKey].arity === 2);
 	});
 
 	// TODO: what else?
@@ -429,7 +420,7 @@ test.group('.toXML()', (test) => {
 		}
 	};
 	const xmlStr = trespass.model.toXML(origModel);
-	const $system = cheerio.load(xmlStr, cheerioOptions)('system');
+	const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
 
 	test('should properly transform model object to XML', (t) => {
 		t.true($system.find('locations > location').length === 2);

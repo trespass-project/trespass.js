@@ -1,14 +1,7 @@
 import { test } from 'ava-spec';
 const cheerio = require('cheerio');
+const common = require('./common.js');
 const trespass = require('../');
-
-
-const cheerioOptions = {
-	xmlMode: true,
-	normalizeWhitespace: false,
-	lowerCaseTags: true,
-	// lowerCaseAttributeNames: true
-};
 
 
 test.group('.scenarioSetModel()', (test) => {
@@ -50,7 +43,7 @@ test.group('.scenarioToXML()', (test) => {
 	scenario.scenario.id = 'scenario-id';
 
 	const xmlStr = trespass.model.scenarioToXML(scenario);
-	const $system = cheerio.load(xmlStr, cheerioOptions)('scenario');
+	const $system = cheerio.load(xmlStr, common.cheerioOptions)('scenario');
 
 	test('should properly transform scenario object to XML', (t) => {
 		t.true($system.find('model').text() === 'model-file-name.xml');
