@@ -39,9 +39,31 @@ test.group('predicates', (test) => {
 		});
 	});
 
-	// test('values should be joint again, on xml export', (t) => {
-	// 	t.true(false);
-	// });
+
+	test('values should be joint again, on xml export', (t) => {
+		const model = {
+			system: {
+				predicates: [
+					{
+						id: 'isUserId',
+						arity: 2,
+						value: [
+							['user1', 'userId1'],
+							['user2', 'userId2'],
+							['user3', 'userId3'],
+						]
+					}
+				]
+			}
+		};
+		let preparedModel = trespass.model.prepareModelForXml(model);
+		preparedModel = trespass.model.prepareForXml(preparedModel);
+
+		const predicates = preparedModel.system.predicates;
+		t.true(predicates.predicate.length === 1);
+		t.true(predicates.predicate[0].value.length === 3);
+		// t.true(predicates.predicate[0][common.attrKey].arity === 2);
+	});
 });
 
 

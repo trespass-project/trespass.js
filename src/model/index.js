@@ -278,6 +278,8 @@ function parse(xmlStr, done) {
 			item = item
 				.replace(/[\r\n\t]/ig, ' ')
 				.replace(/ +/ig, ' ');
+
+			// TODO: do this elsewhere?
 			if (key === 'atLocations') {
 				item = item.split(/ +/)
 					.map(loc => loc.trim())
@@ -353,19 +355,33 @@ function parse(xmlStr, done) {
 		(err) => {
 			if (err) { console.error(err); }
 
-			// make sure predicate `value` is always an array,
-			// and `value` strings always get split
-			model.system.predicates
-				.forEach((pred) => {
-					pred.value = utils.ensureArray(pred.value)
-						.map((val) => val.split(/ +/));
-					pred.arity = parseInt(pred.arity, 10);
-				});
+			model.system.predicates = model.system.predicates
+				.map(preparePredicate);
 
 			done(err, model);
 		}
 	);
 };
+
+
+function preparePredicate(_predicate) {
+	// make sure predicate `value` is always an array,
+	// and `value` strings always get split
+	const predicate = _.merge({}, _predicate);
+	predicate.arity = parseInt(predicate.arity, 10);
+	predicate.value = utils.ensureArray(predicate.value)
+		.map((val) => val.split(/ +/));
+	return predicate;
+}
+
+
+function unpreparePredicate(_predicate) {
+	console.log(_predicate);
+	const predicate = _.merge({}, _predicate);
+	predicate.value = predicate.value
+		.map((val) => val.join(' '));
+	return predicate;
+}
 
 
 const validateComponent =
@@ -648,11 +664,6 @@ module.exports.prepareForXml =
 function prepareForXml(it, parentKey) {
 	if (_.isArray(it)) {
 		return it.map((item) => {
-			// put things back together
-			if (parentKey === 'value' && _.isArray(item)) {
-				item = item.join(' ');
-			}
-
 			return prepareForXml(item, parentKey);
 		});
 	} else if (_.isString(it) || _.isNumber(it)) {
@@ -698,6 +709,10 @@ function prepareModelForXml(model) {
 
 	const system = model.system;
 
+	// transform things back to how they were
+	system.predicates = system.predicates
+		.map(unpreparePredicate);
+
 	const items = system.items || [];
 	const data = system.data || [];
 	delete system.items;
@@ -722,14 +737,13 @@ function prepareModelForXml(model) {
 		data,
 		item: items,
 	};
+
 	if (!system.assets.item.length) {
 		delete system.assets.item;
 	}
-
 	if (!system.assets.data.length) {
 		delete system.assets.data;
 	}
-
 	if (R.keys(system.assets).length === 0) {
 		delete system.assets;
 	}

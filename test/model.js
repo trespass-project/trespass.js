@@ -319,31 +319,6 @@ test.group('.prepareForXml()', (test) => {
 		t.true(system.locations.location[0][common.attrKey].id === 'location');
 	});
 
-	test('should work', (t) => {
-		const model = {
-			system: {
-				predicates: [
-					{
-						arity: 2,
-						id: 'isUserId',
-						value: [
-							'user1 userId1',
-							'user2 userId2',
-							'user3 userId3'
-						]
-					}
-				]
-			}
-		};
-		let preparedModel = trespass.model.prepareModelForXml(model);
-		preparedModel = trespass.model.prepareForXml(preparedModel);
-
-		const predicates = preparedModel.system.predicates;
-		t.true(predicates.predicate.length === 1);
-		t.true(predicates.predicate[0].value.length === 3);
-		t.true(predicates.predicate[0][common.attrKey].arity === 2);
-	});
-
 	// TODO: what else?
 });
 
