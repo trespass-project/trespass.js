@@ -197,6 +197,35 @@ test.group('.addPredicate()', (test) => {
 	});
 });
 
+test.group('predicates', (test) => {
+	test.cb('should re-import model successfully', (t) => {
+		/* eslint indent:0 */
+		const xmlStr = [
+			'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+			'<system xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd" author="trespass.js" version="0.0.0" date="2016-02-08 16:29:30">',
+				'<title>Untitled</title>',
+				'<predicates>',
+					'<predicate arity="2" id="isUserIdAt">',
+						'<value>a b</value>',
+					'</predicate>',
+					'<predicate arity="2" id="isContractedBy">',
+						'<value>c d</value>',
+						'<value>e d</value>',
+					'</predicate>',
+				'</predicates>',
+			'</system>',
+		].join('\n');
+
+		trespass.model.parse(xmlStr, (err, model) => {
+			// console.log(model.system.predicates);
+			t.true(model.system.predicates.length === 2);
+			t.true(_.isArray(model.system.predicates[0].value));
+			t.true(_.isArray(model.system.predicates[1].value));
+			t.end();
+		});
+	});
+});
+
 test.group('.singular()', (test) => {
 	test('should return known singular', (t) => {
 		const s = trespass.model.singular('policies');
