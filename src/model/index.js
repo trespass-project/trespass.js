@@ -280,15 +280,8 @@ function parse(xmlStr, done) {
 				.replace(/ +/ig, ' ');
 			if (key === 'atLocations') {
 				item = item.split(/ +/)
-					.map(loc => {
-						return loc.trim();
-					})
-					.filter(loc => {
-						return !_.isEmpty(loc);
-					});
-			}
-			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
-				item = item.split(/ +/);
+					.map(loc => loc.trim())
+					.filter(loc => (!_.isEmpty(loc)));
 			}
 			return item;
 		} else if (_.isNumber(item)) {
@@ -360,10 +353,13 @@ function parse(xmlStr, done) {
 		(err) => {
 			if (err) { console.error(err); }
 
-			// make sure predicate `value` is always an array
+			// make sure predicate `value` is always an array,
+			// and `value` strings always get split
 			model.system.predicates
 				.forEach((pred) => {
-					pred.value = utils.ensureArray(pred.value);
+					pred.value = utils.ensureArray(pred.value)
+						.map((val) => val.split(/ +/));
+					pred.arity = parseInt(pred.arity, 10);
 				});
 
 			done(err, model);
@@ -540,14 +536,25 @@ const addPredicate =
 module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
-	it.value = it.value
-		.map((val) => val.split(/ +/));
+
+	if (_.isString(it.value)) {
+		throw new Error('predicate value items must be arrays');
+	}
+
+	it.value = [it.value];
+
+	// reminder:
+	// model.predicates will look like this
+	// `{ id: 'contracted-by', arity: 2, value: [ ['a', 'b'], ['b', 'c'] ] }`
 
 	// check if predicate with that id exists already.
 	// if so, only add the values to existing one, instead
 	// of creating an entirely new predicate
-	const existingOne = R.find(R.propEq('id', it.id), model.system.predicates);
-	if (!!existingOne) {
+	const existingOne = R.find(
+		R.propEq('id', it.id),
+		model.system.predicates
+	);
+	if (existingOne) {
 		existingOne.value = R.uniq(
 			[...existingOne.value, ...it.value]
 		);
