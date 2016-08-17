@@ -58,12 +58,11 @@ const testModelXML = fs.readFileSync(testModelFilePath).toString();
 test.group('.parse()', (test) => {
 	test('should dynamically create empty collections', (t) => {
 		const newModel = trespass.model.create();
-		t.true(newModel.system.locations.length === 0);
-		t.true(newModel.system.data.length === 0);
-		t.true(newModel.system.items.length === 0);
-		t.true(newModel.system.policies.length === 0);
-		t.true(newModel.system.predicates.length === 0);
-		t.true(newModel.system.processes.length === 0);
+		t.true(!!trespass.model.collectionNames);
+		trespass.model.collectionNames
+			.forEach((name) => {
+				t.true(newModel.system[name].length === 0);
+			});
 	});
 
 	trespass.model.parse(testModelXML, (err, model) => {
