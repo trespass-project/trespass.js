@@ -158,59 +158,6 @@ test.group('.add*()', (test) => {
 	// TODO: more?
 });
 
-test.group('.addPredicate()', (test) => {
-	let model = trespass.model.create();
-	const relationType = 'contracted-by';
-	const basePred = {
-		id: relationType,
-		arity: 2,
-	};
-	const pred1 = _.extend({}, basePred, { value: ['node-1 node-2'] });
-	const pred2 = _.extend({}, basePred, { value: ['node-2 node-3'] });
-	model = trespass.model.addPredicate(model, pred1);
-	model = trespass.model.addPredicate(model, pred2);
-	const predicates = model.system.predicates;
-
-	test('should use existing predicate', (t) => {
-		t.true(predicates.length === 1); // not 2
-		t.true(predicates[0].value.length === 2);
-	});
-
-	test('should split up values', (t) => {
-		t.true(predicates[0].value[0].length === 2);
-		t.true(predicates[0].value[1].length === 2);
-	});
-});
-
-test.group('predicates', (test) => {
-	test.cb('should re-import model successfully', (t) => {
-		/* eslint indent:0 */
-		const xmlStr = [
-			'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
-			'<system xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd" author="trespass.js" version="0.0.0" date="2016-02-08 16:29:30">',
-				'<title>Untitled</title>',
-				'<predicates>',
-					'<predicate arity="2" id="isUserIdAt">',
-						'<value>a b</value>',
-					'</predicate>',
-					'<predicate arity="2" id="isContractedBy">',
-						'<value>c d</value>',
-						'<value>e d</value>',
-					'</predicate>',
-				'</predicates>',
-			'</system>',
-		].join('\n');
-
-		trespass.model.parse(xmlStr, (err, model) => {
-			// console.log(model.system.predicates);
-			t.true(model.system.predicates.length === 2);
-			t.true(_.isArray(model.system.predicates[0].value));
-			t.true(_.isArray(model.system.predicates[1].value));
-			t.end();
-		});
-	});
-});
-
 test.group('.singular()', (test) => {
 	test('should return known singular', (t) => {
 		const s = trespass.model.singular('policies');
