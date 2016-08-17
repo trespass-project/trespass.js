@@ -356,6 +356,13 @@ function parse(xmlStr, done) {
 
 		(err) => {
 			if (err) { console.error(err); }
+
+			// make sure predicate `value` is always an array
+			model.system.predicates
+				.forEach((pred) => {
+					pred.value = utils.ensureArray(pred.value);
+				});
+
 			done(err, model);
 		}
 	);
