@@ -588,18 +588,6 @@ function addLocation(model, _it={}) {
 };
 
 
-const addRoom =
-/**
- * @deprecated use [addLocation]{@link module:trespass/model.addLocation} instead
- */
-module.exports.addRoom =
-function addRoom(model, _it={}) {
-	const it = _.merge({}, _it);
-	console.warn('use addLocation() instead');
-	return addLocation(model, it);
-};
-
-
 const separateAttributeFromObject =
 /**
  * returns object and its attributes separately.

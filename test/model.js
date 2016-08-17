@@ -141,12 +141,12 @@ test.group('.add*()', (test) => {
 	const atLocation = 'atLocation';
 
 	test('should create rooms as locations', (t) => {
-		model = trespass.model.addRoom(model, { id: 'test-room' });
+		model = trespass.model.addLocation(model, { id: 'test-room' });
 		t.true(model.system.locations.length === 1);
 	});
 
 	test('should create rooms atLocations', (t) => {
-		model = trespass.model.addRoom(model, {
+		model = trespass.model.addLocation(model, {
 			id: 'test-room-2',
 			atLocations: [atLocation]
 		});
@@ -167,12 +167,12 @@ test.group('.add*()', (test) => {
 	// TODO: turn this on again
 	// test('should validate input', (t) => {
 	// 	t.throws(() => {
-	// 		model = trespass.model.addRoom(model, {
+	// 		model = trespass.model.addLocation(model, {
 	// 			// missing `id`
 	// 		});
 	// 	});
 	// 	t.throws(() => {
-	// 		model = trespass.model.addRoom(model, {
+	// 		model = trespass.model.addLocation(model, {
 	// 			domain: '!@#$'
 	// 		});
 	// 	});
