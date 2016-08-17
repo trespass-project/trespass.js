@@ -749,6 +749,8 @@ const addPredicate =
 module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
+	it.value = it.value
+		.map((val) => val.split(/ +/));
 
 	// check if predicate with that id exists already.
 	// if so, only add the values to existing one, instead
