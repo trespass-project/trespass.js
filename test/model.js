@@ -236,6 +236,17 @@ test.group('.prepareModelForXml()', (test) => {
 			});
 	});
 
+	test('should join atLocations', (t) => {
+		const data = {
+			atLocations: ['atLocation-1', 'atLocation-2']
+		};
+		const system = { data };
+		const model = { system };
+		const preparedModel = trespass.model.prepareModelForXml(model);
+		console.log(preparedModel);
+		// t.true(preparedData.atLocations === 'atLocation-1 atLocation-2');
+	});
+
 	test('should join items and data in assets', (t) => {
 		const system = {
 			items: [
@@ -286,15 +297,6 @@ test.group('.prepareForXml()', (test) => {
 	// 	t.true(data[0]['one'][0]['two'].length === 1);
 	// 	t.true(data[0]['one'][0]['two'][0]['three'] === 'value');
 	// });
-
-	test('should join atLocations', (t) => {
-		const data = {
-			atLocations: ['atLocation-1', 'atLocation-2']
-		};
-		const preparedData = trespass.model.prepareForXml(data);
-		t.true(preparedData.atLocations === 'atLocation-1 atLocation-2');
-	});
-
 	test('should create attributes', (t) => {
 		const data = {
 			system: {
