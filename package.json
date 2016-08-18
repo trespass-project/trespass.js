@@ -13,7 +13,7 @@
     "test-watch": "make test-watch"
   },
   "devDependencies": {
-    "ava": "^0.15.2",
+    "ava": "^0.16.0",
     "ava-spec": "^1.0.1",
     "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",

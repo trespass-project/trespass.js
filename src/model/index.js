@@ -79,6 +79,7 @@ singularPluralCollection
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
+
 const collectionNames =
 module.exports.collectionNames =
 R.keys(collectionNamesSingular);
@@ -277,17 +278,12 @@ function parse(xmlStr, done) {
 			item = item
 				.replace(/[\r\n\t]/ig, ' ')
 				.replace(/ +/ig, ' ');
+
+			// TODO: do this elsewhere?
 			if (key === 'atLocations') {
 				item = item.split(/ +/)
-					.map(loc => {
-						return loc.trim();
-					})
-					.filter(loc => {
-						return !_.isEmpty(loc);
-					});
-			}
-			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
-				item = item.split(/ +/);
+					.map(loc => loc.trim())
+					.filter(loc => (!_.isEmpty(loc)));
 			}
 			return item;
 		} else if (_.isNumber(item)) {
@@ -336,9 +332,7 @@ function parse(xmlStr, done) {
 						coll = [];
 					}
 					if (coll) {
-						if (!_.isArray(coll[item.singular])) {
-							coll[item.singular] = [coll[item.singular]];
-						}
+						coll[item.singular] = utils.ensureArray(coll[item.singular]);
 
 						// filter, because for some reason
 						// `coll[item.singular]` is [undefined] in some cases
@@ -361,16 +355,32 @@ function parse(xmlStr, done) {
 		(err) => {
 			if (err) { console.error(err); }
 
-			// make sure predicate `value` is always an array
-			model.system.predicates
-				.forEach((pred) => {
-					pred.value = utils.ensureArray(pred.value);
-				});
+			model.system.predicates = model.system.predicates
+				.map(preparePredicate);
 
 			done(err, model);
 		}
 	);
 };
+
+
+function preparePredicate(_predicate) {
+	// make sure predicate `value` is always an array,
+	// and `value` strings always get split
+	const predicate = _.merge({}, _predicate);
+	predicate.arity = parseInt(predicate.arity, 10);
+	predicate.value = utils.ensureArray(predicate.value)
+		.map((val) => val.split(/ +/));
+	return predicate;
+}
+
+
+function unpreparePredicate(_predicate) {
+	const predicate = _.merge({}, _predicate);
+	predicate.value = predicate.value
+		.map((val) => val.join(' '));
+	return predicate;
+}
 
 
 const validateComponent =
@@ -541,14 +551,25 @@ const addPredicate =
 module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
-	it.value = it.value
-		.map((val) => val.split(/ +/));
+
+	if (_.isString(it.value)) {
+		throw new Error('predicate value items must be arrays');
+	}
+
+	it.value = [it.value];
+
+	// reminder:
+	// model.predicates will look like this
+	// `{ id: 'contracted-by', arity: 2, value: [ ['a', 'b'], ['b', 'c'] ] }`
 
 	// check if predicate with that id exists already.
 	// if so, only add the values to existing one, instead
 	// of creating an entirely new predicate
-	const existingOne = R.find(R.propEq('id', it.id), model.system.predicates);
-	if (!!existingOne) {
+	const existingOne = R.find(
+		R.propEq('id', it.id),
+		model.system.predicates
+	);
+	if (existingOne) {
 		existingOne.value = R.uniq(
 			[...existingOne.value, ...it.value]
 		);
@@ -642,11 +663,6 @@ module.exports.prepareForXml =
 function prepareForXml(it, parentKey) {
 	if (_.isArray(it)) {
 		return it.map((item) => {
-			// put things back together
-			if (parentKey === 'value' && _.isArray(item)) {
-				item = item.join(' ');
-			}
-
 			return prepareForXml(item, parentKey);
 		});
 	} else if (_.isString(it) || _.isNumber(it)) {
@@ -689,8 +705,11 @@ const prepareModelForXml =
 module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	// TODO: clone model?
-
 	const system = model.system;
+
+	// transform things back to how they were
+	system.predicates = (system.predicates || [])
+		.map(unpreparePredicate);
 
 	const items = system.items || [];
 	const data = system.data || [];
@@ -716,14 +735,13 @@ function prepareModelForXml(model) {
 		data,
 		item: items,
 	};
+
 	if (!system.assets.item.length) {
 		delete system.assets.item;
 	}
-
 	if (!system.assets.data.length) {
 		delete system.assets.data;
 	}
-
 	if (R.keys(system.assets).length === 0) {
 		delete system.assets;
 	}
