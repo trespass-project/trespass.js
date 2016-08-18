@@ -683,12 +683,6 @@ function prepareForXml(it, parentKey) {
 				}
 
 				result[key] = prepareForXml(it[key], key);
-
-				// put things back together
-				if (key === 'atLocations') {
-					result[key] = result[key].join(' ');
-				}
-
 				return result;
 			}, {});
 	}
@@ -719,6 +713,15 @@ function prepareModelForXml(model) {
 	collectionNames
 		.forEach((collectionName) => {
 			if (system[collectionName]) {
+				// join atLocations
+				system[collectionName]
+					.forEach((item) => {
+						if (item.atLocations) {
+							item.atLocations = item.atLocations.join(' ');
+						}
+					});
+
+				// prefix
 				system[collectionName] = utils.toPrefixedObject(
 					singular(collectionName),
 					system[collectionName]
