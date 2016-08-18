@@ -376,7 +376,6 @@ function preparePredicate(_predicate) {
 
 
 function unpreparePredicate(_predicate) {
-	console.log(_predicate);
 	const predicate = _.merge({}, _predicate);
 	predicate.value = predicate.value
 		.map((val) => val.join(' '));
@@ -706,11 +705,10 @@ const prepareModelForXml =
 module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	// TODO: clone model?
-
 	const system = model.system;
 
 	// transform things back to how they were
-	system.predicates = system.predicates
+	system.predicates = (system.predicates || [])
 		.map(unpreparePredicate);
 
 	const items = system.items || [];
