@@ -5,33 +5,24 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const diff = require('deep-diff').diff;
-
+const common = require('./common.js');
 const trespass = require('../');
 
 const rootDir = path.join(__dirname, '..');
 const testModelFilePath = path.join(rootDir, 'test', 'data', 'vsphere_export.xml');
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
 
-const attrKey = '_attr';
 
-const cheerioOptions = {
-	xmlMode: true,
-	normalizeWhitespace: false,
-	lowerCaseTags: true,
-	// lowerCaseAttributeNames: true
-};
-
-
-const validateXML = require('xmllint').validateXML;
-const xsdFilePath = path.join(__dirname, '../data/TREsPASS_model.xsd');
-const schemaStr = fs.readFileSync(xsdFilePath).toString();
-function validateXmlWithSchema(schemaStr, modelStr) {
-	const result = validateXML({
-		xml: modelStr,
-		schema: schemaStr,
-	});
-	return result.errors || true;
-}
+// const validateXML = require('xmllint').validateXML;
+// const xsdFilePath = path.join(__dirname, '../data/TREsPASS_model.xsd');
+// const schemaStr = fs.readFileSync(xsdFilePath).toString();
+// function validateXmlWithSchema(schemaStr, modelStr) {
+// 	const result = validateXML({
+// 		xml: modelStr,
+// 		schema: schemaStr,
+// 	});
+// 	return result.errors || true;
+// }
 
 
 // test.group('validation', (test) => {
@@ -65,20 +56,20 @@ function validateXmlWithSchema(schemaStr, modelStr) {
 // });
 
 test.group('.parse()', (test) => {
-	const newModel = trespass.model.create();
 	test('should dynamically create empty collections', (t) => {
-		t.true(newModel.system.locations.length === 0);
-		t.true(newModel.system.data.length === 0);
-		t.true(newModel.system.items.length === 0);
+		const newModel = trespass.model.create();
+		t.true(!!trespass.model.collectionNames);
+		trespass.model.collectionNames
+			.forEach((name) => {
+				t.true(newModel.system[name].length === 0);
+			});
 	});
-});
 
-test.group('.parse()', (test) => {
 	trespass.model.parse(testModelXML, (err, model) => {
 		test.cb('should import metadata', (t) => {
 			t.true(model.system.author === 'ciab-exportAsTML.py');
 			t.true(model.system.version === '0.5');
-			// t.true(model.system.date === '2016-01-17T23:20:21.866232');
+			t.true(!!model.system.date);
 			t.end();
 		});
 
@@ -88,10 +79,10 @@ test.group('.parse()', (test) => {
 		});
 
 		test.cb('should import rest of model', (t) => {
-			const predicates = model.system.predicates;
-			t.true(predicates.length === 3);
-			t.true(predicates[0].value.length === 26);
-			t.true(predicates[0].value[0].length === 2);
+			// const predicates = model.system.predicates;
+			// t.true(predicates.length === 3);
+			// t.true(predicates[0].value.length === 26);
+			// t.true(predicates[0].value[0].length === 2);
 
 			const data = model.system.data;
 			t.true(data.length === 1);
@@ -106,7 +97,6 @@ test.group('.parse()', (test) => {
 
 		test.cb('predicate value should always be an Array', (t) => {
 			const predicates = model.system.predicates;
-			// console.log(predicates[0].value[0]);
 			t.true(_.isArray(predicates[0].value[0]));
 			t.end();
 		});
@@ -117,7 +107,7 @@ test.group('.parse()', (test) => {
 	).toString();
 	trespass.model.parse(modelXML, (err, model) => {
 		test.cb('should not produce any weird [undefined]s', (t) => {
-			t.true(!model.system.items || model.system.items.length === 0);
+			t.true(model.system.items.length === 0);
 			t.end();
 		});
 	});
@@ -140,13 +130,15 @@ test.group('.add*()', (test) => {
 	let model = trespass.model.create();
 	const atLocation = 'atLocation';
 
-	test('should create rooms as locations', (t) => {
-		model = trespass.model.addRoom(model, { id: 'test-room' });
+	test('should create locations', (t) => {
+		model = trespass.model.addLocation(model, {
+			id: 'test-room'
+		});
 		t.true(model.system.locations.length === 1);
 	});
 
 	test('should create rooms atLocations', (t) => {
-		model = trespass.model.addRoom(model, {
+		model = trespass.model.addLocation(model, {
 			id: 'test-room-2',
 			atLocations: [atLocation]
 		});
@@ -160,76 +152,10 @@ test.group('.add*()', (test) => {
 			atLocations: [atLocation]
 		});
 		t.true(model.system.actors.length === 1);
+		t.true(model.system.actors[0].atLocations[0] === atLocation);
 	});
 
 	// TODO: more?
-
-	// TODO: turn this on again
-	// test('should validate input', (t) => {
-	// 	t.throws(() => {
-	// 		model = trespass.model.addRoom(model, {
-	// 			// missing `id`
-	// 		});
-	// 	});
-	// 	t.throws(() => {
-	// 		model = trespass.model.addRoom(model, {
-	// 			domain: '!@#$'
-	// 		});
-	// 	});
-	// });
-});
-
-test.group('.addPredicate()', (test) => {
-	let model = trespass.model.create();
-	const relationType = 'contracted-by';
-	const basePred = {
-		id: relationType,
-		arity: 2,
-	};
-	const pred1 = _.extend({}, basePred, { value: ['node-1 node-2'] });
-	const pred2 = _.extend({}, basePred, { value: ['node-2 node-3'] });
-	model = trespass.model.addPredicate(model, pred1);
-	model = trespass.model.addPredicate(model, pred2);
-	const predicates = model.system.predicates;
-
-	test('should use existing predicate', (t) => {
-		t.true(predicates.length === 1); // not 2
-		t.true(predicates[0].value.length === 2);
-	});
-
-	test('should split up values', (t) => {
-		t.true(predicates[0].value[0].length === 2);
-		t.true(predicates[0].value[1].length === 2);
-	});
-});
-
-test.group('predicates', (test) => {
-	test.cb('should re-import model successfully', (t) => {
-		/* eslint indent:0 */
-		const xmlStr = [
-			'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
-			'<system xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd" author="trespass.js" version="0.0.0" date="2016-02-08 16:29:30">',
-				'<title>Untitled</title>',
-				'<predicates>',
-					'<predicate arity="2" id="isUserIdAt">',
-						'<value>a b</value>',
-					'</predicate>',
-					'<predicate arity="2" id="isContractedBy">',
-						'<value>c d</value>',
-						'<value>e d</value>',
-					'</predicate>',
-				'</predicates>',
-			'</system>',
-		].join('\n');
-
-		trespass.model.parse(xmlStr, (err, model) => {
-			// console.log(model.system.predicates);
-			t.true(model.system.predicates.length === 2);
-			t.true(_.isArray(model.system.predicates[0].value));
-			t.true(_.isArray(model.system.predicates[1].value));
-			t.end();
-		});
-	});
 });
 
 test.group('.singular()', (test) => {
@@ -383,33 +309,14 @@ test.group('.prepareForXml()', (test) => {
 			}
 		};
 		const preparedData = trespass.model.prepareForXml(data);
-
-		t.true(!!preparedData.system[attrKey]);
-		t.true(R.keys(preparedData.system[attrKey]).length === 2);
-		t.true(preparedData.system[attrKey].date === 'date');
-		t.true(preparedData.system[attrKey].author === 'author');
-		t.true(preparedData.system.title === 'title');
-		t.true(preparedData.system.locations.location[0][attrKey].id === 'location');
-	});
-
-	test('should work', (t) => {
-		const model = {
-			system: {
-				predicates: [
-					{ arity: 2, id: 'isUserId', value: [
-						'user1 userId1',
-						'user2 userId2',
-						'user3 userId3'
-					]}
-				]
-			}
-		};
-		let preparedModel = trespass.model.prepareModelForXml(model);
-		preparedModel = trespass.model.prepareForXml(preparedModel);
-
-		t.true(preparedModel.system.predicates.predicate.length === 1);
-		t.true(preparedModel.system.predicates.predicate[0].value.length === 3);
-		t.true(preparedModel.system.predicates.predicate[0][attrKey].arity === 2);
+		const system = preparedData.system;
+		const attributes = preparedData.system[common.attrKey];
+		t.true(!!attributes);
+		t.true(R.keys(attributes).length === 2);
+		t.true(attributes.date === 'date');
+		t.true(attributes.author === 'author');
+		t.true(system.title === 'title');
+		t.true(system.locations.location[0][common.attrKey].id === 'location');
 	});
 
 	// TODO: what else?
@@ -425,16 +332,20 @@ test.group('.toXML()', (test) => {
 				{ id: 'location-2', atLocations: ['loc-1', 'loc-2'] },
 			],
 			predicates: [
-				{ arity: 2, id: 'isPasswordOf', value: [
-					'pred1 user1',
-					'pred2 user2',
-					'pred3 user3'
-				]}
+				{
+					id: 'isPasswordOf',
+					arity: 2,
+					value: [
+						['pred1', 'user1'],
+						['pred2', 'user2'],
+						['pred3', 'user3'],
+					]
+				}
 			]
 		}
 	};
 	const xmlStr = trespass.model.toXML(origModel);
-	const $system = cheerio.load(xmlStr, cheerioOptions)('system');
+	const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
 
 	test('should properly transform model object to XML', (t) => {
 		t.true($system.find('locations > location').length === 2);
@@ -451,7 +362,7 @@ test.group('.toXML()', (test) => {
 		t.true(xmlStr.indexOf('<0>') === -1);
 	});
 
-	test('should require an id', (t) => {
+	test('should require a system id', (t) => {
 		const origModel = {
 			system: {
 				id: undefined,
@@ -511,61 +422,9 @@ test.group('.toXML()', (test) => {
 				}
 
 				t.true(!differences);
-
 				t.end();
 			});
 		});
-	});
-});
-
-// ——————————————————————————————————————
-// SCENARIO
-
-test.group('.scenarioSetModel()', (test) => {
-	const empty = trespass.model.createScenario();
-	const scenario = trespass.model.scenarioSetModel(empty, 'model-file-name.xml');
-
-	test('should add model', (t) => {
-		t.true(!!scenario.scenario.model);
-		t.true(scenario.scenario.model === 'model-file-name.xml');
-		t.true(scenario.scenario.model !== empty.scenario.model);
-	});
-});
-
-test.group('.scenarioSetAssetGoal()', (test) => {
-	const empty = trespass.model.createScenario();
-	const scenario = trespass.model.scenarioSetAssetGoal(empty, 'attackerId', 'assetId');
-	// console.log(scenario);
-
-	test('should add goal', (t) => {
-		t.true(!!scenario.scenario.assetGoal);
-		t.true(scenario.scenario.assetGoal.attacker === 'attackerId');
-		t.true(scenario.scenario.assetGoal.asset === 'assetId');
-	});
-});
-
-test.group('.scenarioToXML()', (test) => {
-	test('should require an id', (t) => {
-		const origScenario = {
-			scenario: { id: undefined }
-		};
-		t.throws(() => {
-			trespass.model.scenarioToXML(origScenario);
-		});
-	});
-
-	const empty = trespass.model.createScenario();
-	let scenario = trespass.model.scenarioSetModel(empty, 'model-file-name.xml');
-	scenario = trespass.model.scenarioSetAssetGoal(scenario, 'attackerId', 'assetId');
-	scenario.scenario.id = 'scenario-id';
-
-	const xmlStr = trespass.model.scenarioToXML(scenario);
-	const $system = cheerio.load(xmlStr, cheerioOptions)('scenario');
-
-	test('should properly transform scenario object to XML', (t) => {
-		t.true($system.find('model').text() === 'model-file-name.xml');
-		t.true($system.find('assetGoal').attr('attacker') === 'attackerId');
-		t.true($system.find('assetGoal > asset').text() === 'assetId');
 	});
 });
 

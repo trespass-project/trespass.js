@@ -14,6 +14,10 @@ const pd = require('pretty-data').pd;
 const utils = require('../utils');
 
 
+/** [trespass/model/validation]{@link module:trespass/model/validation} */
+const validation = require('./validation.js');
+
+
 const attrKey = '_attr';
 const charKey = '_text';
 const xml2jsOptions = {
@@ -75,6 +79,7 @@ singularPluralCollection
 		result[item.plural] = item.singular;
 		return result;
 	}, {});
+
 const collectionNames =
 module.exports.collectionNames =
 R.keys(collectionNamesSingular);
@@ -273,17 +278,12 @@ function parse(xmlStr, done) {
 			item = item
 				.replace(/[\r\n\t]/ig, ' ')
 				.replace(/ +/ig, ' ');
+
+			// TODO: do this elsewhere?
 			if (key === 'atLocations') {
 				item = item.split(/ +/)
-					.map(loc => {
-						return loc.trim();
-					})
-					.filter(loc => {
-						return !_.isEmpty(loc);
-					});
-			}
-			if (R.nth(-4, trace) === 'predicate' && R.nth(-2, trace) === 'value') {
-				item = item.split(/ +/);
+					.map(loc => loc.trim())
+					.filter(loc => (!_.isEmpty(loc)));
 			}
 			return item;
 		} else if (_.isNumber(item)) {
@@ -332,9 +332,7 @@ function parse(xmlStr, done) {
 						coll = [];
 					}
 					if (coll) {
-						if (!_.isArray(coll[item.singular])) {
-							coll[item.singular] = [coll[item.singular]];
-						}
+						coll[item.singular] = utils.ensureArray(coll[item.singular]);
 
 						// filter, because for some reason
 						// `coll[item.singular]` is [undefined] in some cases
@@ -357,11 +355,8 @@ function parse(xmlStr, done) {
 		(err) => {
 			if (err) { console.error(err); }
 
-			// make sure predicate `value` is always an array
-			model.system.predicates
-				.forEach((pred) => {
-					pred.value = utils.ensureArray(pred.value);
-				});
+			model.system.predicates = model.system.predicates
+				.map(preparePredicate);
 
 			done(err, model);
 		}
@@ -369,216 +364,23 @@ function parse(xmlStr, done) {
 };
 
 
-// element schema definitions for input validation
-// const options = {
-// 	atLocations: {
-// 		language: {
-// 			// label: ' ',
-// 			any: { required: 'must be located somewhere' }
-// 		}
-// 	}
-// };
+function preparePredicate(_predicate) {
+	// make sure predicate `value` is always an array,
+	// and `value` strings always get split
+	const predicate = _.merge({}, _predicate);
+	predicate.arity = parseInt(predicate.arity, 10);
+	predicate.value = utils.ensureArray(predicate.value)
+		.map((val) => val.split(/ +/));
+	return predicate;
+}
 
-/**
- * validation schemas for different model component types.
- */
-const schemas = {};
-schemas.location = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				// anyOf: [{ type: 'string' }],
-				type: 'string',
-			},
-			required: false,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-	}
-};
-schemas.edge = {
-	properties: {
-		source: {
-			type: 'string',
-			required: true,
-		},
-		target: {
-			type: 'string',
-			required: true,
-		},
-		kind: {
-			type: 'string',
-			required: false,
-		},
-		directed: {
-			type: 'boolean',
-			required: false,
-		},
-	}
-};
-schemas.item = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		name: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.data = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		name: {
-			type: 'string',
-			required: true,
-		},
-		value: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.actor = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		type: {
-			type: 'string',
-			required: false,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.policy = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		enabled: {
-			type: 'object',
-			required: true,
-		},
-		credentials: {
-			type: 'object',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.process = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		actions: {
-			type: 'object',
-			required: true,
-		},
-		atLocations: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.predicate = {
-	properties: {
-		id: {
-			type: 'string',
-			required: true,
-		},
-		arity: {
-			type: 'number',
-			required: true,
-		},
-		value: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			minItems: 1,
-			required: true,
-		},
-	}
-};
-schemas.metric = {
-	properties: {
-		name: {
-			type: 'string',
-			required: true,
-		},
-		value: {
-			type: 'string',
-			required: true,
-		},
-		namespace: {
-			type: 'string',
-			required: false,
-		},
-	}
-};
 
-const validationOptions = {
-	additionalProperties: true,
-};
+function unpreparePredicate(_predicate) {
+	const predicate = _.merge({}, _predicate);
+	predicate.value = predicate.value
+		.map((val) => val.join(' '));
+	return predicate;
+}
 
 
 const validateComponent =
@@ -591,7 +393,7 @@ const validateComponent =
  */
 module.exports.validateComponent =
 function validateComponent(it, schemaName) {
-	const result = revalidator.validate(it, schemas[schemaName], validationOptions);
+	const result = revalidator.validate(it, validation.schemas[schemaName], validation.options);
 	/*
 	{ valid: false,
 	  errors:
@@ -749,14 +551,25 @@ const addPredicate =
 module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
-	it.value = it.value
-		.map((val) => val.split(/ +/));
+
+	if (_.isString(it.value)) {
+		throw new Error('predicate value items must be arrays');
+	}
+
+	it.value = [it.value];
+
+	// reminder:
+	// model.predicates will look like this
+	// `{ id: 'contracted-by', arity: 2, value: [ ['a', 'b'], ['b', 'c'] ] }`
 
 	// check if predicate with that id exists already.
 	// if so, only add the values to existing one, instead
 	// of creating an entirely new predicate
-	const existingOne = R.find(R.propEq('id', it.id), model.system.predicates);
-	if (!!existingOne) {
+	const existingOne = R.find(
+		R.propEq('id', it.id),
+		model.system.predicates
+	);
+	if (existingOne) {
 		existingOne.value = R.uniq(
 			[...existingOne.value, ...it.value]
 		);
@@ -793,18 +606,6 @@ module.exports.addLocation =
 function addLocation(model, _it={}) {
 	const it = _.merge({}, _it);
 	return add_(model, 'locations', it);
-};
-
-
-const addRoom =
-/**
- * @deprecated use [addLocation]{@link module:trespass/model.addLocation} instead
- */
-module.exports.addRoom =
-function addRoom(model, _it={}) {
-	const it = _.merge({}, _it);
-	console.warn('use addLocation() instead');
-	return addLocation(model, it);
 };
 
 
@@ -862,11 +663,6 @@ module.exports.prepareForXml =
 function prepareForXml(it, parentKey) {
 	if (_.isArray(it)) {
 		return it.map((item) => {
-			// put things back together
-			if (parentKey === 'value' && _.isArray(item)) {
-				item = item.join(' ');
-			}
-
 			return prepareForXml(item, parentKey);
 		});
 	} else if (_.isString(it) || _.isNumber(it)) {
@@ -909,8 +705,11 @@ const prepareModelForXml =
 module.exports.prepareModelForXml =
 function prepareModelForXml(model) {
 	// TODO: clone model?
-
 	const system = model.system;
+
+	// transform things back to how they were
+	system.predicates = (system.predicates || [])
+		.map(unpreparePredicate);
 
 	const items = system.items || [];
 	const data = system.data || [];
@@ -936,14 +735,13 @@ function prepareModelForXml(model) {
 		data,
 		item: items,
 	};
+
 	if (!system.assets.item.length) {
 		delete system.assets.item;
 	}
-
 	if (!system.assets.data.length) {
 		delete system.assets.data;
 	}
-
 	if (R.keys(system.assets).length === 0) {
 		delete system.assets;
 	}
