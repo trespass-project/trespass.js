@@ -708,11 +708,6 @@ function prepareModelForXml(model) {
 	system.predicates = (system.predicates || [])
 		.map(unpreparePredicate);
 
-	const items = system.items || [];
-	const data = system.data || [];
-	delete system.items;
-	delete system.data;
-
 	collectionNames
 		.forEach((collectionName) => {
 			if (system[collectionName]) {
@@ -723,15 +718,28 @@ function prepareModelForXml(model) {
 							item.atLocations = item.atLocations.join(' ');
 						}
 					});
+			}
+		});
+
+	const items = system.items || [];
+	const data = system.data || [];
+	delete system.items;
+	delete system.data;
+
+	collectionNames
+		.forEach((collectionName) => {
+			if (system[collectionName]) {
+
+				const singularName = singular(collectionName);
 
 				// prefix
 				system[collectionName] = utils.toPrefixedObject(
-					singular(collectionName),
+					singularName,
 					system[collectionName]
 				);
 
 				// remove empty ones
-				if (!system[collectionName][singular(collectionName)].length) {
+				if (!system[collectionName][singularName].length) {
 					delete system[collectionName];
 				}
 			}
