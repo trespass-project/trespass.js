@@ -182,7 +182,10 @@ schemas.predicate = {
 		value: {
 			type: 'array',
 			items: {
-				type: 'string',
+				type: 'array',
+				items: {
+					type: 'string',
+				},
 			},
 			minItems: 1,
 			required: true,
