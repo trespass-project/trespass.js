@@ -552,8 +552,11 @@ module.exports.addPredicate =
 function addPredicate(model, _it={}) {
 	const it = _.merge({}, _it);
 
-	if (_.isString(it.value)) {
-		throw new Error('predicate value items must be arrays');
+	if (!_.isArray(it.value)) {
+		throw new Error('predicate value must be an array');
+	}
+	if (!_.isString(it.value[0])) {
+		throw new Error('predicate value items must be strings');
 	}
 
 	it.value = [it.value];
