@@ -237,14 +237,20 @@ test.group('.prepareModelForXml()', (test) => {
 	});
 
 	test('should join atLocations', (t) => {
-		const data = {
-			atLocations: ['atLocation-1', 'atLocation-2']
+		const model = {
+			system: {
+				locations: [
+					{ atLocations: ['loc-1', 'loc-2'] }
+				],
+				data: [
+					{ atLocations: ['loc-1', 'loc-2'] }
+				],
+			}
 		};
-		const system = { data };
-		const model = { system };
 		const preparedModel = trespass.model.prepareModelForXml(model);
-		console.log(preparedModel);
-		// t.true(preparedData.atLocations === 'atLocation-1 atLocation-2');
+		const system = preparedModel.system;
+		t.true(system.locations.location[0].atLocations === 'loc-1 loc-2');
+		t.true(system.assets.data[0].atLocations === 'loc-1 loc-2');
 	});
 
 	test('should join items and data in assets', (t) => {
@@ -353,6 +359,7 @@ test.group('.toXML()', (test) => {
 		t.true($system.find('locations > location').length === 2);
 		t.true($system.find('predicates > predicate').length === 1);
 		t.true($system.find('atLocations').length === 1);
+		t.true($system.find('atLocations').eq(0).text() === 'loc-1 loc-2');
 	});
 
 	test('should remove empty collections', (t) => {
