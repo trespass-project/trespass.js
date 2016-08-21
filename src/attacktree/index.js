@@ -487,7 +487,13 @@ module.exports.subtreeFromLeafLabels =
 function subtreeFromLeafLabels(rootNode, leafLabels) {
 	const paths = leafLabels
 		// labels to nodes
-		.map((label) => findNode(rootNode, 'label', label))
+		.map((label) => {
+			const node = findNode(rootNode, 'label', label);
+			if (!node) {
+				console.error(`"${label}" does not exist in reference tree`);
+			}
+			return node;
+		})
 		// nodes to paths
 		.map((node) => pathToRoot(node));
 	return treeFromPaths(paths);
