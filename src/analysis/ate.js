@@ -23,7 +23,7 @@ function parseLine(line) {
 		.map((line) => line.trim());
 
 	const [ probability, cost, labelsStr ] = parts;
-	const labels = labelsStr.split(/ AND /ig)
+	const labels = labelsStr.split(/ AND /g)
 		.map((line) => line.trim());
 
 	return {

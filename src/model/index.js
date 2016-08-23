@@ -726,7 +726,6 @@ function prepareModelForXml(model) {
 	collectionNames
 		.forEach((collectionName) => {
 			if (system[collectionName]) {
-
 				const singularName = singular(collectionName);
 
 				// prefix
