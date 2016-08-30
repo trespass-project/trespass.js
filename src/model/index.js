@@ -369,6 +369,10 @@ function preparePredicate(_predicate) {
 	// and `value` strings always get split
 	const predicate = _.merge({}, _predicate);
 	predicate.arity = parseInt(predicate.arity, 10);
+
+	// when predicate has no values, this is `undefined`
+	predicate.value = predicate.value || [];
+
 	predicate.value = utils.ensureArray(predicate.value)
 		.map((val) => val.split(/ +/));
 	return predicate;
