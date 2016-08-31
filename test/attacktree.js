@@ -496,3 +496,11 @@ test.group('parseLabel()', (test) => {
 	});
 });
 
+
+test.group('getIdsFromLabel()', (test) => {
+	test('should return all ids in label', (t) => {
+		const labelStr = 'MAKE cleo big IN big pin sydney';
+		const ids = trespass.attacktree.getIdsFromLabel(labelStr);
+		t.true(ids.length === 5);
+	});
+});

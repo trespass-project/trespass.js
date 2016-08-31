@@ -553,3 +553,16 @@ function parseLabel(_labelStr) {
 	return result;
 };
 
+
+const getIdsFromLabel =
+/**
+ * takes a tree node label string and returns a list of ids
+ *
+ * @param {Object} labelStr - label
+ * @returns {Array} list of ids
+ */
+module.exports.getIdsFromLabel = R.compose(
+	R.flatten,
+	R.map(R.prop('ids')),
+	parseLabel
+);
