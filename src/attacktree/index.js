@@ -498,3 +498,58 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		.map((node) => pathToRoot(node));
 	return treeFromPaths(paths);
 };
+
+
+const actions = [
+	'in',
+	'out',
+	'move',
+	'exec',
+	'goto',
+	'make',
+	'force',
+
+	'get', // ? not according to leafGrammer.txt
+	'and',
+	'attacker',
+];
+const parseLabel =
+/**
+ * parses a tree label and returns structured information
+ *
+ * @param {Object} _labelStr - label
+ * @returns {Object} parsed information
+ */
+module.exports.parseLabel =
+function parseLabel(_labelStr) {
+	const labelStr = _labelStr
+		.trim()
+		.replace(/ +/ig, ' ');
+	const parts = labelStr.split(/ /ig);
+
+	const isAction = (item) => R.contains(item.toLowerCase(), actions);
+	const isNotAction = R.complement(isAction);
+
+	let result = [];
+	let remaining = parts;
+	let action = undefined;
+	while (remaining.length) {
+		const collected = R.takeWhile(isNotAction, remaining);
+		if (!collected.length) {
+			action = R.head(remaining).toLowerCase();
+			remaining = R.tail(remaining);
+		}
+
+		remaining = R.slice(collected.length, Infinity, remaining);
+
+		if (collected.length || action === 'and') {
+			result = [
+				...result,
+				{ action, ids: collected }
+			];
+		}
+	}
+
+	return result;
+};
+
