@@ -452,6 +452,7 @@ test.group('parseLabel()', (test) => {
 			},
 			{
 				// what is `item` here?
+				// is this --idsonly or not?
 				str: 'get item entity_vim.VirtualMachine_vm-51 get fileX',
 				expectedActions: ['get', 'get'],
 			},
