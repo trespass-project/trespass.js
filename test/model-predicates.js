@@ -1,6 +1,5 @@
 import { test } from 'ava-spec';
 const _ = require('lodash');
-const common = require('./common.js');
 const trespass = require('../');
 
 
@@ -62,6 +61,7 @@ test.group('predicates', (test) => {
 		const predicates = preparedModel.system.predicates;
 		t.true(predicates.predicate.length === 1);
 		t.true(predicates.predicate[0].value.length === 3);
+		t.true(predicates.predicate[0].value[0] === 'user1 userId1');
 		// t.true(predicates.predicate[0][common.attrKey].arity === 2);
 	});
 });
@@ -83,6 +83,8 @@ test.group('.addPredicate()', (test) => {
 	test('should use existing predicate', (t) => {
 		t.true(predicates.length === 1); // not 2
 		t.true(predicates[0].value.length === 2);
+		t.true(predicates[0].value[0].length === 2);
+		t.true(predicates[0].value[1].length === 2);
 	});
 
 	test('should complain about values not being split already', (t) => {

@@ -437,3 +437,71 @@ test.group('detectFlavor()', (test) => {
 			});
 	});
 });
+
+
+test.group('parseLabel()', (test) => {
+	test('should extract strucuterd information from label', (t) => {
+		const labels = [
+			{
+				str: 'attacker finn get data pin',
+				expectedActions: ['attacker', 'get'],
+			},
+			{
+				str: 'FORCE cleo DoorDatacenter',
+				expectedActions: ['force'],
+			},
+			{
+				// what is `item` here?
+				// is this --idsonly or not?
+				str: 'get item entity_vim.VirtualMachine_vm-51 get fileX',
+				expectedActions: ['get', 'get'],
+			},
+			{
+				str: 'get pin',
+				expectedActions: ['get'],
+			},
+			{
+				str: 'goto RoomDatacenter and get entity_vim.Datastore_datastore-41',
+				expectedActions: ['goto', 'and', 'get'],
+			},
+			{
+				str: 'IN cleo card sydney',
+				expectedActions: ['in'],
+			},
+			{
+				str: 'make administrator get card',
+				expectedActions: ['make', 'get'],
+			},
+			{
+				str: 'MAKE cleo big IN big pin sydney',
+				expectedActions: ['make', 'in'],
+			},
+			{
+				str: 'make finn get pin',
+				expectedActions: ['make', 'get'],
+			},
+		];
+		labels.forEach((label) => {
+			// console.log('——————————');
+			// console.log(label.str);
+			const parsed = trespass.attacktree.parseLabel(label.str);
+			// console.log(parsed);
+			t.true(parsed.length === label.expectedActions.length);
+			t.true(
+				R.equals(
+					parsed.map(R.prop('action')),
+					label.expectedActions
+				)
+			);
+		});
+	});
+});
+
+
+test.group('getIdsFromLabel()', (test) => {
+	test('should return all ids in label', (t) => {
+		const labelStr = 'MAKE cleo big IN big pin sydney';
+		const ids = trespass.attacktree.getIdsFromLabel(labelStr);
+		t.true(ids.length === 5);
+	});
+});

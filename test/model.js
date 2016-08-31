@@ -128,7 +128,7 @@ test.group('.parse()', (test) => {
 
 test.group('.add*()', (test) => {
 	let model = trespass.model.create();
-	const atLocation = 'atLocation';
+	const atLocation = 'at-location';
 
 	test('should create locations', (t) => {
 		model = trespass.model.addLocation(model, {
