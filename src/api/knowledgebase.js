@@ -82,7 +82,7 @@ const getAnalysisResultsSnapshots =
  */
 module.exports.getAnalysisResultsSnapshots =
 function getAnalysisResultsSnapshots(axios, modelId) {
-	const toolchainPrefixPattern = /^\(toolchain_run_\d+\.\d+\)/i;
+	const toolchainPrefixPattern = /^\(toolchain_(.*)_run_\d+\.\d+\)/i;
 
 	const markToolchainFiles = (commit) => {
 		if (toolchainPrefixPattern.test(commit.message)) {
@@ -104,12 +104,22 @@ function getAnalysisResultsSnapshots(axios, modelId) {
 
 	const reduceGrouped = (pair) => {
 		const prefix = pair[0];
-		// (toolchain_run_1468575416.093705)
-		const unixTimestampStr = R.last(
-			prefix
+		// (toolchain_toolchain-id_could-contain-underscore_run_1468575416.093705)
+		const parts = prefix
 				.replace(')', '')
-				.split('_')
-		);
+				.split('_');
+		/*
+		toolchain
+			toolchain-id
+			could-contain-underscore
+		run
+		1468575416.093705
+		*/
+
+		const toolchainId = R.slice(1, -2, parts)
+			.join('_');
+
+		const unixTimestampStr = R.last(parts);
 		const unixTimestamp = parseFloat(unixTimestampStr, 10);
 
 		const commits = pair[1];
@@ -127,6 +137,7 @@ function getAnalysisResultsSnapshots(axios, modelId) {
 				return acc;
 			}, {
 				prefix,
+				toolchainId,
 				formattedToolchainRunDate: moment.unix(unixTimestamp)
 					.format('YYYY-MM-DD HH:mm:ss'),
 				tree: {},
@@ -691,6 +702,8 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.an
 				api.requestOptions.acceptBlob,
 				api.requestOptions.crossDomain
 			);
+
+			// TODO: consider using `getFile()` here
 
 			return new Promise((resolve, reject) => {
 				axios(params)
