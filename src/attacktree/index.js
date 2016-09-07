@@ -296,6 +296,28 @@ function toXml(rootNode, opts=xml2jsOptions) {
 };
 
 
+const getAllNodes =
+/**
+ * returns a list of all nodes in tree
+ *
+ * @param {Object} rootNode - tree root
+ * @returns {Array} list of nodes
+ */
+module.exports.getAllNodes =
+function getAllNodes(rootNode) {
+	let result = [];
+
+	function recurse(node) {
+		result = [...result, node];
+		const children = node[childElemName] || [];
+		children.forEach(child => recurse(child));
+	}
+
+	recurse(rootNode);
+	return result;
+};
+
+
 const findLeafNodes =
 /**
  * given a list of nodes, returns all leaf nodes.

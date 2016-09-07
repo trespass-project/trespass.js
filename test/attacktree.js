@@ -505,3 +505,34 @@ test.group('getIdsFromLabel()', (test) => {
 		t.true(ids.length === 5);
 	});
 });
+
+
+test.group('getAllNodes()', (test) => {
+	const rootNode = {
+		label: 'root',
+		node: [
+			{
+				label: 'child-1',
+				node: [
+					{ label: 'grand-child-1' }
+				],
+			},
+			{
+				label: 'child-2',
+				node: [],
+			},
+			{
+				label: 'child-3',
+				node: [
+					{ label: 'grand-child-2' },
+					{ label: 'grand-child-3' },
+				],
+			},
+		],
+	};
+
+	test('should return all nodes in tree', (t) => {
+		const allNodes = trespass.attacktree.getAllNodes(rootNode);
+		t.true(allNodes.length === 7);
+	});
+});
