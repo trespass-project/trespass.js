@@ -534,6 +534,57 @@ function getAttackerProfiles(axios, modelId) {
 };
 
 
+const deleteAttackerProfile =
+/**
+ * deletes an attacker profile
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} profileId - profile id
+ * @returns {Promise}
+ */
+module.exports.deleteAttackerProfile =
+function deleteAttackerProfile(axios, modelId, profileId) {
+	const url = api.makeUrl(paths, `attackerprofile/${profileId}?model_id=${modelId}`);
+	const params = _.merge(
+		{
+			url,
+			method: 'delete',
+		},
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
+
+
+const saveAttackerProfile =
+/**
+ * saves a attacker profile
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {Objecjt} profile - attacker profile
+ * @returns {Promise}
+ */
+module.exports.saveAttackerProfile =
+function saveAttackerProfile(axios, modelId, profile) {
+	const url = api.makeUrl(paths, `attackerprofile/${profile.id}?model_id=${modelId}`);
+	const params = _.merge(
+		{
+			url,
+			method: 'put',
+			data: profile,
+		},
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
+
+
 const getToolChains =
 /**
  * gets the list of toolchains.
