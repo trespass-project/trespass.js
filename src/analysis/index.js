@@ -21,6 +21,12 @@ module.exports = {
 
 const analysisTools =
 module.exports.analysisTools = {
+	'Treemaker': {
+		outputFileName: 'treemaker_output_combined.xml',
+	},
+	'Attack Pattern Lib.': {
+		outputFileName: 'apl_output.xml',
+	},
 	'A.T. Analyzer': {
 		outputFileName: 'ata_output.zip',
 	},
