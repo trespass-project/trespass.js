@@ -304,7 +304,7 @@ const getFile =
  * @returns {Promise} resolves to file content, but type depends on file extension.
  */
 module.exports.getFile =
-function getFile(axios, modelId, fileName, gitFileId=undefined) {
+function getFile(axios, modelId, fileName, gitFileId=undefined, asBlob=false) {
 	const query = queryString.stringify({
 		model_id: modelId,
 		filename: fileName,
@@ -316,7 +316,9 @@ function getFile(axios, modelId, fileName, gitFileId=undefined) {
 		{
 			url,
 			method: 'get',
-			responseType: fileType.responseType,
+			responseType: (asBlob) // enforce blob
+				? 'blob'
+				: fileType.responseType,
 			headers: { 'Accept': fileType.mimeType }
 		},
 		api.requestOptions.crossDomain
