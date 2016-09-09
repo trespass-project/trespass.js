@@ -732,6 +732,27 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.an
 };
 
 
+const getModelPatterns =
+/**
+ * gets the list of model patterns
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @returns {Promise} resolves to array of pattern objects
+ */
+module.exports.getModelPatterns =
+function getModelPatterns(axios, modelId) {
+	const url = api.makeUrl(paths, `modelpattern?model_id=${modelId}`);
+	const params = _.merge(
+		{ url },
+		api.requestOptions.acceptJSON,
+		api.requestOptions.crossDomain
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
+
+
 const saveModelPattern =
 /**
  * save model fragment as pattern
