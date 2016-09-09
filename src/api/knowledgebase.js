@@ -730,3 +730,40 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.an
 
 	return Promise.all(promises);
 };
+
+
+const saveModelPattern =
+/**
+ * save model fragment as pattern
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {Object} fragment - model fragment
+ * @param {String} title - pattern title
+ * @param {String} patternId - pattern id
+ * @returns {Promise}
+ */
+module.exports.saveModelPattern =
+function saveModelPattern(axios, modelId, fragment, title, patternId) {
+	const pattern = {
+		id: patternId,
+		name: title,
+		pattern: fragment,
+	};
+
+	const query = queryString.stringify({
+		model_id: modelId,
+	});
+	const url = `${api.makeUrl(paths, `modelpattern/${patternId}`)}?${query}`;
+	const params = _.merge(
+		{
+			url,
+			data: pattern,
+			method: 'put',
+		},
+		api.requestOptions.crossDomain,
+		api.requestOptions.acceptJSON
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
