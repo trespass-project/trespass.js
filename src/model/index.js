@@ -392,6 +392,13 @@ function parse(xmlStr, done) {
 };
 
 
+function unprepareCredLocation(credLocation) {
+	return {
+		[attrKey]: { id: credLocation.id },
+	};
+}
+
+
 function prepareCredPredicate(credPred) {
 	const ordered = credPred.$$
 		.map((item) => {
@@ -524,6 +531,12 @@ function unpreparePolicy(_policy) {
 	const { credentials } = policy;
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
+
+		if (credLocation) {
+			policy.credentials.credLocation = credLocation
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredLocation);
+		}
 
 		if (credPredicate) {
 			policy.credentials.credPredicate = credPredicate

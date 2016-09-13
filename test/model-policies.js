@@ -60,6 +60,10 @@ test.group('.addPolicy()', (test) => {
 			'laptop',
 		],
 		'credentials': {
+			'credLocation': [
+				{ id: 'loc1' },
+				{ id: 'loc2' },
+			],
 			'credPredicate': [
 				{
 					'relationType': 'is-user-id-at',
@@ -151,5 +155,9 @@ test.group('.addPolicy()', (test) => {
 		t.true($credData.children().length === 1);
 		t.true($credData.children().eq(0)[0].name === 'variable');
 		t.true($credData.children().eq(0).text() === 'X');
+
+		const $credLocation = $system.find('policies > policy > credentials > credLocation');
+		t.true($credLocation.eq(0).attr('id') === 'loc1');
+		t.true($credLocation.eq(1).attr('id') === 'loc2');
 	});
 });
