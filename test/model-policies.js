@@ -3,6 +3,8 @@ const path = require('path');
 import { test } from 'ava-spec';
 const _ = require('lodash');
 const trespass = require('../');
+const common = require('./common.js');
+const cheerio = require('cheerio');
 
 
 const rootDir = path.join(__dirname, '..');
@@ -20,6 +22,7 @@ test.group('policies', (test) => {
 
 			{
 				const policy = policies[0];
+				// console.log(JSON.stringify(policy));
 				t.true(policy.atLocations.length === 2);
 				t.true(policy.credentials.credPredicate.length === 2);
 
@@ -38,6 +41,7 @@ test.group('policies', (test) => {
 
 			{
 				const policy = policies[2];
+				// console.log(JSON.stringify(policy));
 				const credItem0 = policy.credentials.credItem[0];
 				t.true(credItem0.values[0].values[0].type === 'variable');
 			}
@@ -48,23 +52,92 @@ test.group('policies', (test) => {
 });
 
 
-// test.group('.addPolicy()', (test) => {
-// 	const policy = {
-// 		id: 'policy-1',
-// 		atLocations: ['room', 'laptop'],
-// 		credentials: {}
-// 	};
+test.group('.addPolicy()', (test) => {
+	const policy = {
+		'id': 'p-003',
+		'atLocations': [
+			'RoomDatacenter'
+		],
+		'credentials': {
+			'credPredicate': [
+				{
+					'relationType': 'is-user-id-at',
+					'values': [
+						{
+							'type': 'variable',
+							'value': 'X'
+						},
+						{
+							'type': 'value',
+							'value': 'laptop'
+						}
+					]
+				}
+			],
+			// 'credData': [
+			// 	{
+			// 		'name': 'userpin',
+			// 		'values': [
+			// 			{
+			// 				'type': 'variable',
+			// 				'value': 'X'
+			// 			}
+			// 		]
+			// 	}
+			// ],
+			// 'credItem': [
+			// 	{
+			// 		'name': 'usercard',
+			// 		'values': [
+			// 			{
+			// 				'type': 'credData',
+			// 				'name': 'userpin',
+			// 				'values': [
+			// 					{
+			// 						'type': 'variable',
+			// 						'value': 'X'
+			// 					}
+			// 				]
+			// 			}
+			// 		]
+			// 	}
+			// ]
+		}
+	};
 
-// 	let model = trespass.model.create();
-// 	model = trespass.model.addPolicy(model, policy);
-// 	// const policies = model.system.policies;
+	let model = trespass.model.create();
+	model = trespass.model.addPolicy(model, policy);
+	model.system.id = 'test';
+	const _model = _.merge({}, model);
+	// const policies = model.system.policies;
 
-// 	test('should', (t) => {
-// 		let preparedModel = trespass.model.prepareModelForXml(model);
-// 		preparedModel = trespass.model.prepareForXml(preparedModel);
+	// let preparedModel = trespass.model.prepareModelForXml(model);
+	// preparedModel = trespass.model.prepareForXml(preparedModel);
 
-// 		const policies = preparedModel.system.policies.policy;
-// 		// console.log(policies[0]);
-// 		// t.true(predicates.predicate.length === 1);
-// 	});
-// });
+	// test('should', (t) => {
+	// 	const policies = preparedModel.system.policies.policy;
+	// 	// console.log(
+	// 	// 	JSON.stringify(
+	// 	// 		policies[0].credentials.credPredicate,
+	// 	// 		null,
+	// 	// 		'  '
+	// 	// 	)
+	// 	// );
+	// 	// t.true(predicates.predicate.length === 1);
+	// });
+
+	test('should properly export to xml', (t) => {
+		const xmlStr = trespass.model.toXML(_model);
+		// console.log(xmlStr);
+
+		const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
+		t.true($system.find('policies > policy').length === 1);
+		const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
+		t.true($credPredicate.attr('name') === 'is-user-id-at');
+		t.true($credPredicate.children().length === 2);
+		t.true($credPredicate.children().eq(0)[0].name === 'variable');
+		t.true($credPredicate.children().eq(0).text() === 'X');
+		t.true($credPredicate.children().eq(1)[0].name === 'value');
+		t.true($credPredicate.children().eq(1).text() === 'laptop');
+	});
+});

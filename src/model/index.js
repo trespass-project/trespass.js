@@ -20,6 +20,7 @@ const validation = require('./validation.js');
 
 const attrKey = '_attr';
 const charKey = '_text';
+const childrenKey = '$$';
 const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
@@ -402,12 +403,27 @@ function prepareCredPredicate(credPred) {
 		});
 	return _.merge(
 		{},
-		R.omit(['$$', 'variable', 'value', 'name'], credPred),
+		R.omit([childrenKey, 'variable', 'value', 'name'], credPred),
 		{
 			relationType: credPred.name,
 			values: ordered,
 		}
 	);
+}
+
+
+function unprepareCredPredicate(credPred) {
+	const children = credPred.values
+		.map((item) => {
+			return {
+				[item.type]: item.value
+			};
+		});
+
+	return {
+		[attrKey]: { name: credPred.relationType },
+		[childrenKey]: children,
+	};
 }
 
 
@@ -422,7 +438,7 @@ function prepareCredData(credData) {
 		});
 	return _.merge(
 		{},
-		R.omit(['$$', 'variable', 'value'], credData),
+		R.omit([childrenKey, 'variable', 'value'], credData),
 		{ values: ordered }
 	);
 }
@@ -447,7 +463,7 @@ function prepareCredItem(credItem) {
 		});
 	return _.merge(
 		{},
-		R.omit(['$$', 'credItem', 'credData'], credItem),
+		R.omit([childrenKey, 'credItem', 'credData'], credItem),
 		{ values: ordered }
 	);
 }
@@ -484,6 +500,22 @@ function preparePolicy(_policy) {
 		}
 	}
 
+	return policy;
+}
+
+
+function unpreparePolicy(_policy) {
+	const policy = _.merge({}, _policy);
+	const { credentials } = policy;
+	if (credentials) {
+		const { credLocation, credPredicate, credData, credItem } = credentials;
+
+		if (credPredicate) {
+			policy.credentials.credPredicate = credPredicate
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredPredicate);
+		}
+	}
 	return policy;
 }
 
@@ -835,6 +867,9 @@ function prepareModelForXml(model) {
 	// transform things back to how they were
 	system.predicates = (system.predicates || [])
 		.map(unpreparePredicate);
+	system.policies = (system.policies || [])
+		.map(unpreparePolicy);
+	// TODO: processes
 
 	collectionNames
 		.forEach((collectionName) => {
@@ -916,7 +951,10 @@ function toXML(_model) {
 	const preparedModel = prepareForXml(model);
 
 	const builder = new xml2js.Builder(xml2jsOptions);
-	const xmlStr = builder.buildObject(preparedModel);
+	const xmlStr = builder.buildObject(preparedModel)
+		// hack, but there seems to be no other way
+		.replace(/<\$\$>/ig, '')
+		.replace(/<\/\$\$>/ig, '');
 
 	// return xmlStr;
 	return pd.xml(xmlStr)
