@@ -56,7 +56,8 @@ test.group('.addPolicy()', (test) => {
 	const policy = {
 		'id': 'p-003',
 		'atLocations': [
-			'RoomDatacenter'
+			'RoomDatacenter',
+			'laptop',
 		],
 		'credentials': {
 			'credPredicate': [
@@ -132,6 +133,11 @@ test.group('.addPolicy()', (test) => {
 
 		const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
 		t.true($system.find('policies > policy').length === 1);
+		t.true($system.find('policies > policy').eq(0).attr('id') === 'p-003');
+
+		const $atLocations = $system.find('policies > policy > atLocations');
+		t.true($atLocations.text() === 'RoomDatacenter laptop');
+
 		const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
 		t.true($credPredicate.attr('name') === 'is-user-id-at');
 		t.true($credPredicate.children().length === 2);
