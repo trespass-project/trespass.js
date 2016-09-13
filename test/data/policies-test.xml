@@ -44,5 +44,16 @@
 				</credData>
 			</credentials>
 		</policy>
+
+		<policy id="p-003">
+			<atLocations>RoomDatacenter</atLocations>
+			<credentials>
+				<credItem name="usercard">
+					<credData name="userpin">
+						<variable>X</variable>
+					</credData>
+				</credItem>
+			</credentials>
+		</policy>
 	</policies>
 </system>

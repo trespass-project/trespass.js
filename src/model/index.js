@@ -420,10 +420,32 @@ function prepareCredData(credData) {
 			return utils.renameHashMapKeys(renameMap, item);
 		});
 	return Object.assign(
-		{
-			values: ordered,
-		},
+		{ values: ordered },
 		R.omit(['$$', 'variable', 'value'], credData)
+	);
+}
+
+
+function prepareCredItem(credItem) {
+	// values can be: credItem, credData
+	const prepareFuncMap = {
+		credItem: prepareCredItem,
+		credData: prepareCredData,
+	};
+
+	const ordered = credItem.$$
+		.map((_item) => {
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
+			};
+			const item = utils.renameHashMapKeys(renameMap, _item);
+			return (prepareFuncMap[item.type]
+				|| R.identity)(item);
+		});
+	return Object.assign(
+		{ values: ordered },
+		R.omit(['$$', 'credItem', 'credData'], credItem)
 	);
 }
 
@@ -443,6 +465,12 @@ function preparePolicy(_policy) {
 		if (credData) {
 			policy.credentials.credData = utils.ensureArray(credData)
 				.map(prepareCredData);
+		}
+
+		const { credItem } = credentials;
+		if (credItem) {
+			policy.credentials.credItem = utils.ensureArray(credItem)
+				.map(prepareCredItem);
 		}
 	}
 

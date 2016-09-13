@@ -16,7 +16,7 @@ test.group('policies', (test) => {
 		trespass.model.parse(xmlStr, (err, model) => {
 			const policies = model.system.policies;
 
-			t.true(policies.length === 2);
+			t.true(policies.length === 3);
 
 			{
 				const policy = policies[0];
@@ -34,6 +34,12 @@ test.group('policies', (test) => {
 				const credData0 = policy.credentials.credData[0];
 				t.true(credData0.values.length === 1);
 				t.true(credData0.values[0].type === 'variable');
+			}
+
+			{
+				const policy = policies[2];
+				const credItem0 = policy.credentials.credItem[0];
+				t.true(credItem0.values[0].values[0].type === 'variable');
 			}
 
 			t.end();
