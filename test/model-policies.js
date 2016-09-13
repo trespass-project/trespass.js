@@ -16,16 +16,25 @@ test.group('policies', (test) => {
 		trespass.model.parse(xmlStr, (err, model) => {
 			const policies = model.system.policies;
 
-			t.true(policies.length === 1);
+			t.true(policies.length === 2);
 
-			const policy = policies[0];
-			t.true(policy.atLocations.length === 2);
-			t.true(policy.credentials.credPredicate.length === 2);
+			{
+				const policy = policies[0];
+				t.true(policy.atLocations.length === 2);
+				t.true(policy.credentials.credPredicate.length === 2);
 
-			const credPred0 = policy.credentials.credPredicate[0];
-			t.true(credPred0.values.length === 2);
-			t.true(credPred0.relationType === 'is-user-id-at');
-			t.true(credPred0.values[0].type === 'variable');
+				const credPred0 = policy.credentials.credPredicate[0];
+				t.true(credPred0.values.length === 2);
+				t.true(credPred0.relationType === 'is-user-id-at');
+				t.true(credPred0.values[0].type === 'variable');
+			}
+
+			{
+				const policy = policies[1];
+				const credData0 = policy.credentials.credData[0];
+				t.true(credData0.values.length === 1);
+				t.true(credData0.values[0].type === 'variable');
+			}
 
 			t.end();
 		});

@@ -410,6 +410,24 @@ function prepareCredPredicate(credPred) {
 }
 
 
+function prepareCredData(credData) {
+	const ordered = credData.$$
+		.map((item) => {
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
+			};
+			return utils.renameHashMapKeys(renameMap, item);
+		});
+	return Object.assign(
+		{
+			values: ordered,
+		},
+		R.omit(['$$', 'variable', 'value'], credData)
+	);
+}
+
+
 function preparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
 	const { credentials } = policy;
@@ -417,8 +435,14 @@ function preparePolicy(_policy) {
 	if (credentials) {
 		const { credPredicate } = credentials;
 		if (credPredicate) {
-			policy.credentials.credPredicate = credPredicate
+			policy.credentials.credPredicate = utils.ensureArray(credPredicate)
 				.map(prepareCredPredicate);
+		}
+
+		const { credData } = credentials;
+		if (credData) {
+			policy.credentials.credData = utils.ensureArray(credData)
+				.map(prepareCredData);
 		}
 	}
 

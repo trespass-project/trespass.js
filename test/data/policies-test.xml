@@ -35,5 +35,14 @@
 				</out>
 			</enabled>
 		</policy>
+
+		<policy id="p-002">
+			<atLocations>RoomDatacenter</atLocations>
+			<credentials>
+				<credData name="adminpin">
+					<variable>X</variable>
+				</credData>
+			</credentials>
+		</policy>
 	</policies>
 </system>
