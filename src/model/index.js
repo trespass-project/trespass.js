@@ -491,6 +491,23 @@ function prepareCredItem(credItem) {
 }
 
 
+function unprepareCredItem(credItem) {
+	const children = credItem.values
+		.map((item) => {
+			return {
+				[item.type]: (item.type === 'credItem')
+					? unprepareCredItem(item)
+					: unprepareCredData(item)
+			};
+		});
+
+	return {
+		[attrKey]: { name: credItem.name },
+		[childrenKey]: children,
+	};
+}
+
+
 function preparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
 	const { credentials } = policy;
@@ -548,6 +565,12 @@ function unpreparePolicy(_policy) {
 			policy.credentials.credData = credData
 				.map((item) => _.merge({}, item))
 				.map(unprepareCredData);
+		}
+
+		if (credItem) {
+			policy.credentials.credItem = credItem
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredItem);
 		}
 	}
 	return policy;
