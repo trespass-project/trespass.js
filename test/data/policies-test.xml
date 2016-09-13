@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<system id="trespass-model-id" author="test" date="2016-09-12"
+	version="0.0" xmlns="https://www.trespass-project.eu/schemas/TREsPASS_model"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.trespass-project.eu/schemas/TREsPASS_model.xsd">
+	<title>policies test</title>
+
+	<locations>
+		<location id="RoomDatacenter" />
+		<location id="laptop" />
+	</locations>
+
+	<policies>
+		<policy id="p-001">
+			<atLocations>RoomDatacenter laptop</atLocations>
+			<credentials>
+				<credPredicate name="is-user-id-at">
+					<variable>X</variable>
+					<value>laptop</value>
+				</credPredicate>
+				<credPredicate name="is-password-of">
+					<variable>X</variable>
+					<variable>Y</variable>
+				</credPredicate>
+			</credentials>
+			<enabled>
+				<out loc="laptop">
+					<variable>X</variable>
+					<variable>Y</variable>
+					<tuple>
+						<value>get</value>
+						<wildcard />
+						<wildcard />
+					</tuple>
+				</out>
+			</enabled>
+		</policy>
+
+		<policy id="p-002">
+			<atLocations>RoomDatacenter</atLocations>
+			<credentials>
+				<credData name="adminpin">
+					<variable>X</variable>
+				</credData>
+			</credentials>
+		</policy>
+
+		<policy id="p-003">
+			<atLocations>RoomDatacenter</atLocations>
+			<credentials>
+				<credData name="userpin">
+					<variable>X</variable>
+				</credData>
+				<credItem name="usercard">
+					<credData name="userpin">
+						<variable>X</variable>
+					</credData>
+				</credItem>
+			</credentials>
+		</policy>
+	</policies>
+</system>
