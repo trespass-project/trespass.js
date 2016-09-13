@@ -444,6 +444,21 @@ function prepareCredData(credData) {
 }
 
 
+function unprepareCredData(credData) {
+	const children = credData.values
+		.map((item) => {
+			return {
+				[item.type]: item.value
+			};
+		});
+
+	return {
+		[attrKey]: { name: credData.name },
+		[childrenKey]: children,
+	};
+}
+
+
 function prepareCredItem(credItem) {
 	// values can be: credItem, credData
 	const prepareFuncMap = {
@@ -514,6 +529,12 @@ function unpreparePolicy(_policy) {
 			policy.credentials.credPredicate = credPredicate
 				.map((item) => _.merge({}, item))
 				.map(unprepareCredPredicate);
+		}
+
+		if (credData) {
+			policy.credentials.credData = credData
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredData);
 		}
 	}
 	return policy;

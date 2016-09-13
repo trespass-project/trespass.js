@@ -75,17 +75,17 @@ test.group('.addPolicy()', (test) => {
 					]
 				}
 			],
-			// 'credData': [
-			// 	{
-			// 		'name': 'userpin',
-			// 		'values': [
-			// 			{
-			// 				'type': 'variable',
-			// 				'value': 'X'
-			// 			}
-			// 		]
-			// 	}
-			// ],
+			'credData': [
+				{
+					'name': 'userpin',
+					'values': [
+						{
+							'type': 'variable',
+							'value': 'X'
+						}
+					]
+				}
+			],
 			// 'credItem': [
 			// 	{
 			// 		'name': 'usercard',
@@ -129,7 +129,7 @@ test.group('.addPolicy()', (test) => {
 
 	test('should properly export to xml', (t) => {
 		const xmlStr = trespass.model.toXML(_model);
-		// console.log(xmlStr);
+		console.log(xmlStr);
 
 		const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
 		t.true($system.find('policies > policy').length === 1);
@@ -145,5 +145,11 @@ test.group('.addPolicy()', (test) => {
 		t.true($credPredicate.children().eq(0).text() === 'X');
 		t.true($credPredicate.children().eq(1)[0].name === 'value');
 		t.true($credPredicate.children().eq(1).text() === 'laptop');
+
+		const $credData = $system.find('policies > policy > credentials > credData');
+		t.true($credData.attr('name') === 'userpin');
+		t.true($credData.children().length === 1);
+		t.true($credData.children().eq(0)[0].name === 'variable');
+		t.true($credData.children().eq(0).text() === 'X');
 	});
 });
