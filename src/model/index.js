@@ -400,12 +400,13 @@ function prepareCredPredicate(credPred) {
 			};
 			return utils.renameHashMapKeys(renameMap, item);
 		});
-	return Object.assign(
+	return _.merge(
+		{},
+		R.omit(['$$', 'variable', 'value', 'name'], credPred),
 		{
 			relationType: credPred.name,
 			values: ordered,
-		},
-		R.omit(['$$', 'variable', 'value', 'name'], credPred)
+		}
 	);
 }
 
@@ -419,9 +420,10 @@ function prepareCredData(credData) {
 			};
 			return utils.renameHashMapKeys(renameMap, item);
 		});
-	return Object.assign(
-		{ values: ordered },
-		R.omit(['$$', 'variable', 'value'], credData)
+	return _.merge(
+		{},
+		R.omit(['$$', 'variable', 'value'], credData),
+		{ values: ordered }
 	);
 }
 
@@ -440,12 +442,13 @@ function prepareCredItem(credItem) {
 				'_text': 'value',
 			};
 			const item = utils.renameHashMapKeys(renameMap, _item);
-			return (prepareFuncMap[item.type]
+			return (prepareFuncMap[_item['#name']]
 				|| R.identity)(item);
 		});
-	return Object.assign(
-		{ values: ordered },
-		R.omit(['$$', 'credItem', 'credData'], credItem)
+	return _.merge(
+		{},
+		R.omit(['$$', 'credItem', 'credData'], credItem),
+		{ values: ordered }
 	);
 }
 
@@ -455,21 +458,28 @@ function preparePolicy(_policy) {
 	const { credentials } = policy;
 
 	if (credentials) {
-		const { credPredicate } = credentials;
+		const { credLocation, credPredicate, credData, credItem } = credentials;
+
+		if (credLocation) {
+			policy.credentials.credLocation = utils.ensureArray(credLocation)
+				.map((item) => _.merge({}, item));
+		}
+
 		if (credPredicate) {
 			policy.credentials.credPredicate = utils.ensureArray(credPredicate)
+				.map((item) => _.merge({}, item))
 				.map(prepareCredPredicate);
 		}
 
-		const { credData } = credentials;
 		if (credData) {
 			policy.credentials.credData = utils.ensureArray(credData)
+				.map((item) => _.merge({}, item))
 				.map(prepareCredData);
 		}
 
-		const { credItem } = credentials;
 		if (credItem) {
 			policy.credentials.credItem = utils.ensureArray(credItem)
+				.map((item) => _.merge({}, item))
 				.map(prepareCredItem);
 		}
 	}
