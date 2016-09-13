@@ -19,6 +19,36 @@ test.group('stringToNumber()', (test) => {
 });
 
 
+test.group('renameHashMapKeys()', (test) => {
+	const before = {
+		'rename-1': 1,
+		'rename-2': 2,
+		'keep': 3,
+	};
+
+	const renameMap = {
+		'rename-1': 'renamed-1',
+		'rename-2': 'renamed-2',
+	};
+	const after = utils.renameHashMapKeys(renameMap, before);
+	const expected = {
+		'renamed-1': 1,
+		'renamed-2': 2,
+		'keep': 3,
+	};
+
+	test('should work', (t) => {
+		t.true(!after['rename-1']);
+		t.true(after['renamed-1'] === 1);
+
+		t.true(!after['rename-2']);
+		t.true(after['renamed-2'] === 2);
+
+		t.true(after['keep'] === 3);
+	});
+});
+
+
 test.group('toHashMap()', (test) => {
 	const list = [
 		{ name: 'cost', value: 1 },

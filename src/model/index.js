@@ -394,10 +394,11 @@ function parse(xmlStr, done) {
 function prepareCredPredicate(credPred) {
 	const ordered = credPred.$$
 		.map((item) => {
-			return {
-				type: item['#name'],
-				value: item['_text'],
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
 			};
+			return utils.renameHashMapKeys(renameMap, item);
 		});
 	return Object.assign(
 		{

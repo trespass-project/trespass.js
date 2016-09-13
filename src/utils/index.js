@@ -4,6 +4,7 @@
  */
 
 const _ = require('lodash');
+const R = require('ramda');
 
 
 const toPrefixedObject =
@@ -74,4 +75,24 @@ function toHashMap(key='id', list) {
 			acc[item[key]] = item;
 			return acc;
 		}, {});
+};
+
+
+const renameHashMapKeys =
+/**
+ * renames keys in an object
+ *
+ * @param {Object} keyRenameMap - map from old to new key name
+ * @param {Object} obj - the hashmap
+ * @returns {Object}
+ */
+module.exports.renameHashMapKeys =
+function renameHashMapKeys(keyRenameMap, obj) {
+	const oldKeys = R.keys(keyRenameMap);
+	return oldKeys
+		.reduce((acc, oldKey) => {
+			const newKey = keyRenameMap[oldKey];
+			acc[newKey] = obj[oldKey];
+			return acc;
+		}, R.omit(oldKeys, obj));
 };
