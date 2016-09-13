@@ -20,11 +20,15 @@ const validation = require('./validation.js');
 
 const attrKey = '_attr';
 const charKey = '_text';
+const childrenKey = '$$';
 const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
 	trim: true,
 	explicitArray: false,
+
+	explicitChildren: true,
+	preserveChildrenOrder: true,
 };
 
 
@@ -267,6 +271,8 @@ function parse(xmlStr, done) {
 	}
 
 	function recurse(item, trace=[]) {
+		/* eslint consistent-return: 0 */
+
 		// console.log(trace);
 		const key = R.last(trace);
 		if (_.isArray(item)) {
@@ -294,6 +300,22 @@ function parse(xmlStr, done) {
 				.forEach((key) => {
 					item[key] = recurse(item[key], R.append(key, trace));
 				});
+			return item;
+		}
+	}
+
+	function remove$$(item) {
+		/* eslint consistent-return: 0 */
+		if (_.isArray(item)) {
+			return item.map((arrItem) => remove$$(arrItem));
+		} else if (_.isObject(item)) {
+			delete item.$$;
+			R.keys(item)
+				.forEach((key) => {
+					item[key] = remove$$(item[key]);
+				});
+			return item;
+		} else {
 			return item;
 		}
 	}
@@ -358,10 +380,201 @@ function parse(xmlStr, done) {
 			model.system.predicates = model.system.predicates
 				.map(preparePredicate);
 
-			done(err, model);
+			model.system.policies = model.system.policies
+				.map(preparePolicy);
+
+			done(
+				err,
+				remove$$(model) // finally remove all `$$` fields
+			);
 		}
 	);
 };
+
+
+function unprepareCredLocation(credLocation) {
+	return {
+		[attrKey]: { id: credLocation.id },
+	};
+}
+
+
+function prepareCredPredicate(credPred) {
+	const ordered = credPred.$$
+		.map((item) => {
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
+			};
+			return utils.renameHashMapKeys(renameMap, item);
+		});
+	return _.merge(
+		{},
+		R.omit([childrenKey, 'variable', 'value', 'name'], credPred),
+		{
+			relationType: credPred.name,
+			values: ordered,
+		}
+	);
+}
+
+
+function unprepareCredPredicate(credPred) {
+	const children = credPred.values
+		.map((item) => {
+			return {
+				[item.type]: item.value
+			};
+		});
+
+	return {
+		[attrKey]: { name: credPred.relationType },
+		[childrenKey]: children,
+	};
+}
+
+
+function prepareCredData(credData) {
+	const ordered = credData.$$
+		.map((item) => {
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
+			};
+			return utils.renameHashMapKeys(renameMap, item);
+		});
+	return _.merge(
+		{},
+		R.omit([childrenKey, 'variable', 'value'], credData),
+		{ values: ordered }
+	);
+}
+
+
+function unprepareCredData(credData) {
+	const children = credData.values
+		.map((item) => {
+			return {
+				[item.type]: item.value
+			};
+		});
+
+	return {
+		[attrKey]: { name: credData.name },
+		[childrenKey]: children,
+	};
+}
+
+
+function prepareCredItem(credItem) {
+	// values can be: credItem, credData
+	const prepareFuncMap = {
+		credItem: prepareCredItem,
+		credData: prepareCredData,
+	};
+
+	const ordered = credItem.$$
+		.map((_item) => {
+			const renameMap = {
+				'#name': 'type',
+				'_text': 'value',
+			};
+			const item = utils.renameHashMapKeys(renameMap, _item);
+			return (prepareFuncMap[_item['#name']]
+				|| R.identity)(item);
+		});
+	return _.merge(
+		{},
+		R.omit([childrenKey, 'credItem', 'credData'], credItem),
+		{ values: ordered }
+	);
+}
+
+
+function unprepareCredItem(credItem) {
+	const children = credItem.values
+		.map((item) => {
+			return {
+				[item.type]: (item.type === 'credItem')
+					? unprepareCredItem(item)
+					: unprepareCredData(item)
+			};
+		});
+
+	return {
+		[attrKey]: { name: credItem.name },
+		[childrenKey]: children,
+	};
+}
+
+
+function preparePolicy(_policy) {
+	const policy = _.merge({}, _policy);
+	const { credentials } = policy;
+
+	if (credentials) {
+		const { credLocation, credPredicate, credData, credItem } = credentials;
+
+		if (credLocation) {
+			policy.credentials.credLocation = utils.ensureArray(credLocation)
+				.map((item) => _.merge({}, item));
+		}
+
+		if (credPredicate) {
+			policy.credentials.credPredicate = utils.ensureArray(credPredicate)
+				.map((item) => _.merge({}, item))
+				.map(prepareCredPredicate);
+		}
+
+		if (credData) {
+			policy.credentials.credData = utils.ensureArray(credData)
+				.map((item) => _.merge({}, item))
+				.map(prepareCredData);
+		}
+
+		if (credItem) {
+			policy.credentials.credItem = utils.ensureArray(credItem)
+				.map((item) => _.merge({}, item))
+				.map(prepareCredItem);
+		}
+	}
+
+	return policy;
+}
+
+
+function unpreparePolicy(_policy) {
+	const policy = _.merge({}, _policy);
+	const { credentials } = policy;
+	if (credentials) {
+		const { credLocation, credPredicate, credData, credItem } = credentials;
+
+		if (credLocation) {
+			policy.credentials.credLocation = credLocation
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredLocation);
+		}
+
+		if (credPredicate) {
+			policy.credentials.credPredicate = credPredicate
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredPredicate);
+		}
+
+		if (credData) {
+			policy.credentials.credData = credData
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredData);
+		}
+
+		if (credItem) {
+			policy.credentials.credItem = credItem
+				.map((item) => _.merge({}, item))
+				.map(unprepareCredItem);
+		}
+	}
+	return policy;
+}
 
 
 function preparePredicate(_predicate) {
@@ -711,6 +924,9 @@ function prepareModelForXml(model) {
 	// transform things back to how they were
 	system.predicates = (system.predicates || [])
 		.map(unpreparePredicate);
+	system.policies = (system.policies || [])
+		.map(unpreparePolicy);
+	// TODO: processes
 
 	collectionNames
 		.forEach((collectionName) => {
@@ -792,7 +1008,10 @@ function toXML(_model) {
 	const preparedModel = prepareForXml(model);
 
 	const builder = new xml2js.Builder(xml2jsOptions);
-	const xmlStr = builder.buildObject(preparedModel);
+	const xmlStr = builder.buildObject(preparedModel)
+		// hack, but there seems to be no other way
+		.replace(/<\$\$>/ig, '')
+		.replace(/<\/\$\$>/ig, '');
 
 	// return xmlStr;
 	return pd.xml(xmlStr)
