@@ -25,6 +25,9 @@ const xml2jsOptions = {
 	charkey: charKey,
 	trim: true,
 	explicitArray: false,
+
+	explicitChildren: true,
+	preserveChildrenOrder: true,
 };
 
 
@@ -267,6 +270,8 @@ function parse(xmlStr, done) {
 	}
 
 	function recurse(item, trace=[]) {
+		/* eslint consistent-return: 0 */
+
 		// console.log(trace);
 		const key = R.last(trace);
 		if (_.isArray(item)) {
@@ -294,6 +299,22 @@ function parse(xmlStr, done) {
 				.forEach((key) => {
 					item[key] = recurse(item[key], R.append(key, trace));
 				});
+			return item;
+		}
+	}
+
+	function remove$$(item) {
+		/* eslint consistent-return: 0 */
+		if (_.isArray(item)) {
+			return item.map((arrItem) => remove$$(arrItem));
+		} else if (_.isObject(item)) {
+			delete item.$$;
+			R.keys(item)
+				.forEach((key) => {
+					item[key] = remove$$(item[key]);
+				});
+			return item;
+		} else {
 			return item;
 		}
 	}
@@ -358,10 +379,50 @@ function parse(xmlStr, done) {
 			model.system.predicates = model.system.predicates
 				.map(preparePredicate);
 
-			done(err, model);
+			model.system.policies = model.system.policies
+				.map(preparePolicy);
+
+			done(
+				err,
+				remove$$(model) // finally remove all `$$` fields
+			);
 		}
 	);
 };
+
+
+function prepareCredPredicate(credPred) {
+	const ordered = credPred.$$
+		.map((item) => {
+			return {
+				type: item['#name'],
+				value: item['_text'],
+			};
+		});
+	return Object.assign(
+		{
+			relationType: credPred.name,
+			values: ordered,
+		},
+		R.omit(['$$', 'variable', 'value', 'name'], credPred)
+	);
+}
+
+
+function preparePolicy(_policy) {
+	const policy = _.merge({}, _policy);
+	const { credentials } = policy;
+
+	if (credentials) {
+		const { credPredicate } = credentials;
+		if (credPredicate) {
+			policy.credentials.credPredicate = credPredicate
+				.map(prepareCredPredicate);
+		}
+	}
+
+	return policy;
+}
 
 
 function preparePredicate(_predicate) {
