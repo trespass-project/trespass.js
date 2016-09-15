@@ -1,7 +1,7 @@
 {
   "name": "trespass.js",
   "description": "TREsPASS javascript / node library",
-  "author": "freder.code@gmail.com",
+  "author": "",
   "main": "./dist",
   "version": "0.24.0",
   "scripts": {
