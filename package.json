@@ -1,6 +1,10 @@
 {
   "name": "trespass.js",
   "description": "TREsPASS javascript / node library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trespass-project/trespass.js"
+  },
   "author": "",
   "main": "./dist",
   "version": "0.24.0",
