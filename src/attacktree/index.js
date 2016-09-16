@@ -539,7 +539,7 @@ const parseLabel =
 /**
  * parses a tree label and returns structured information
  *
- * @param {Object} _labelStr - label
+ * @param {String} _labelStr - label
  * @returns {Object} parsed information
  */
 module.exports.parseLabel =
@@ -580,7 +580,7 @@ const getIdsFromLabel =
 /**
  * takes a tree node label string and returns a list of ids
  *
- * @param {Object} labelStr - label
+ * @param {String} labelStr - label
  * @returns {Array} list of ids
  */
 module.exports.getIdsFromLabel = R.compose(
