@@ -30,6 +30,8 @@ test.group('policies', (test) => {
 				t.true(credPred0.values.length === 2);
 				t.true(credPred0.relationType === 'is-user-id-at');
 				t.true(credPred0.values[0].type === 'variable');
+
+				t.true(_.isArray(policy.enabled));
 			}
 
 			{
