@@ -510,7 +510,11 @@ function unprepareCredItem(credItem) {
 
 function preparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
-	const { credentials } = policy;
+	const { credentials, enabled } = policy;
+
+	if (enabled) {
+		policy.enabled = utils.ensureArray(enabled);
+	}
 
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
