@@ -43,6 +43,9 @@
 					<variable>X</variable>
 				</credData>
 			</credentials>
+			<enabled>
+				<move />
+			</enabled>
 		</policy>
 
 		<policy id="p-003">
