@@ -788,3 +788,31 @@ function saveModelPattern(axios, modelId, fragment, title, patternId) {
 	return axios(params)
 		.then((res) => res.data);
 };
+
+
+const deleteModelPattern =
+/**
+ * delete model pattern
+ *
+ * @param {axios}
+ * @param {String} modelId - model id
+ * @param {String} patternId - pattern id
+ * @returns {Promise}
+ */
+module.exports.deleteModelPattern =
+function deleteModelPattern(axios, modelId, patternId) {
+	const query = queryString.stringify({
+		model_id: modelId,
+	});
+	const url = `${api.makeUrl(paths, `modelpattern/${patternId}`)}?${query}`;
+	const params = _.merge(
+		{
+			url,
+			method: 'delete',
+		},
+		api.requestOptions.crossDomain,
+		api.requestOptions.acceptJSON
+	);
+	return axios(params)
+		.then((res) => res.data);
+};
