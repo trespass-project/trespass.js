@@ -2,7 +2,7 @@
 <adtree>
 	<node refinement="conjunctive">
 		<label>root</label>
-		<node refinement="conjunctive">
+		<node refinement="conjunctive" switchRole="yes">
 			<label>N_1</label>
 			<parameter domainId="MinCost1" category="basic">200</parameter>
 		</node>
