@@ -2,10 +2,11 @@
 node_modules
 trespass.js.sublime-project
 trespass.js.sublime-workspace
-docs
 _old
 npm-debug.log
 
+docs
+jsdoc.json
 src
 test
 data
