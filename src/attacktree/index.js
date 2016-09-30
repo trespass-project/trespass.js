@@ -217,11 +217,15 @@ function prepareTree(attacktree) {
 
 		const children = item[childElemName];
 		if (!!children) {
-			// set parent
 			children.forEach((node) => {
+				// set parent
 				node[parentKey] = (depth > 0)
 					? item
 					: null;
+
+				// if it already exists, remove it
+				delete node.conjunctiveSiblingLeft;
+				delete node.conjunctiveSiblingRight;
 			});
 
 			// set left / right conjunctive sibling
@@ -506,7 +510,16 @@ const subtreeFromLeafLabels =
  * @returns {Object} root node of subtree
  */
 module.exports.subtreeFromLeafLabels =
-function subtreeFromLeafLabels(rootNode, leafLabels) {
+function subtreeFromLeafLabels(_rootNode, leafLabels) {
+	const rootNode = _.merge({}, _rootNode);
+
+	// const allLabels = getAllNodes(rootNode)
+	// 	.map(R.prop('label'));
+	// const histogramMap = R.countBy(R.identity, allLabels);
+
+	// // it's true: there are duplica nodes
+	// console.log(histogramMap);
+
 	const paths = leafLabels
 		// labels to nodes
 		.map((label) => {
@@ -518,7 +531,51 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		})
 		// nodes to paths
 		.map((node) => pathToRoot(node));
-	return treeFromPaths(paths);
+
+	let subtree = treeFromPaths(paths);
+
+	// add `parent` field again,
+	// and conjunctive siblings
+	subtree = prepareTree(subtree);
+
+	// function fixSiblings(node) {
+	// 	console.log(node.parent);
+	// 	if (node.conjunctiveSiblingRight) {
+	// 		const siblingLabel = node.conjunctiveSiblingRight.label;
+	// 		const sibling = findNode(
+	// 			cleanSubtree,
+	// 			'label',
+	// 			siblingLabel
+	// 		);
+	// 		if (!sibling) {
+	// 			console.log(`'${node.label}' is missing right-hand sibling '${siblingLabel}'`);
+	// 			delete node.conjunctiveSiblingRight;
+	// 		} else {
+	// 			node.conjunctiveSiblingRight = sibling;
+	// 		}
+	// 	}
+	// 	if (node.conjunctiveSiblingLeft) {
+	// 		const siblingLabel = node.conjunctiveSiblingLeft.label;
+	// 		const sibling = findNode(
+	// 			cleanSubtree,
+	// 			'label',
+	// 			siblingLabel
+	// 		);
+	// 		if (!sibling) {
+	// 			console.log(`'${node.label}' is missing left-hand sibling '${siblingLabel}'`);
+	// 			delete node.conjunctiveSiblingLeft;
+	// 		} else {
+	// 			node.conjunctiveSiblingLeft = sibling;
+	// 		}
+	// 	}
+
+	// 	(node[childElemName] || []).forEach(fixSiblings);
+	// }
+	// const cleanSubtree = _.merge({}, subtree);
+	// fixSiblings(cleanSubtree);
+
+	// return cleanSubtree;
+	return subtree;
 };
 
 
