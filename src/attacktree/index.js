@@ -506,7 +506,16 @@ const subtreeFromLeafLabels =
  * @returns {Object} root node of subtree
  */
 module.exports.subtreeFromLeafLabels =
-function subtreeFromLeafLabels(rootNode, leafLabels) {
+function subtreeFromLeafLabels(_rootNode, leafLabels) {
+	const rootNode = _.merge({}, _rootNode);
+
+	// const allLabels = getAllNodes(rootNode)
+	// 	.map(R.prop('label'));
+	// const histogramMap = R.countBy(R.identity, allLabels);
+
+	// // it's true: there are duplica nodes
+	// console.log(histogramMap);
+
 	const paths = leafLabels
 		// labels to nodes
 		.map((label) => {
@@ -518,7 +527,42 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		})
 		// nodes to paths
 		.map((node) => pathToRoot(node));
-	return treeFromPaths(paths);
+
+	const subtree = treeFromPaths(paths);
+
+	function fixSiblings(node) {
+		if (node.conjunctiveSiblingRight) {
+			const siblingLabel = node.conjunctiveSiblingRight.label;
+			const sibling = findNode(
+				cleanSubtree,
+				'label',
+				siblingLabel
+			);
+			if (!sibling) {
+				console.log(`'${node.label}' is missing right-hand sibling '${siblingLabel}'`);
+				delete node.conjunctiveSiblingRight;
+			}
+		}
+		if (node.conjunctiveSiblingLeft) {
+			const siblingLabel = node.conjunctiveSiblingLeft.label;
+			const sibling = findNode(
+				cleanSubtree,
+				'label',
+				siblingLabel
+			);
+			if (!sibling) {
+				console.log(`'${node.label}' is missing left-hand sibling '${siblingLabel}'`);
+				delete node.conjunctiveSiblingLeft;
+			}
+		}
+
+		(node[childElemName] || [])
+			.forEach(fixSiblings);
+	}
+	const cleanSubtree = _.merge({}, subtree);
+	fixSiblings(cleanSubtree);
+
+	return cleanSubtree;
 };
 
 
