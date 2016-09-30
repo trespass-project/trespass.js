@@ -217,11 +217,15 @@ function prepareTree(attacktree) {
 
 		const children = item[childElemName];
 		if (!!children) {
-			// set parent
 			children.forEach((node) => {
+				// set parent
 				node[parentKey] = (depth > 0)
 					? item
 					: null;
+
+				// if it already exists, remove it
+				delete node.conjunctiveSiblingLeft;
+				delete node.conjunctiveSiblingRight;
 			});
 
 			// set left / right conjunctive sibling
@@ -528,41 +532,50 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 		// nodes to paths
 		.map((node) => pathToRoot(node));
 
-	const subtree = treeFromPaths(paths);
+	let subtree = treeFromPaths(paths);
 
-	function fixSiblings(node) {
-		if (node.conjunctiveSiblingRight) {
-			const siblingLabel = node.conjunctiveSiblingRight.label;
-			const sibling = findNode(
-				cleanSubtree,
-				'label',
-				siblingLabel
-			);
-			if (!sibling) {
-				console.log(`'${node.label}' is missing right-hand sibling '${siblingLabel}'`);
-				delete node.conjunctiveSiblingRight;
-			}
-		}
-		if (node.conjunctiveSiblingLeft) {
-			const siblingLabel = node.conjunctiveSiblingLeft.label;
-			const sibling = findNode(
-				cleanSubtree,
-				'label',
-				siblingLabel
-			);
-			if (!sibling) {
-				console.log(`'${node.label}' is missing left-hand sibling '${siblingLabel}'`);
-				delete node.conjunctiveSiblingLeft;
-			}
-		}
+	// add `parent` field again,
+	// and conjunctive siblings
+	subtree = prepareTree(subtree);
 
-		(node[childElemName] || [])
-			.forEach(fixSiblings);
-	}
-	const cleanSubtree = _.merge({}, subtree);
-	fixSiblings(cleanSubtree);
+	// function fixSiblings(node) {
+	// 	console.log(node.parent);
+	// 	if (node.conjunctiveSiblingRight) {
+	// 		const siblingLabel = node.conjunctiveSiblingRight.label;
+	// 		const sibling = findNode(
+	// 			cleanSubtree,
+	// 			'label',
+	// 			siblingLabel
+	// 		);
+	// 		if (!sibling) {
+	// 			console.log(`'${node.label}' is missing right-hand sibling '${siblingLabel}'`);
+	// 			delete node.conjunctiveSiblingRight;
+	// 		} else {
+	// 			node.conjunctiveSiblingRight = sibling;
+	// 		}
+	// 	}
+	// 	if (node.conjunctiveSiblingLeft) {
+	// 		const siblingLabel = node.conjunctiveSiblingLeft.label;
+	// 		const sibling = findNode(
+	// 			cleanSubtree,
+	// 			'label',
+	// 			siblingLabel
+	// 		);
+	// 		if (!sibling) {
+	// 			console.log(`'${node.label}' is missing left-hand sibling '${siblingLabel}'`);
+	// 			delete node.conjunctiveSiblingLeft;
+	// 		} else {
+	// 			node.conjunctiveSiblingLeft = sibling;
+	// 		}
+	// 	}
 
-	return cleanSubtree;
+	// 	(node[childElemName] || []).forEach(fixSiblings);
+	// }
+	// const cleanSubtree = _.merge({}, subtree);
+	// fixSiblings(cleanSubtree);
+
+	// return cleanSubtree;
+	return subtree;
 };
 
 
