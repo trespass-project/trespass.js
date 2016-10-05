@@ -320,8 +320,72 @@ test.group('getAllPaths()', (test) => {
 });
 
 
+test.group('treeFromPaths()', (test) => {
+	test('should construct a tree from single paths', (t) => {
+		const path1 = [
+			{ label: 'a' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const path2 = [
+			{ label: 'b' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const rootNode = trespass.attacktree.treeFromPaths([
+			R.reverse(path1),
+			R.reverse(path2),
+		]);
+
+		t.true(rootNode.label === 'root');
+
+		t.true(rootNode.node.length === 1);
+		t.true(rootNode.node[0].label === 'x');
+
+		t.true(rootNode.node[0].node.length === 2);
+		t.true(
+			R.equals(
+				rootNode.node[0].node.map(R.prop('label')),
+				['a', 'b']
+			)
+		);
+	});
+
+	test('should take conjunctive-ness into account', (t) => {
+		const path1 = [
+			{ label: 'a' },
+			{ label: 'x', _attr: { refinement: 'conjunctive' } },
+			{ label: 'root' },
+		];
+		const path2 = [
+			{ label: 'b' },
+			{ label: 'x', _attr: { refinement: 'conjunctive' } },
+			{ label: 'root' },
+		];
+		const path3 = [
+			{ label: 'c' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const rootNode = trespass.attacktree.treeFromPaths([
+			R.reverse(path1),
+			R.reverse(path2),
+			R.reverse(path3),
+		]);
+
+		t.true(rootNode.node.length === 2);
+		t.true(
+			R.equals(
+				rootNode.node.map(R.prop('label')),
+				['x', 'x']
+			)
+		);
+	});
+});
+
+
 test.group('subtreeFromLeafNodes()', (test) => {
-	test('should return a subtree of the original tree from a list of leaf nodes', (t) => {
+	test('should return a subtree of the original tree', (t) => {
 		const attacktree = {
 			node: [
 				{
@@ -350,28 +414,104 @@ test.group('subtreeFromLeafNodes()', (test) => {
 		};
 		const prepared = trespass.attacktree.prepareTree(attacktree);
 		const rootNode = trespass.attacktree.getRootNode(prepared);
-		const leafLabels = ['child-1', 'grand-child-2'];
+		const leafLabels = ['child-2', 'grand-child-2'];
 		const subtree = trespass.attacktree.subtreeFromLeafLabels(rootNode, leafLabels);
 
-		const expected = {
-			label: 'root',
+		// const expected = {
+		// 	label: 'root',
+		// 	node: [
+		// 		{
+		// 			label: 'child-2',
+		// 			node: [],
+		// 		},
+		// 		{
+		// 			label: 'child-3',
+		// 			node: [
+		// 				{
+		// 					label: 'grand-child-2',
+		// 					node: [],
+		// 				},
+		// 			],
+		// 		},
+		// 	],
+		// };
+		t.true(
+			R.equals(
+				subtree.node.map(R.prop('label')),
+				['child-2', 'child-3']
+			)
+		);
+		t.true(!subtree.node[0].node.length);
+
+		t.true(subtree.node[1].node.length === 1);
+		t.true(subtree.node[1].node[0].label === 'grand-child-2');
+	});
+
+	test('should filter out nodes', (t) => {
+		const attacktree = {
 			node: [
 				{
-					label: 'child-1',
-					node: [],
-				},
-				{
-					label: 'child-3',
+					label: 'root',
 					node: [
 						{
-							label: 'grand-child-2',
-							node: [],
+							label: '1',
+							node: [
+								{ label: 'a' },
+								{ label: 'x' },
+							],
+						},
+						{
+							label: '2',
+							_attr: { refinement: 'conjunctive' },
+							node: [
+								{ label: 'x' },
+								{ label: 'b' },
+							],
+						},
+						{
+							label: '3',
+							_attr: { refinement: 'conjunctive' },
+							node: [
+								{ label: 'x' },
+								{ label: 'b' },
+								{ label: 'c' },
+							],
+						},
+						{
+							label: 'x',
+							node: [
+								{ label: 'd' },
+							],
 						},
 					],
-				},
-			],
+				}
+			]
 		};
-		t.true(R.equals(subtree, expected));
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+		const rootNode = trespass.attacktree.getRootNode(prepared);
+
+		let leafLabels = ['x'];
+		let subtree = trespass.attacktree.subtreeFromLeafLabels(
+			rootNode,
+			leafLabels
+		);
+		t.true(subtree.node.length === 1);
+		t.true(subtree.node[0].label === '1');
+
+		// ———
+
+		leafLabels = ['x', 'b', 'c'];
+		subtree = trespass.attacktree.subtreeFromLeafLabels(
+			rootNode,
+			leafLabels
+		);
+		t.true(subtree.node.length === 3);
+		t.true(
+			R.equals(
+				subtree.node.map(R.prop('label')),
+				['1', '2', '3']
+			)
+		);
 	});
 });
 
