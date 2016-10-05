@@ -286,11 +286,11 @@ function prepareAnnotatedTree(attacktree, flavor) {
 
 		const children = item[childElemName];
 		if (!!children) {
-			children.forEach(node => recurse(node));
+			children.forEach(recurse);
 		}
 	}
 
-	[attacktree].forEach(node => recurse(node));
+	[attacktree].forEach(recurse);
 	return attacktree;
 };
 
@@ -532,35 +532,26 @@ const subtreeFromLeafLabels =
  * @returns {Object} root node of subtree
  */
 module.exports.subtreeFromLeafLabels =
-function subtreeFromLeafLabels(_rootNode, leafLabels) {
-	const rootNode = _.merge({}, _rootNode);
+function subtreeFromLeafLabels(rootNode, leafLabels) {
+	const subtreeRoot = _.merge({}, rootNode);
 
-	// const allLabels = getAllNodes(rootNode)
-	// 	.map(R.prop('label'));
-	// const histogramMap = R.countBy(R.identity, allLabels);
+	const isInLabelsList = (node) => {
+		return R.contains(node.label, leafLabels);
+	};
 
-	// labels to nodes
-	let nodes = leafLabels
-		.reduce((acc, label) => {
-			const nodes = findNodes(rootNode, 'label', label);
-			if (!nodes.length) {
-				console.error(`"${label}" does not exist in reference tree`);
-			}
-			return [...acc, ...nodes];
-		}, []);
+	const recurse = (node) => {
+		let doKeep = true;
 
-	nodes = nodes
-		.filter((node) => {
-			// eliminate ones that are not leaf nodes
-			if (node[childElemName] && node[childElemName].length) {
-				return false;
+		const children = node[childElemName] || [];
+		const isLeafNode = !children.length;
+
+		if (isLeafNode) {
+			if (!isInLabelsList(node)) {
+				doKeep = false;
 			}
 
 			// eliminate nodes with missing conjunctive siblings
-			if (isConjunctive(node.parent)) {
-				const isInLabelsList = (node) => {
-					return R.contains(node.label, leafLabels);
-				};
+			if (node.parent && isConjunctive(node.parent)) {
 				const allSiblingsInLeafLabelsList = R.all(
 					isInLabelsList,
 					node.parent[childElemName]
@@ -568,20 +559,39 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 				if (!allSiblingsInLeafLabelsList) {
 					// this is definitely not the right one,
 					// so it can be removed
-					return false;
+					doKeep = false;
 				}
 			}
-			return true;
-		});
+		} else {
+			const branchLeafLabels = R.uniq(
+				findLeafNodes(children)
+					.map(R.prop('label'))
+			);
+			const noneMatch = R.all(
+				(label) => !R.contains(label, leafLabels),
+				branchLeafLabels
+			);
+			if (noneMatch) {
+				doKeep = false;
+			}
+		}
 
-	// nodes to paths
-	const paths = nodes.map(pathToRoot);
-	// tree from paths
-	let subtree = treeFromPaths(paths);
+		node[childElemName] = children
+			.map(recurse)
+			.filter(node => (node !== null));
 
-	// add `parent` field again,
-	// and conjunctive siblings
-	subtree = prepareTree(subtree);
+		if (!isLeafNode && !node[childElemName].length) {
+			// used to be a prent, but now all children are gone
+			doKeep = false;
+		}
+
+		if (!doKeep) {
+			// console.log('removing', node.label, node.parent.label);
+			return null;
+		}
+
+		return node;
+	};
 
 	// function fixSiblings(node) {
 	// 	console.log(node.parent);
@@ -619,8 +629,9 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 	// const cleanSubtree = _.merge({}, subtree);
 	// fixSiblings(cleanSubtree);
 
-	// return cleanSubtree;
-	return subtree;
+	return prepareTree(
+		recurse(subtreeRoot)
+	);
 };
 
 
