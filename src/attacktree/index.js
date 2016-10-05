@@ -383,23 +383,23 @@ function getAllPaths(nodes) {
 };
 
 
-const findNode =
+const findNodes =
 /**
- * find node in tree by property value.
+ * find nodes in tree by property value.
  *
  * @param {Object} rootNode - tree root
  * @param {String} key - name of property
  * @param {} value - the value to find
- * @returns {Object} node or `null`
+ * @returns {Array} list of nodes
  */
-module.exports.findNode =
-function findNode(rootNode, key, value) {
-	let result = null;
+module.exports.findNodes =
+function findNodes(rootNode, key, value) {
+	let results = [];
 
 	function recurse(nodes) {
 		nodes.forEach((node) => {
 			if (node[key] === value) {
-				result = node;
+				results = [...results, node];
 			} else {
 				recurse(node[childElemName] || []);
 			}
@@ -407,7 +407,7 @@ function findNode(rootNode, key, value) {
 	}
 
 	recurse([rootNode]);
-	return result;
+	return results;
 };
 
 
@@ -516,21 +516,47 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 	// const allLabels = getAllNodes(rootNode)
 	// 	.map(R.prop('label'));
 	// const histogramMap = R.countBy(R.identity, allLabels);
-
-	// // it's true: there are duplica nodes
+	// it's true: there are duplicate nodes
 	// console.log(histogramMap);
 
-	const paths = leafLabels
-		// labels to nodes
-		.map((label) => {
-			const node = findNode(rootNode, 'label', label);
-			if (!node) {
+	// labels to nodes
+	let nodes = leafLabels
+		.reduce((acc, label) => {
+			const nodes = findNodes(rootNode, 'label', label);
+			if (!nodes.length) {
 				console.error(`"${label}" does not exist in reference tree`);
 			}
-			return node;
-		})
-		// nodes to paths
-		.map((node) => pathToRoot(node));
+			return [...acc, ...nodes];
+		}, []);
+
+	nodes = nodes
+		.filter((node) => {
+			// eliminate ones that are not leaf nodes
+			if (node[childElemName] && node[childElemName].length) {
+				return false;
+			}
+
+			// eliminate nodes with missing conjunctive siblings
+			if (node.parent[attrKey]
+				&& node.parent[attrKey].refinement === 'conjunctive') {
+				const isInLabelsList = (node) => {
+					return R.contains(node.label, leafLabels);
+				};
+				const allSiblingsInLeafLabelsList = R.all(
+					isInLabelsList,
+					node.parent[childElemName]
+				);
+				if (!allSiblingsInLeafLabelsList) {
+					// this is definitely not the right one,
+					// so it can be removed
+					return false;
+				}
+			}
+			return true;
+		});
+
+	// nodes to paths
+	const paths = nodes.map(pathToRoot);
 
 	let subtree = treeFromPaths(paths);
 
