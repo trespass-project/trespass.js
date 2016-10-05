@@ -593,42 +593,6 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		return node;
 	};
 
-	// function fixSiblings(node) {
-	// 	console.log(node.parent);
-	// 	if (node.conjunctiveSiblingRight) {
-	// 		const siblingLabel = node.conjunctiveSiblingRight.label;
-	// 		const sibling = findNode(
-	// 			cleanSubtree,
-	// 			'label',
-	// 			siblingLabel
-	// 		);
-	// 		if (!sibling) {
-	// 			console.log(`'${node.label}' is missing right-hand sibling '${siblingLabel}'`);
-	// 			delete node.conjunctiveSiblingRight;
-	// 		} else {
-	// 			node.conjunctiveSiblingRight = sibling;
-	// 		}
-	// 	}
-	// 	if (node.conjunctiveSiblingLeft) {
-	// 		const siblingLabel = node.conjunctiveSiblingLeft.label;
-	// 		const sibling = findNode(
-	// 			cleanSubtree,
-	// 			'label',
-	// 			siblingLabel
-	// 		);
-	// 		if (!sibling) {
-	// 			console.log(`'${node.label}' is missing left-hand sibling '${siblingLabel}'`);
-	// 			delete node.conjunctiveSiblingLeft;
-	// 		} else {
-	// 			node.conjunctiveSiblingLeft = sibling;
-	// 		}
-	// 	}
-
-	// 	(node[childElemName] || []).forEach(fixSiblings);
-	// }
-	// const cleanSubtree = _.merge({}, subtree);
-	// fixSiblings(cleanSubtree);
-
 	return prepareTree(
 		recurse(subtreeRoot)
 	);
