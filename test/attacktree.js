@@ -350,6 +350,37 @@ test.group('treeFromPaths()', (test) => {
 			)
 		);
 	});
+
+	test('should take conjunctive-ness into account', (t) => {
+		const path1 = [
+			{ label: 'a' },
+			{ label: 'x', _attr: { refinement: 'conjunctive' } },
+			{ label: 'root' },
+		];
+		const path2 = [
+			{ label: 'b' },
+			{ label: 'x', _attr: { refinement: 'conjunctive' } },
+			{ label: 'root' },
+		];
+		const path3 = [
+			{ label: 'c' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const rootNode = trespass.attacktree.treeFromPaths([
+			R.reverse(path1),
+			R.reverse(path2),
+			R.reverse(path3),
+		]);
+
+		t.true(rootNode.node.length === 2);
+		t.true(
+			R.equals(
+				rootNode.node.map(R.prop('label')),
+				['x', 'x']
+			)
+		);
+	});
 });
 
 

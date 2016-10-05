@@ -190,6 +190,14 @@ function getRootNode(attacktree) {
 };
 
 
+const isConjunctive =
+module.exports.isConjunctive =
+function isConjunctive(node) {
+	return node[attrKey]
+		&& node[attrKey].refinement === 'conjunctive';
+}
+
+
 const prepareTree =
 /**
  * prepares an attack tree object.
@@ -229,8 +237,7 @@ function prepareTree(attacktree) {
 			});
 
 			// set left / right conjunctive sibling
-			if (item[attrKey]
-				&& item[attrKey].refinement === 'conjunctive') {
+			if (isConjunctive(item)) {
 				R.tail(children)
 					.forEach((node, i) => {
 						node.conjunctiveSiblingLeft = children[i];
@@ -474,11 +481,18 @@ function treeFromPaths(paths) {
 			return;
 		}
 
-		const getHeadLabel = R.compose(
-			R.prop('label'),
-			R.head
+		const grouped = R.groupBy(
+			R.pipe(
+				R.head,
+				(headNode) => {
+					const suffix = (isConjunctive(headNode))
+						? 'conjunctive'
+						: 'disjunctive';
+					return `${headNode.label}_${suffix}`;
+				}
+			),
+			paths
 		);
-		const grouped = R.groupBy(getHeadLabel, paths);
 		R.values(grouped)
 			.forEach((paths) => {
 				// all paths share the same head
@@ -539,8 +553,7 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 			}
 
 			// eliminate nodes with missing conjunctive siblings
-			if (node.parent[attrKey]
-				&& node.parent[attrKey].refinement === 'conjunctive') {
+			if (isConjunctive(node.parent)) {
 				const isInLabelsList = (node) => {
 					return R.contains(node.label, leafLabels);
 				};
