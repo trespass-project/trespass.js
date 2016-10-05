@@ -195,7 +195,7 @@ module.exports.isConjunctive =
 function isConjunctive(node) {
 	return node[attrKey]
 		&& node[attrKey].refinement === 'conjunctive';
-}
+};
 
 
 const prepareTree =
@@ -254,7 +254,7 @@ function prepareTree(attacktree) {
 
 	attacktree[attrKey] = attacktree[attrKey] || {};
 
-	[attacktree].forEach(node => recurse(node));
+	[attacktree].forEach(recurse);
 	return attacktree;
 };
 
@@ -532,8 +532,6 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 	// const allLabels = getAllNodes(rootNode)
 	// 	.map(R.prop('label'));
 	// const histogramMap = R.countBy(R.identity, allLabels);
-	// it's true: there are duplicate nodes
-	// console.log(histogramMap);
 
 	// labels to nodes
 	let nodes = leafLabels
