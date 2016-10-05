@@ -203,14 +203,20 @@ const prepareTree =
  * prepares an attack tree object.
  * - conversion from strings to numbers
  * - ensure all children are arrays
+ * - give each node an id
  *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {Object} root node
  */
 module.exports.prepareTree =
 function prepareTree(attacktree) {
+	let counter = 0;
+
 	function recurse(item, depth=0) {
 		item.depth = depth;
+
+		item.id = counter;
+		counter++;
 
 		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
