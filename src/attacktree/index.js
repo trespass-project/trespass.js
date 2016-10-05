@@ -557,7 +557,7 @@ function subtreeFromLeafLabels(_rootNode, leafLabels) {
 
 	// nodes to paths
 	const paths = nodes.map(pathToRoot);
-
+	// tree from paths
 	let subtree = treeFromPaths(paths);
 
 	// add `parent` field again,

@@ -320,6 +320,39 @@ test.group('getAllPaths()', (test) => {
 });
 
 
+test.group('treeFromPaths()', (test) => {
+	test('should construct a tree from single paths', (t) => {
+		const path1 = [
+			{ label: 'a' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const path2 = [
+			{ label: 'b' },
+			{ label: 'x' },
+			{ label: 'root' },
+		];
+		const rootNode = trespass.attacktree.treeFromPaths([
+			R.reverse(path1),
+			R.reverse(path2)
+		]);
+
+		t.true(rootNode.label === 'root');
+
+		t.true(rootNode.node.length === 1);
+		t.true(rootNode.node[0].label === 'x');
+
+		t.true(rootNode.node[0].node.length === 2);
+		t.true(
+			R.equals(
+				rootNode.node[0].node.map(R.prop('label')),
+				['a', 'b']
+			)
+		);
+	});
+});
+
+
 test.group('subtreeFromLeafNodes()', (test) => {
 	test('should return a subtree of the original tree', (t) => {
 		const attacktree = {
