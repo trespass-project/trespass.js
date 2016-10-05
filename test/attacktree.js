@@ -334,7 +334,7 @@ test.group('treeFromPaths()', (test) => {
 		];
 		const rootNode = trespass.attacktree.treeFromPaths([
 			R.reverse(path1),
-			R.reverse(path2)
+			R.reverse(path2),
 		]);
 
 		t.true(rootNode.label === 'root');

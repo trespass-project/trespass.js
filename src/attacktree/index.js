@@ -474,11 +474,13 @@ function treeFromPaths(paths) {
 			return;
 		}
 
-		const groupByFirstLabel = R.compose(R.prop('label'), R.head);
-		const grouped = R.groupBy(groupByFirstLabel, paths);
-		R.toPairs(grouped)
-			.forEach((group) => {
-				const paths = group[1];
+		const getHeadLabel = R.compose(
+			R.prop('label'),
+			R.head
+		);
+		const grouped = R.groupBy(getHeadLabel, paths);
+		R.values(grouped)
+			.forEach((paths) => {
 				// all paths share the same head
 				const node = duplicateNode(paths[0][0]);
 				parentNode.node = [...parentNode.node, node];
