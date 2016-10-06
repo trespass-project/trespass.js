@@ -40,3 +40,9 @@ module.exports.analysisTools = {
 
 const analysisToolNames =
 module.exports.analysisToolNames = R.keys(analysisTools);
+
+const analysisToolNamesStrict =
+module.exports.analysisToolNamesStrict = R.without(
+	['Treemaker', 'Attack Pattern Lib.'],
+	analysisToolNames
+);
