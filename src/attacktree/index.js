@@ -542,6 +542,9 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 	const recurse = (node) => {
 		let doKeep = true;
 
+		// keep original id
+		node._originalId = node.id;
+
 		const children = node[childElemName] || [];
 		const isLeafNode = !children.length;
 
@@ -593,9 +596,17 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		return node;
 	};
 
-	return prepareTree(
+	const restoreOriginalId = (node) => {
+		node.id = node._originalId;
+		delete node._originalId;
+		(node[childElemName] || []).forEach(restoreOriginalId);
+	};
+
+	let result = prepareTree(
 		recurse(subtreeRoot)
 	);
+	restoreOriginalId(result);
+	return result;
 };
 
 
