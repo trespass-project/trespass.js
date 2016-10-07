@@ -552,30 +552,19 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 			if (!isInLabelsList(node)) {
 				doKeep = false;
 			}
-
-			// eliminate nodes with missing conjunctive siblings
-			if (node.parent && isConjunctive(node.parent)) {
-				const allSiblingsInLeafLabelsList = R.all(
-					isInLabelsList,
-					node.parent[childElemName]
-				);
-				if (!allSiblingsInLeafLabelsList) {
-					// this is definitely not the right one,
-					// so it can be removed
+		} else {
+			// if any of the conjunctive children are
+			// leaf nodes, and even one of them is not
+			// on the list, remove this node
+			if (isConjunctive(node)) {
+				const leafChildren = node[childElemName]
+					.filter((child) => {
+						return !(child[childElemName] || []).length;
+					});
+				const inList = leafChildren.filter(isInLabelsList);
+				if (inList.length !== leafChildren.length) {
 					doKeep = false;
 				}
-			}
-		} else {
-			const branchLeafLabels = R.uniq(
-				findLeafNodes(children)
-					.map(R.prop('label'))
-			);
-			const noneMatch = R.all(
-				(label) => !R.contains(label, leafLabels),
-				branchLeafLabels
-			);
-			if (noneMatch) {
-				doKeep = false;
 			}
 		}
 
@@ -602,9 +591,12 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		(node[childElemName] || []).forEach(restoreOriginalId);
 	};
 
-	let result = prepareTree(
-		recurse(subtreeRoot)
-	);
+	const _result = recurse(subtreeRoot);
+	if (!_result) {
+		return null;
+	}
+
+	const result = prepareTree(_result);
 	restoreOriginalId(result);
 	return result;
 };

@@ -455,6 +455,38 @@ test.group('subtreeFromLeafNodes()', (test) => {
 					node: [
 						{
 							label: '1',
+							_attr: { refinement: 'conjunctive' },
+							node: [
+								{
+									label: '2',
+									node: { label: 'x' }
+								},
+								{ label: 'a' },
+							],
+						},
+					],
+				}
+			]
+		};
+		const prepared = trespass.attacktree.prepareTree(attacktree);
+		const rootNode = trespass.attacktree.getRootNode(prepared);
+
+		const leafLabels = ['x'];
+		const subtree = trespass.attacktree.subtreeFromLeafLabels(
+			rootNode,
+			leafLabels
+		);
+		t.true(_.isEmpty(subtree));
+	});
+
+	test('should filter out nodes', (t) => {
+		const attacktree = {
+			node: [
+				{
+					label: 'root',
+					node: [
+						{
+							label: '1',
 							node: [
 								{ label: 'a' },
 								{ label: 'x' },
