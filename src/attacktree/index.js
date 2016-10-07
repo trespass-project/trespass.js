@@ -546,7 +546,9 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		node._originalId = node.id;
 
 		const children = node[childElemName] || [];
-		const isLeafNode = !children.length;
+		const numChildren = children.length;
+		const isLeafNode = !numChildren;
+		const isConj = isConjunctive(node);
 
 		if (isLeafNode) {
 			if (!isInLabelsList(node)) {
@@ -556,7 +558,7 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 			// if any of the conjunctive children are
 			// leaf nodes, and even one of them is not
 			// on the list, remove this node
-			if (isConjunctive(node)) {
+			if (isConj) {
 				const leafChildren = node[childElemName]
 					.filter((child) => {
 						return !(child[childElemName] || []).length;
@@ -573,7 +575,11 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 			.filter(node => (node !== null));
 
 		if (!isLeafNode && !node[childElemName].length) {
-			// used to be a prent, but now all children are gone
+			// used to be a parent, but now all children are gone
+			doKeep = false;
+		}
+		if (isConj && (node[childElemName].length !== numChildren)) {
+			// we lost conjunctive children
 			doKeep = false;
 		}
 
