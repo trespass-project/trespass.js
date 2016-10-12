@@ -511,8 +511,8 @@ function unprepareCredItem(credItem) {
 
 function prepareEnabledAction(enabled) {
 	// element name of first child
-	const type = R.head(enabled.$$)['#name'];
-	const actionValues = (enabled[type].$$ || [])
+	const actionType = R.head(enabled.$$)['#name'];
+	const actionValues = (enabled[actionType].$$ || [])
 		.map(rename$$Keys);
 
 	// filter out `locvar` and `locval` types
@@ -537,7 +537,7 @@ function prepareEnabledAction(enabled) {
 	}
 
 	return {
-		type,
+		action: actionType,
 		location,
 		values: values.map(recurse),
 	};
