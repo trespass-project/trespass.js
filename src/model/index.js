@@ -472,8 +472,11 @@ function prepareCredItem(credItem) {
 		credItem: prepareCredItem,
 		credData: prepareCredData,
 	};
-
-	const ordered = credItem.$$
+	const renameMap = {
+		'#name': 'type',
+		'_text': 'value',
+	};
+	const ordered = (credItem.$$ || [])
 		.map((_item) => {
 			const renameMap = {
 				'#name': 'type',

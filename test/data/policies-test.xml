@@ -61,5 +61,15 @@
 				</credItem>
 			</credentials>
 		</policy>
+
+		<policy id="p-004">
+			<atLocations>location__johnsoffice</atLocations>
+			<credentials>
+				<credItem name="key" />
+			</credentials>
+			<enabled>
+				<move />
+			</enabled>
+		</policy>
 	</policies>
 </system>
