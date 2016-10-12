@@ -155,25 +155,34 @@ test.group('.addPolicy()', (test) => {
 		// console.log(xmlStr);
 
 		const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
-		t.true($system.find('policies > policy').length === 1);
-		t.true($system.find('policies > policy').eq(0).attr('id') === 'p-003');
+		{
+			const $policy = $system.find('policies > policy');
+			t.true($policy.length === 1);
+			t.true($policy.eq(0).attr('id') === 'p-003');
+		}
 
 		const $atLocations = $system.find('policies > policy > atLocations');
 		t.true($atLocations.text() === 'RoomDatacenter laptop');
 
-		const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
-		t.true($credPredicate.attr('name') === 'is-user-id-at');
-		t.true($credPredicate.children().length === 2);
-		t.true($credPredicate.children().eq(0)[0].name === 'variable');
-		t.true($credPredicate.children().eq(0).text() === 'X');
-		t.true($credPredicate.children().eq(1)[0].name === 'value');
-		t.true($credPredicate.children().eq(1).text() === 'laptop');
+		{
+			const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
+			t.true($credPredicate.attr('name') === 'is-user-id-at');
+			const $children = $credPredicate.children();
+			t.true($children.length === 2);
+			t.true($children.eq(0)[0].name === 'variable');
+			t.true($children.eq(0).text() === 'X');
+			t.true($children.eq(1)[0].name === 'value');
+			t.true($children.eq(1).text() === 'laptop');
+		}
 
-		const $credData = $system.find('policies > policy > credentials > credData');
-		t.true($credData.attr('name') === 'userpin');
-		t.true($credData.children().length === 1);
-		t.true($credData.children().eq(0)[0].name === 'variable');
-		t.true($credData.children().eq(0).text() === 'X');
+		{
+			const $credData = $system.find('policies > policy > credentials > credData');
+			const $children = $credData.children();
+			t.true($credData.attr('name') === 'userpin');
+			t.true($children.length === 1);
+			t.true($children.eq(0)[0].name === 'variable');
+			t.true($children.eq(0).text() === 'X');
+		}
 
 		const $credLocation = $system.find('policies > policy > credentials > credLocation');
 		t.true($credLocation.eq(0).attr('id') === 'loc1');
