@@ -490,10 +490,6 @@ function prepareCredItem(credItem) {
 	};
 	const ordered = (credItem.$$ || [])
 		.map((_item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
 			const item = utils.renameHashMapKeys(renameMap, _item);
 			return (prepareFuncMap[_item['#name']]
 				|| R.identity)(item);
