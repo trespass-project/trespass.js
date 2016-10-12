@@ -56,6 +56,7 @@ test.group('policies', (test) => {
 				// console.log(JSON.stringify(policy, null, '  '));
 				t.true(policy.enabled.length === 1);
 				const enabled = policy.enabled[0];
+				t.true(enabled.type === 'in');
 				t.true(enabled.location.type === 'locvar');
 				t.true(enabled.location.value === 'locX');
 				t.true(enabled.values.length === 1);
