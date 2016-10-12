@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 import { test } from 'ava-spec';
+const R = require('ramda');
 const _ = require('lodash');
 const trespass = require('../');
 const common = require('./common.js');
@@ -20,7 +21,7 @@ test.group('policies', (test) => {
 		trespass.model.parse(xmlStr, (err, model) => {
 			const policies = model.system.policies;
 
-			t.true(policies.length === 4);
+			t.true(policies.length === 5);
 
 			{
 				const policy = policies[0];
@@ -48,6 +49,20 @@ test.group('policies', (test) => {
 				// console.log(JSON.stringify(policy));
 				const credItem0 = policy.credentials.credItem[0];
 				t.true(credItem0.values[0].values[0].type === 'variable');
+			}
+
+			{
+				const policy = policies[4];
+				// console.log(JSON.stringify(policy, null, '  '));
+				t.true(policy.enabled.length === 1);
+				const enabled = policy.enabled[0];
+				t.true(enabled.location.type === 'locvar');
+				t.true(enabled.location.value === 'locX');
+				t.true(enabled.values.length === 1);
+				t.true(enabled.values[0].type === 'tuple');
+				t.true(enabled.values[0].values.length === 2);
+				const vals = enabled.values[0].values.map(R.prop('type'));
+				t.true(R.equals(vals, ['value', 'variable']));
 			}
 
 			t.end();

@@ -32,6 +32,12 @@ const xml2jsOptions = {
 	preserveChildrenOrder: true,
 };
 
+const renameMap = {
+	'#name': 'type',
+	'_text': 'value',
+};
+const rename$$Keys = R.partial(utils.renameHashMapKeys, [renameMap]);
+
 
 const singularPluralCollection = [
 	{
@@ -412,14 +418,8 @@ function unprepareCredLocation(credLocation) {
 
 
 function prepareCredPredicate(credPred) {
-	const ordered = credPred.$$
-		.map((item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
-			return utils.renameHashMapKeys(renameMap, item);
-		});
+	const ordered = (credPred.$$ || [])
+		.map(rename$$Keys);
 	return _.merge(
 		{},
 		R.omit([childrenKey, 'variable', 'value', 'name'], credPred),
@@ -447,14 +447,8 @@ function unprepareCredPredicate(credPred) {
 
 
 function prepareCredData(credData) {
-	const ordered = credData.$$
-		.map((item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
-			return utils.renameHashMapKeys(renameMap, item);
-		});
+	const ordered = (credData.$$ || [])
+		.map(rename$$Keys);
 	return _.merge(
 		{},
 		R.omit([childrenKey, 'variable', 'value'], credData),
@@ -483,10 +477,6 @@ function prepareCredItem(credItem) {
 	const prepareFuncMap = {
 		credItem: prepareCredItem,
 		credData: prepareCredData,
-	};
-	const renameMap = {
-		'#name': 'type',
-		'_text': 'value',
 	};
 	const ordered = (credItem.$$ || [])
 		.map((_item) => {
@@ -519,13 +509,53 @@ function unprepareCredItem(credItem) {
 }
 
 
+function prepareEnabledAction(enabled) {
+	const type = R.head(R.keys(enabled));
+	const actionValues = (enabled[type][0].$$ || [])
+		.map(rename$$Keys);
+
+	// filter out `locvar` and `locval` types
+	const locTypes = ['locvar', 'locval'];
+	const isLocType = (item) => R.contains(item.type, locTypes);
+	const notLocType = R.complement(isLocType);
+	const location = R.last(
+		actionValues.filter(isLocType)
+	);
+	const values = actionValues.filter(notLocType);
+
+	function recurse(val) {
+		// nested values
+		const values = (val.$$ || [])
+			.map(rename$$Keys);
+		return (!values.length)
+			? val
+			: {
+				type: val.type,
+				values: values.map(recurse),
+			};
+	}
+
+	return {
+		location,
+		values: values.map(recurse),
+	};
+}
+
+
 function preparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
 	const { credentials, enabled } = policy;
 
 	if (enabled) {
-		policy.enabled = utils.ensureArray(enabled);
+		// there can only be one, so we discard the rest
+		policy.enabled = [
+			utils.ensureArray(enabled)[0]
+		]
+			.map(prepareEnabledAction);
+	} else {
+		console.warn(`policy '${policy.id}' is missing an enabled action.`/*, policy*/);
 	}
+
 
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
