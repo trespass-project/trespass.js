@@ -8,7 +8,9 @@ const cheerio = require('cheerio');
 
 
 const rootDir = path.join(__dirname, '..');
-const testModelFilePath = path.join(rootDir, 'test', 'data', 'policies-test.xml');
+const testModelFilePath = path.join(
+	rootDir, 'test', 'data', 'policies-test.xml'
+);
 const testModelXML = fs.readFileSync(testModelFilePath).toString();
 
 
@@ -18,7 +20,7 @@ test.group('policies', (test) => {
 		trespass.model.parse(xmlStr, (err, model) => {
 			const policies = model.system.policies;
 
-			t.true(policies.length === 3);
+			t.true(policies.length === 4);
 
 			{
 				const policy = policies[0];
