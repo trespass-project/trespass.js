@@ -602,6 +602,8 @@ function preparePredicate(_predicate) {
 	const predicate = _.merge({}, _predicate);
 	predicate.arity = parseInt(predicate.arity, 10);
 
+	predicate.id = sanitizePredicateId(predicate.id);
+
 	// when predicate has no values, this is `undefined`
 	predicate.value = predicate.value || [];
 
