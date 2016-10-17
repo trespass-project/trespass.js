@@ -9,6 +9,7 @@ const R = require('ramda');
 const revalidator = require('revalidator');
 const async = require('async');
 const moment = require('moment');
+const mout = require('mout');
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
 const utils = require('../utils');
@@ -249,6 +250,17 @@ const singular =
 module.exports.singular =
 function singular(plural) {
 	return collectionNamesSingular[plural];
+};
+
+
+const sanitizePredicateId =
+module.exports.sanitizePredicateId =
+function sanitizePredicateId(str) {
+	return mout.string.camelCase(
+		str
+			.replace(/[^A-Za-z]+/g, '-')
+			.replace(/[0-9]+/g, '-')
+	);
 };
 
 

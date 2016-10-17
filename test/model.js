@@ -475,3 +475,30 @@ test.group('.validateComponent()', (test) => {
 		t.true(result[0].message === 'actor must be located somewhere');
 	});
 });
+
+
+test.group('.sanitizePredicateId()', (test) => {
+	test('should camelCase', (t) => {
+		let str = 'employed-by';
+		let result = trespass.model.sanitizePredicateId(str);
+		t.true(result === 'employedBy');
+
+		str = 'employed by';
+		result = trespass.model.sanitizePredicateId(str);
+		t.true(result === 'employedBy');
+
+		str = 'employed_by';
+		result = trespass.model.sanitizePredicateId(str);
+		t.true(result === 'employedBy');
+	});
+
+	test('should remove all non-letters', (t) => {
+		let str = 'no1234numbers';
+		let result = trespass.model.sanitizePredicateId(str);
+		t.true(result === 'noNumbers');
+
+		str = 'no%^other!@bullshit';
+		result = trespass.model.sanitizePredicateId(str);
+		t.true(result === 'noOtherBullshit');
+	});
+});
