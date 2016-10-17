@@ -9,6 +9,7 @@ const R = require('ramda');
 const revalidator = require('revalidator');
 const async = require('async');
 const moment = require('moment');
+const mout = require('mout');
 const xml2js = require('xml2js');
 const pd = require('pretty-data').pd;
 const utils = require('../utils');
@@ -249,6 +250,17 @@ const singular =
 module.exports.singular =
 function singular(plural) {
 	return collectionNamesSingular[plural];
+};
+
+
+const sanitizePredicateId =
+module.exports.sanitizePredicateId =
+function sanitizePredicateId(str) {
+	return mout.string.camelCase(
+		str
+			.replace(/[^A-Za-z]+/g, '-')
+			.replace(/[0-9]+/g, '-')
+	);
 };
 
 
@@ -590,6 +602,8 @@ function preparePredicate(_predicate) {
 	const predicate = _.merge({}, _predicate);
 	predicate.arity = parseInt(predicate.arity, 10);
 
+	predicate.id = sanitizePredicateId(predicate.id);
+
 	// when predicate has no values, this is `undefined`
 	predicate.value = predicate.value || [];
 
@@ -603,6 +617,7 @@ function unpreparePredicate(_predicate) {
 	const predicate = _.merge({}, _predicate);
 	predicate.value = predicate.value
 		.map((val) => val.join(' '));
+	predicate.id = sanitizePredicateId(predicate.id);
 	return predicate;
 }
 
