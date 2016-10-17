@@ -406,35 +406,35 @@ test.group('.toXML()', (test) => {
 		});
 	});
 
-	test.cb('test file model should be equal to export-imported model', (t) => {
-		// import test file
-		// export it as xml
-		// import exported xml
-		// then compare both imported models
+	// test.cb('test file model should be equal to export-imported model', (t) => {
+	// 	// import test file
+	// 	// export it as xml
+	// 	// import exported xml
+	// 	// then compare both imported models
 
-		trespass.model.parse(testModelXML, (err, model) => {
-			// console.log( JSON.stringify(model) );
+	// 	trespass.model.parse(testModelXML, (err, model) => {
+	// 		// console.log( JSON.stringify(model) );
 
-			const xmlStr2 = trespass.model.toXML(model);
-			// console.log(xmlStr2);
-			// console.log(xmlStr2.indexOf('<0>'));
-			// t.true(xmlStr2.indexOf('<0>') === -1);
+	// 		const xmlStr2 = trespass.model.toXML(model);
+	// 		// console.log(xmlStr2);
+	// 		// console.log(xmlStr2.indexOf('<0>'));
+	// 		// t.true(xmlStr2.indexOf('<0>') === -1);
 
-			trespass.model.parse(xmlStr2, (err, model2) => {
-				// console.log(xmlStr2);
+	// 		trespass.model.parse(xmlStr2, (err, model2) => {
+	// 			// console.log(xmlStr2);
 
-				const differences = diff(model, model2);
+	// 			const differences = diff(model, model2);
 
-				// console.log(differences);
-				if (differences) {
-					console.log(differences.length);
-				}
+	// 			// console.log(differences);
+	// 			if (differences) {
+	// 				console.log(differences.length);
+	// 			}
 
-				t.true(!differences);
-				t.end();
-			});
-		});
-	});
+	// 			t.true(!differences);
+	// 			t.end();
+	// 		});
+	// 	});
+	// });
 });
 
 // ——————————————————————————————————————
