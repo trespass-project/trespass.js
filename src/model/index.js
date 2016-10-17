@@ -617,6 +617,7 @@ function unpreparePredicate(_predicate) {
 	const predicate = _.merge({}, _predicate);
 	predicate.value = predicate.value
 		.map((val) => val.join(' '));
+	predicate.id = sanitizePredicateId(predicate.id);
 	return predicate;
 }
 
