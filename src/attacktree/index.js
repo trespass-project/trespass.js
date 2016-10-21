@@ -218,6 +218,11 @@ function prepareTree(attacktree) {
 		item.id = counter;
 		counter++;
 
+		// clean up labels
+		if (item.label) {
+			item.label = (item.label).replace(/ +/g, ' ').trim();
+		}
+
 		// convert numeric attributes from strings to real numbers
 		R.keys(item[attrKey])
 			.forEach((key) => {
