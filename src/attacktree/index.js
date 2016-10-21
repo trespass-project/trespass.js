@@ -613,18 +613,25 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 };
 
 
-const actions = [
+const labelActions =
+module.exports.labelActions = [
+	// action can be:
 	'in',
 	'out',
 	'move',
+
+	// furthermore there is:
+	'force',
+	'make',
+	'fulfil',
+
+	// according to leafGrammer.txt
 	'exec',
 	'goto',
-	'make',
-	'force',
 
-	'get', // ? not according to leafGrammer.txt
-	'and',
-	'attacker',
+	// 'get', // ? not according to leafGrammer.txt
+	// 'and',
+	// 'attacker',
 ];
 const parseLabel =
 /**
@@ -640,7 +647,7 @@ function parseLabel(_labelStr) {
 		.replace(/ +/ig, ' ');
 	const parts = labelStr.split(/ /ig);
 
-	const isAction = (item) => R.contains(item.toLowerCase(), actions);
+	const isAction = (item) => R.contains(item.toLowerCase(), labelActions);
 	const isNotAction = R.complement(isAction);
 
 	let result = [];
