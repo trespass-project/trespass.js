@@ -21,6 +21,7 @@ const validation = require('./validation.js');
 
 const attrKey = '_attr';
 const charKey = '_text';
+const elemKey = '#name';
 const childrenKey = '$$';
 const xml2jsOptions = {
 	attrkey: attrKey,
@@ -33,10 +34,13 @@ const xml2jsOptions = {
 };
 
 const renameMap = {
-	'#name': 'type',
-	'_text': 'value',
+	[elemKey]: 'type',
+	[charKey]: 'value',
 };
-const rename$$Keys = R.partial(utils.renameHashMapKeys, [renameMap]);
+const rename$$Keys = R.partial(
+	utils.renameHashMapKeys,
+	[renameMap]
+);
 
 
 const singularPluralCollection = [
@@ -481,7 +485,7 @@ function prepareCredItem(credItem) {
 	const ordered = (credItem.$$ || [])
 		.map((_item) => {
 			const item = utils.renameHashMapKeys(renameMap, _item);
-			return (prepareFuncMap[_item['#name']]
+			return (prepareFuncMap[_item[elemKey]]
 				|| R.identity)(item);
 		});
 	return _.merge(
@@ -511,7 +515,7 @@ function unprepareCredItem(credItem) {
 
 function prepareEnabledAction(enabled) {
 	// element name of first child
-	const actionType = R.head(enabled.$$)['#name'];
+	const actionType = R.head(enabled.$$)[elemKey];
 	const actionValues = (enabled[actionType].$$ || [])
 		.map(rename$$Keys);
 
