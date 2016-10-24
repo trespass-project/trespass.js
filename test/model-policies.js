@@ -79,6 +79,36 @@ test.group('.addPolicy()', (test) => {
 			'RoomDatacenter',
 			'laptop',
 		],
+		'enabled': [
+			{
+				'action': 'out',
+				'values': [
+					{
+						'type': 'variable',
+						'value': 'X'
+					},
+					{
+						'type': 'value',
+						'value': 'val',
+					},
+					{
+						'type': 'tuple',
+						'values': [
+							{
+								'type': 'value',
+								'value': 'get'
+							},
+							{
+								'type': 'wildcard'
+							},
+							{
+								'type': 'wildcard'
+							}
+						]
+					}
+				]
+			}
+		],
 		'credentials': {
 			'credLocation': [
 				{ id: 'loc1' },

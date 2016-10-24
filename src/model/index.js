@@ -41,6 +41,11 @@ const rename$$Keys = R.partial(
 	utils.renameHashMapKeys,
 	[renameMap]
 );
+const unrename$$Keys = (item) => {
+	return {
+		[item.type]: item.value,
+	};
+};
 
 
 const singularPluralCollection = [
@@ -514,6 +519,7 @@ function unprepareCredItem(credItem) {
 
 
 function prepareEnabledAction(enabled) {
+	// console.log(JSON.stringify(enabled));
 	// element name of first child
 	const actionType = R.head(enabled.$$)[elemKey];
 	const actionValues = (enabled[actionType].$$ || [])
@@ -543,6 +549,40 @@ function prepareEnabledAction(enabled) {
 		action: actionType,
 		location,
 		values: values.map(recurse),
+	};
+}
+
+
+function unprepareEnabledAction(_enabled) {
+	function recurse(val) {
+		// nested values
+		const values = (val.values || []);
+		if (!values.length) {
+			val.value = val.value || '';
+			return unrename$$Keys(val);
+		} else {
+			// val[$$] = values.map(recurse);
+			// delete val.values;
+			return {
+				[val.type]: {
+					[$$]: values.map(recurse),
+				},
+			};
+		}
+	}
+
+	const enabled = utils.ensureArray(_enabled)[0];
+
+	// unprepare values
+	enabled[$$] = (enabled.values || []).map(recurse);
+	delete enabled.values;
+
+	return {
+		[$$]: [
+			{ action: enabled.action },
+			// TODO: location
+			...enabled[$$],
+		],
 	};
 }
 
@@ -592,7 +632,11 @@ function preparePolicy(_policy) {
 
 function unpreparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
-	const { credentials } = policy;
+	const { credentials, enabled } = policy;
+
+	const e = unprepareEnabledAction(enabled);
+	console.log(JSON.stringify(e));
+
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
 
