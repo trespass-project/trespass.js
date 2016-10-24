@@ -15,7 +15,7 @@ const analysis = require('../analysis/index.js');
 const hostExceptions = [
 	{
 		check: () => (window.location.toString().indexOf('itrust') > -1),
-		host: 'https://trespass-tkb.itrust.lu/',
+		host: 'https://trespass.itrust.lu/tkb/',
 	},
 	{
 		check: () => (window.location.toString().indexOf('dynu.com') > -1),
