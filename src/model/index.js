@@ -22,7 +22,7 @@ const validation = require('./validation.js');
 const attrKey = '_attr';
 const charKey = '_text';
 const elemKey = '#name';
-const childrenKey = '$$';
+const $$ = '$$';
 const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
@@ -426,7 +426,7 @@ function prepareCredPredicate(credPred) {
 		.map(rename$$Keys);
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'variable', 'value', 'name'], credPred),
+		R.omit([$$, 'variable', 'value', 'name'], credPred),
 		{
 			relationType: credPred.name,
 			values: ordered,
@@ -445,7 +445,7 @@ function unprepareCredPredicate(credPred) {
 
 	return {
 		[attrKey]: { name: credPred.relationType },
-		[childrenKey]: children,
+		[$$]: children,
 	};
 }
 
@@ -455,7 +455,7 @@ function prepareCredData(credData) {
 		.map(rename$$Keys);
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'variable', 'value'], credData),
+		R.omit([$$, 'variable', 'value'], credData),
 		{ values: ordered }
 	);
 }
@@ -471,7 +471,7 @@ function unprepareCredData(credData) {
 
 	return {
 		[attrKey]: { name: credData.name },
-		[childrenKey]: children,
+		[$$]: children,
 	};
 }
 
@@ -490,7 +490,7 @@ function prepareCredItem(credItem) {
 		});
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'credItem', 'credData'], credItem),
+		R.omit([$$, 'credItem', 'credData'], credItem),
 		{ values: ordered }
 	);
 }
@@ -508,7 +508,7 @@ function unprepareCredItem(credItem) {
 
 	return {
 		[attrKey]: { name: credItem.name },
-		[childrenKey]: children,
+		[$$]: children,
 	};
 }
 
