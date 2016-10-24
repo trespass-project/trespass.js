@@ -518,11 +518,10 @@ function prepareEnabledAction(enabled) {
 	// filter out `locvar` and `locval` types
 	const locTypes = ['locvar', 'locval'];
 	const isLocType = (item) => R.contains(item.type, locTypes);
-	const notLocType = R.complement(isLocType);
 	const location = R.last(
 		actionValues.filter(isLocType)
 	);
-	const values = actionValues.filter(notLocType);
+	const values = R.reject(isLocType, actionValues);
 
 	function recurse(val) {
 		// nested values
@@ -550,14 +549,11 @@ function preparePolicy(_policy) {
 
 	if (enabled) {
 		// there can only be one, so we discard the rest
-		policy.enabled = [
-			utils.ensureArray(enabled)[0]
-		]
+		policy.enabled = [utils.ensureArray(enabled)[0]]
 			.map(prepareEnabledAction);
 	} else {
 		console.warn(`policy '${policy.id}' is missing an enabled action.`/*, policy*/);
 	}
-
 
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
