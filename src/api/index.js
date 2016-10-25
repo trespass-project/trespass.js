@@ -14,7 +14,8 @@ module.exports.tools = require('./tools.js');
 module.exports.knowledgebase = require('./knowledgebase.js');
 
 
-const fileTypes = module.exports.fileTypes = {
+const fileTypes =
+module.exports.fileTypes = {
 	txt: {
 		mimeType: 'text/plain',
 		responseType: 'text',
