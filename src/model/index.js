@@ -561,8 +561,6 @@ function unprepareEnabledAction(_enabled) {
 			val.value = val.value || '';
 			return unrename$$Keys(val);
 		} else {
-			// val[$$] = values.map(recurse);
-			// delete val.values;
 			return {
 				[val.type]: {
 					[$$]: values.map(recurse),
@@ -579,9 +577,21 @@ function unprepareEnabledAction(_enabled) {
 
 	return {
 		[$$]: [
-			{ action: enabled.action },
-			// TODO: location
-			...enabled[$$],
+			{
+				[enabled.action]: {
+					[attrKey]: {
+						logged: enabled.logged || false,
+					},
+
+					[$$]: [
+						// location
+						unrename$$Keys(enabled.location),
+
+						// rest, in order
+						...enabled[$$],
+					]
+				}
+			},
 		],
 	};
 }
@@ -634,8 +644,7 @@ function unpreparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
 	const { credentials, enabled } = policy;
 
-	const e = unprepareEnabledAction(enabled);
-	console.log(JSON.stringify(e));
+	policy.enabled = unprepareEnabledAction(enabled);
 
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
@@ -1105,7 +1114,8 @@ function toXML(_model) {
 	const xmlStr = builder.buildObject(preparedModel)
 		// hack, but there seems to be no other way
 		.replace(/<\$\$>/ig, '')
-		.replace(/<\/\$\$>/ig, '');
+		.replace(/<\/\$\$>/ig, '')
+		.replace(/<\$\$\/>/ig, '');
 
 	// return xmlStr;
 	return pd.xml(xmlStr)

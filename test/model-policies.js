@@ -82,6 +82,11 @@ test.group('.addPolicy()', (test) => {
 		'enabled': [
 			{
 				'action': 'out',
+				'logged': true,
+				'location': {
+					'type': 'locvar',
+					'value': 'XX',
+				},
 				'values': [
 					{
 						'type': 'variable',
