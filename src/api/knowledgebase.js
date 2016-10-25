@@ -12,18 +12,21 @@ const analysis = require('../analysis/index.js');
 
 
 // default is `http://localhost:8080/tkb/`, but there are exceptions
+const defaultHost = 'http://localhost:8080/';
+const itrustHost = 'https://trespass.itrust.lu/tkb/';
+const dynuHost = 'https://trespass.itrust.lu/tkb/';
 const hostExceptions = [
 	{
 		check: () => (window.location.toString().indexOf('itrust') > -1),
-		host: 'https://trespass.itrust.lu/tkb/',
+		host: itrustHost,
 	},
 	{
 		check: () => (window.location.toString().indexOf('dynu.com') > -1),
-		host: 'http://trespass-anm.dynu.com/',
+		host: dynuHost,
 	},
 ];
-const defaultHost = 'http://localhost:8080/';
-const host = module.exports.host = (typeof window === 'undefined')
+const host =
+module.exports.host = (typeof window === 'undefined')
 	? defaultHost
 	: hostExceptions.reduce((result, item) => {
 		return (item.check())
