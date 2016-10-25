@@ -575,6 +575,18 @@ function unprepareEnabledAction(_enabled) {
 	enabled[$$] = (enabled.values || []).map(recurse);
 	delete enabled.values;
 
+	let $$values = [
+		...enabled[$$],
+	];
+
+	// location
+	if (R.pathOr(undefined, ['location', 'value'], enabled)) {
+		$$values = [
+			unrename$$Keys(enabled.location),
+			...$$values,
+		];
+	}
+
 	return {
 		[$$]: [
 			{
@@ -582,14 +594,7 @@ function unprepareEnabledAction(_enabled) {
 					[attrKey]: {
 						logged: enabled.logged || false,
 					},
-
-					[$$]: [
-						// location
-						unrename$$Keys(enabled.location),
-
-						// rest, in order
-						...enabled[$$],
-					]
+					[$$]: $$values
 				}
 			},
 		],
