@@ -24,7 +24,7 @@
 				</credPredicate>
 			</credentials>
 			<enabled>
-				<out loc="laptop">
+				<out loc="laptop"><!-- ← not valid anymore -->
 					<variable>X</variable>
 					<variable>Y</variable>
 					<tuple>
@@ -69,6 +69,19 @@
 			</credentials>
 			<enabled>
 				<move />
+			</enabled>
+		</policy>
+
+		<policy id="p-005">
+			<atLocations>item__laptop</atLocations>
+			<enabled>
+				<in>
+					<tuple>
+						<value>call</value>
+						<variable>callee</variable>
+					</tuple>
+					<locvar>locX</locvar>
+				</in>
 			</enabled>
 		</policy>
 	</policies>

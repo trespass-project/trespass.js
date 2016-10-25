@@ -21,7 +21,8 @@ const validation = require('./validation.js');
 
 const attrKey = '_attr';
 const charKey = '_text';
-const childrenKey = '$$';
+const elemKey = '#name';
+const $$ = '$$';
 const xml2jsOptions = {
 	attrkey: attrKey,
 	charkey: charKey,
@@ -30,6 +31,20 @@ const xml2jsOptions = {
 
 	explicitChildren: true,
 	preserveChildrenOrder: true,
+};
+
+const renameMap = {
+	[elemKey]: 'type',
+	[charKey]: 'value',
+};
+const rename$$Keys = R.partial(
+	utils.renameHashMapKeys,
+	[renameMap]
+);
+const unrename$$Keys = (item) => {
+	return {
+		[item.type]: item.value,
+	};
 };
 
 
@@ -412,17 +427,11 @@ function unprepareCredLocation(credLocation) {
 
 
 function prepareCredPredicate(credPred) {
-	const ordered = credPred.$$
-		.map((item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
-			return utils.renameHashMapKeys(renameMap, item);
-		});
+	const ordered = (credPred.$$ || [])
+		.map(rename$$Keys);
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'variable', 'value', 'name'], credPred),
+		R.omit([$$, 'variable', 'value', 'name'], credPred),
 		{
 			relationType: credPred.name,
 			values: ordered,
@@ -441,23 +450,17 @@ function unprepareCredPredicate(credPred) {
 
 	return {
 		[attrKey]: { name: credPred.relationType },
-		[childrenKey]: children,
+		[$$]: children,
 	};
 }
 
 
 function prepareCredData(credData) {
-	const ordered = credData.$$
-		.map((item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
-			return utils.renameHashMapKeys(renameMap, item);
-		});
+	const ordered = (credData.$$ || [])
+		.map(rename$$Keys);
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'variable', 'value'], credData),
+		R.omit([$$, 'variable', 'value'], credData),
 		{ values: ordered }
 	);
 }
@@ -473,7 +476,7 @@ function unprepareCredData(credData) {
 
 	return {
 		[attrKey]: { name: credData.name },
-		[childrenKey]: children,
+		[$$]: children,
 	};
 }
 
@@ -484,23 +487,15 @@ function prepareCredItem(credItem) {
 		credItem: prepareCredItem,
 		credData: prepareCredData,
 	};
-	const renameMap = {
-		'#name': 'type',
-		'_text': 'value',
-	};
 	const ordered = (credItem.$$ || [])
 		.map((_item) => {
-			const renameMap = {
-				'#name': 'type',
-				'_text': 'value',
-			};
 			const item = utils.renameHashMapKeys(renameMap, _item);
-			return (prepareFuncMap[_item['#name']]
+			return (prepareFuncMap[_item[elemKey]]
 				|| R.identity)(item);
 		});
 	return _.merge(
 		{},
-		R.omit([childrenKey, 'credItem', 'credData'], credItem),
+		R.omit([$$, 'credItem', 'credData'], credItem),
 		{ values: ordered }
 	);
 }
@@ -518,7 +513,91 @@ function unprepareCredItem(credItem) {
 
 	return {
 		[attrKey]: { name: credItem.name },
-		[childrenKey]: children,
+		[$$]: children,
+	};
+}
+
+
+function prepareEnabledAction(enabled) {
+	// console.log(JSON.stringify(enabled));
+	// element name of first child
+	const actionType = R.head(enabled.$$)[elemKey];
+	const actionValues = (enabled[actionType].$$ || [])
+		.map(rename$$Keys);
+
+	// filter out `locvar` and `locval` types
+	const locTypes = ['locvar', 'locval'];
+	const isLocType = (item) => R.contains(item.type, locTypes);
+	const location = R.last(
+		actionValues.filter(isLocType)
+	);
+	const values = R.reject(isLocType, actionValues);
+
+	function recurse(val) {
+		// nested values
+		const values = (val.$$ || [])
+			.map(rename$$Keys);
+		return (!values.length)
+			? val
+			: {
+				type: val.type,
+				values: values.map(recurse),
+			};
+	}
+
+	return {
+		action: actionType,
+		location,
+		values: values.map(recurse),
+	};
+}
+
+
+function unprepareEnabledAction(_enabled) {
+	function recurse(val) {
+		// nested values
+		const values = (val.values || []);
+		if (!values.length) {
+			val.value = val.value || '';
+			return unrename$$Keys(val);
+		} else {
+			return {
+				[val.type]: {
+					[$$]: values.map(recurse),
+				},
+			};
+		}
+	}
+
+	const enabled = utils.ensureArray(_enabled)[0];
+
+	// unprepare values
+	enabled[$$] = (enabled.values || []).map(recurse);
+	delete enabled.values;
+
+	let $$values = [
+		...enabled[$$],
+	];
+
+	// location
+	if (R.pathOr(undefined, ['location', 'value'], enabled)) {
+		$$values = [
+			unrename$$Keys(enabled.location),
+			...$$values,
+		];
+	}
+
+	return {
+		[$$]: [
+			{
+				[enabled.action]: {
+					[attrKey]: {
+						logged: enabled.logged || false,
+					},
+					[$$]: $$values
+				}
+			},
+		],
 	};
 }
 
@@ -528,7 +607,11 @@ function preparePolicy(_policy) {
 	const { credentials, enabled } = policy;
 
 	if (enabled) {
-		policy.enabled = utils.ensureArray(enabled);
+		// there can only be one, so we discard the rest
+		policy.enabled = [utils.ensureArray(enabled)[0]]
+			.map(prepareEnabledAction);
+	} else {
+		console.warn(`policy '${policy.id}' is missing an enabled action.`/*, policy*/);
 	}
 
 	if (credentials) {
@@ -564,7 +647,10 @@ function preparePolicy(_policy) {
 
 function unpreparePolicy(_policy) {
 	const policy = _.merge({}, _policy);
-	const { credentials } = policy;
+	const { credentials, enabled } = policy;
+
+	policy.enabled = unprepareEnabledAction(enabled);
+
 	if (credentials) {
 		const { credLocation, credPredicate, credData, credItem } = credentials;
 
@@ -886,8 +972,8 @@ module.exports.knownAttributes = {
 	credItem: ['name'],
 	credPredicate: ['name'],
 	process: ['id'],
-	in: ['loc'],
-	out: ['loc'],
+	in: ['logged'],
+	out: ['logged'],
 	predicate: ['id', 'arity'],
 	policy: ['id'],
 	metric: ['namespace', 'name', 'value'],
@@ -1033,7 +1119,8 @@ function toXML(_model) {
 	const xmlStr = builder.buildObject(preparedModel)
 		// hack, but there seems to be no other way
 		.replace(/<\$\$>/ig, '')
-		.replace(/<\/\$\$>/ig, '');
+		.replace(/<\/\$\$>/ig, '')
+		.replace(/<\$\$\/>/ig, '');
 
 	// return xmlStr;
 	return pd.xml(xmlStr)

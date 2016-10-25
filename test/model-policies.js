@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 import { test } from 'ava-spec';
+const R = require('ramda');
 const _ = require('lodash');
 const trespass = require('../');
 const common = require('./common.js');
@@ -20,7 +21,7 @@ test.group('policies', (test) => {
 		trespass.model.parse(xmlStr, (err, model) => {
 			const policies = model.system.policies;
 
-			t.true(policies.length === 4);
+			t.true(policies.length === 5);
 
 			{
 				const policy = policies[0];
@@ -50,6 +51,21 @@ test.group('policies', (test) => {
 				t.true(credItem0.values[0].values[0].type === 'variable');
 			}
 
+			{
+				const policy = policies[4];
+				// console.log(JSON.stringify(policy, null, '  '));
+				t.true(policy.enabled.length === 1);
+				const enabled = policy.enabled[0];
+				t.true(enabled.action === 'in');
+				t.true(enabled.location.type === 'locvar');
+				t.true(enabled.location.value === 'locX');
+				t.true(enabled.values.length === 1);
+				t.true(enabled.values[0].type === 'tuple');
+				t.true(enabled.values[0].values.length === 2);
+				const vals = enabled.values[0].values.map(R.prop('type'));
+				t.true(R.equals(vals, ['value', 'variable']));
+			}
+
 			t.end();
 		});
 	});
@@ -62,6 +78,41 @@ test.group('.addPolicy()', (test) => {
 		'atLocations': [
 			'RoomDatacenter',
 			'laptop',
+		],
+		'enabled': [
+			{
+				'action': 'out',
+				'logged': true,
+				'location': {
+					'type': 'locvar',
+					'value': 'XX',
+				},
+				'values': [
+					{
+						'type': 'variable',
+						'value': 'X'
+					},
+					{
+						'type': 'value',
+						'value': 'val',
+					},
+					{
+						'type': 'tuple',
+						'values': [
+							{
+								'type': 'value',
+								'value': 'get'
+							},
+							{
+								'type': 'wildcard'
+							},
+							{
+								'type': 'wildcard'
+							}
+						]
+					}
+				]
+			}
 		],
 		'credentials': {
 			'credLocation': [
@@ -140,25 +191,34 @@ test.group('.addPolicy()', (test) => {
 		// console.log(xmlStr);
 
 		const $system = cheerio.load(xmlStr, common.cheerioOptions)('system');
-		t.true($system.find('policies > policy').length === 1);
-		t.true($system.find('policies > policy').eq(0).attr('id') === 'p-003');
+		{
+			const $policy = $system.find('policies > policy');
+			t.true($policy.length === 1);
+			t.true($policy.eq(0).attr('id') === 'p-003');
+		}
 
 		const $atLocations = $system.find('policies > policy > atLocations');
 		t.true($atLocations.text() === 'RoomDatacenter laptop');
 
-		const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
-		t.true($credPredicate.attr('name') === 'is-user-id-at');
-		t.true($credPredicate.children().length === 2);
-		t.true($credPredicate.children().eq(0)[0].name === 'variable');
-		t.true($credPredicate.children().eq(0).text() === 'X');
-		t.true($credPredicate.children().eq(1)[0].name === 'value');
-		t.true($credPredicate.children().eq(1).text() === 'laptop');
+		{
+			const $credPredicate = $system.find('policies > policy > credentials > credPredicate');
+			t.true($credPredicate.attr('name') === 'is-user-id-at');
+			const $children = $credPredicate.children();
+			t.true($children.length === 2);
+			t.true($children.eq(0)[0].name === 'variable');
+			t.true($children.eq(0).text() === 'X');
+			t.true($children.eq(1)[0].name === 'value');
+			t.true($children.eq(1).text() === 'laptop');
+		}
 
-		const $credData = $system.find('policies > policy > credentials > credData');
-		t.true($credData.attr('name') === 'userpin');
-		t.true($credData.children().length === 1);
-		t.true($credData.children().eq(0)[0].name === 'variable');
-		t.true($credData.children().eq(0).text() === 'X');
+		{
+			const $credData = $system.find('policies > policy > credentials > credData');
+			const $children = $credData.children();
+			t.true($credData.attr('name') === 'userpin');
+			t.true($children.length === 1);
+			t.true($children.eq(0)[0].name === 'variable');
+			t.true($children.eq(0).text() === 'X');
+		}
 
 		const $credLocation = $system.find('policies > policy > credentials > credLocation');
 		t.true($credLocation.eq(0).attr('id') === 'loc1');
