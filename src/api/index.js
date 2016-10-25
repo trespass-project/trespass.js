@@ -7,14 +7,8 @@ const R = require('ramda');
 const urljoin = require('url-join');
 
 
-/** [trespass/api/tools]{@link module:trespass/api/tools} */
-module.exports.tools = require('./tools.js');
-
-/** [trespass/api/knowledgebase]{@link module:trespass/api/knowledgebase} */
-module.exports.knowledgebase = require('./knowledgebase.js');
-
-
-const fileTypes = module.exports.fileTypes = {
+const fileTypes =
+module.exports.fileTypes = {
 	txt: {
 		mimeType: 'text/plain',
 		responseType: 'text',
@@ -159,3 +153,10 @@ module.exports.requestOptions = {
 	},
 }
 */
+
+
+/** [trespass/api/tools]{@link module:trespass/api/tools} */
+module.exports.tools = require('./tools.js');
+
+/** [trespass/api/knowledgebase]{@link module:trespass/api/knowledgebase} */
+module.exports.knowledgebase = require('./knowledgebase.js');
