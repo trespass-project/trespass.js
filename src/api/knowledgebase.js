@@ -33,6 +33,9 @@ module.exports.host = (typeof window === 'undefined')
 			? item.host
 			: result;
 	}, defaultHost);
+const maybeWithCredentials = (host === itrustHost)
+	? api.requestOptions.withCredentials
+	: {};
 const prefix = module.exports.prefix = 'tkb/';
 const paths = { host, prefix };
 // ———
@@ -63,7 +66,8 @@ function listCommits(axios, modelId) {
 		const params = _.merge(
 			{ url },
 			api.requestOptions.acceptJSON,
-			api.requestOptions.crossDomain
+			api.requestOptions.crossDomain,
+			maybeWithCredentials
 		);
 
 		axios(params)
@@ -180,7 +184,8 @@ function listModels(axios) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -205,7 +210,8 @@ function getModel(axios, modelId) {
 		const url = api.makeUrl(paths, `model/${modelId}`);
 		const params = _.merge(
 			{ url },
-			api.requestOptions.crossDomain
+			api.requestOptions.crossDomain,
+			maybeWithCredentials
 		);
 
 		axios(params)
@@ -242,7 +248,8 @@ function createModel(axios, desiredModelId) {
 				method: 'put',
 			},
 			api.requestOptions.acceptJSON,
-			api.requestOptions.crossDomain
+			api.requestOptions.crossDomain,
+			maybeWithCredentials
 		);
 
 		axios(params)
@@ -286,7 +293,8 @@ function deleteModel(axios, modelId) {
 			url,
 			method: 'delete',
 		},
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 
 	return axios(params)
@@ -324,7 +332,8 @@ function getFile(axios, modelId, fileName, gitFileId=undefined, asBlob=false) {
 				: fileType.responseType,
 			headers: { 'Accept': fileType.mimeType }
 		},
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -372,7 +381,8 @@ function putFile(axios, modelId, data, fileName, type=undefined) {
 			method: 'put',
 			headers: { 'Content-type': fileType.mimeType },
 		},
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -408,7 +418,8 @@ function getTypes(axios, modelId) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -433,7 +444,8 @@ function getItem(axios, modelId, itemId) {
 			method: 'get',
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -463,7 +475,8 @@ function createItem(axios, modelId, item) {
 				method: 'put',
 				data: R.omit(['id'], item),
 			},
-			api.requestOptions.crossDomain
+			api.requestOptions.crossDomain,
+			maybeWithCredentials
 		);
 		axios(params)
 			.then((res) => {
@@ -498,7 +511,8 @@ function renameItemId(axios, modelId, itemId, newId) {
 			method: 'post',
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -522,7 +536,8 @@ function deleteItem(axios, modelId, itemId) {
 			url,
 			method: 'delete'
 		},
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -543,7 +558,8 @@ function getAttackerProfiles(axios, modelId) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -568,7 +584,8 @@ function deleteAttackerProfile(axios, modelId, profileId) {
 			method: 'delete',
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -594,7 +611,8 @@ function saveAttackerProfile(axios, modelId, profile) {
 			data: profile,
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -615,7 +633,8 @@ function getToolChains(axios, modelId) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -653,7 +672,8 @@ function runToolChain(axios, modelId, toolchainId, attackerProfileId, _callbacks
 			method: 'post'
 		},
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 
 	callbacks.onToolChainStart();
@@ -676,7 +696,8 @@ function getTaskStatus(axios, taskUrl) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -705,7 +726,8 @@ function getAnalysisResults(axios, taskStatusData, analysisToolNames=analysis.an
 					url: tool.result_file_url,
 				},
 				api.requestOptions.acceptBlob,
-				api.requestOptions.crossDomain
+				api.requestOptions.crossDomain,
+				maybeWithCredentials
 			);
 
 			// TODO: consider using `getFile()` here
@@ -749,7 +771,8 @@ function getModelPatterns(axios, modelId) {
 	const params = _.merge(
 		{ url },
 		api.requestOptions.acceptJSON,
-		api.requestOptions.crossDomain
+		api.requestOptions.crossDomain,
+		maybeWithCredentials
 	);
 	return axios(params)
 		.then((res) => res.data);
@@ -786,6 +809,7 @@ function saveModelPattern(axios, modelId, fragment, title, patternId) {
 			method: 'put',
 		},
 		api.requestOptions.crossDomain,
+		maybeWithCredentials,
 		api.requestOptions.acceptJSON
 	);
 	return axios(params)
@@ -814,6 +838,7 @@ function deleteModelPattern(axios, modelId, patternId) {
 			method: 'delete',
 		},
 		api.requestOptions.crossDomain,
+		maybeWithCredentials,
 		api.requestOptions.acceptJSON
 	);
 	return axios(params)
