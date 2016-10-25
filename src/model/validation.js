@@ -3,6 +3,8 @@
  * @module trespass/model/validation
  */
 
+// TODO: this file is probly out of date
+
 const schemas =
 module.exports.schemas = {};
 
