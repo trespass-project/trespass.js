@@ -679,7 +679,17 @@ function runToolChain(axios, modelId, toolchainId, attackerProfileId, _callbacks
 
 	callbacks.onToolChainStart();
 	return axios(params)
-		.then((res) => res.data);
+		.then((res) => res.data)
+		.then((data) => {
+			// kb used to return `task_url`, but we
+			// need to contruct our own url, a la:
+			// http://localhost:8080/tkb/task/0d178007ae7044fdb3de5b204ce94e36
+			return Object.assign(
+				{},
+				data,
+				{ task_url: api.makeUrl(paths, `task/${data.task_id}`) }
+			);
+		});
 };
 
 
