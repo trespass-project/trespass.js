@@ -474,8 +474,14 @@ function unprepareCredData(credData) {
 			};
 		});
 
+	const attrs = {};
+	if (credData.name) {
+		attrs.name = credData.name;
+	} else {
+		console.warn('credData is missing name', credData);
+	}
 	return {
-		[attrKey]: { name: credData.name },
+		[attrKey]: attrs,
 		[$$]: children,
 	};
 }
@@ -511,8 +517,14 @@ function unprepareCredItem(credItem) {
 			};
 		});
 
+	const attrs = {};
+	if (credItem.name) {
+		attrs.name = credItem.name;
+	} else {
+		console.warn('credItem is missing name', credItem);
+	}
 	return {
-		[attrKey]: { name: credItem.name },
+		[attrKey]: attrs,
 		[$$]: children,
 	};
 }
