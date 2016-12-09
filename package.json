@@ -1,6 +1,7 @@
 {
   "name": "trespass.js",
   "description": "TREsPASS javascript / node library",
+  "license" : "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/trespass-project/trespass.js"
