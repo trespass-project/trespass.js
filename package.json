@@ -8,7 +8,7 @@
   },
   "author": "freder.code+trespass@gmail.com",
   "main": "./dist",
-  "version": "0.31.4",
+  "version": "0.31.5",
   "scripts": {
     "build": "make build",
     "prepublish": "npm run build",

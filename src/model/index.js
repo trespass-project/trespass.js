@@ -531,6 +531,11 @@ function unprepareCredItem(credItem) {
 
 
 function prepareEnabledAction(enabled) {
+	// <enabled></enabled>
+	if ((enabled.$$ || []).length === 0) {
+		return {};
+	}
+
 	// console.log(JSON.stringify(enabled));
 	// element name of first child
 	const actionType = R.head(enabled.$$)[elemKey];
@@ -583,6 +588,10 @@ function unprepareEnabledAction(_enabled) {
 
 	const enabled = utils.ensureArray(_enabled)[0];
 
+	if (enabled.action === 'undefined' || !enabled.action) {
+		return { [$$]: [] };
+	}
+
 	// unprepare values
 	enabled[$$] = (enabled.values || []).map(recurse);
 	delete enabled.values;
@@ -631,7 +640,14 @@ function preparePolicy(_policy) {
 
 		if (credLocation) {
 			policy.credentials.credLocation = utils.ensureArray(credLocation)
-				.map((item) => _.merge({}, item));
+				.map((item) => _.merge({}, item))
+				.map((item) => {
+					// HACK:
+					// chris' models have `name` attributes, but according
+					// to the .xsd it should be `id`s!
+					item.id = item.id || item.name /*|| ''*/;
+					return item;
+				});
 		}
 
 		if (credPredicate) {
