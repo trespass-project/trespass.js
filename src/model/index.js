@@ -631,7 +631,14 @@ function preparePolicy(_policy) {
 
 		if (credLocation) {
 			policy.credentials.credLocation = utils.ensureArray(credLocation)
-				.map((item) => _.merge({}, item));
+				.map((item) => _.merge({}, item))
+				.map((item) => {
+					// HACK:
+					// chris' models have `name` attributes, but according
+					// to the .xsd it should be `id`s!
+					item.id = item.id || item.name /*|| ''*/;
+					return item;
+				});
 		}
 
 		if (credPredicate) {
