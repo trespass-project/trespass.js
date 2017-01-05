@@ -531,6 +531,11 @@ function unprepareCredItem(credItem) {
 
 
 function prepareEnabledAction(enabled) {
+	// <enabled></enabled>
+	if ((enabled.$$ || []).length === 0) {
+		return {};
+	}
+
 	// console.log(JSON.stringify(enabled));
 	// element name of first child
 	const actionType = R.head(enabled.$$)[elemKey];
@@ -582,6 +587,10 @@ function unprepareEnabledAction(_enabled) {
 	}
 
 	const enabled = utils.ensureArray(_enabled)[0];
+
+	if (enabled.action === 'undefined' || !enabled.action) {
+		return { [$$]: [] };
+	}
 
 	// unprepare values
 	enabled[$$] = (enabled.values || []).map(recurse);
