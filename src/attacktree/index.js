@@ -203,20 +203,14 @@ const prepareTree =
  * prepares an attack tree object.
  * - conversion from strings to numbers
  * - ensure all children are arrays
- * - give each node an id
  *
  * @param {Object} rootNode - root node of an attack tree
  * @returns {Object} root node
  */
 module.exports.prepareTree =
 function prepareTree(attacktree) {
-	let counter = 0;
-
 	function recurse(item, depth=0) {
 		item.depth = depth;
-
-		item.id = counter;
-		counter++;
 
 		// clean up labels
 		if (item.label) {
@@ -527,7 +521,7 @@ function treeFromPaths(paths) {
 };
 
 
-const subtreeFromLeafLabels =
+const subtreeFromLeafIds =
 /**
  * given a tree and a list of labels, returns a new tree,
  * which is a subset of the original tree, whose leaf nodes
@@ -536,43 +530,51 @@ const subtreeFromLeafLabels =
  * @param {Object} rootNode - tree root
  * @returns {Object} root node of subtree
  */
-module.exports.subtreeFromLeafLabels =
-function subtreeFromLeafLabels(rootNode, leafLabels) {
+module.exports.subtreeFromLeafIds =
+function subtreeFromLeafIds(rootNode, leafIds) {
 	const subtreeRoot = _.merge({}, rootNode);
+	// console.log(subtreeRoot.label);
+	// console.log(leafIds);
 
-	const isInLabelsList = (node) => {
-		return R.contains(node.label, leafLabels);
+	const isInList = (id) => {
+		return R.contains(id, leafIds);
 	};
 
 	const recurse = (node) => {
 		let doKeep = true;
 
+		const id = `${node[attrKey].id}`;
+
 		// keep original id
-		node._originalId = node.id;
+		// node._originalId = id;
 
 		const children = node[childElemName] || [];
 		const numChildren = children.length;
 		const isLeafNode = !numChildren;
 		const isConj = isConjunctive(node);
 
+		node.label = (isConj)
+			? `${node.label} (${id})`
+			: `(${id}) ${node.label}`;
+
 		if (isLeafNode) {
-			if (!isInLabelsList(node)) {
+			if (!isInList(id)) {
 				doKeep = false;
 			}
 		} else {
-			// if any of the conjunctive children are
-			// leaf nodes, and even one of them is not
-			// on the list, remove this node
-			if (isConj) {
-				const leafChildren = node[childElemName]
-					.filter((child) => {
-						return !(child[childElemName] || []).length;
-					});
-				const inList = leafChildren.filter(isInLabelsList);
-				if (inList.length !== leafChildren.length) {
-					doKeep = false;
-				}
-			}
+		// 	// if any of the conjunctive children are
+		// 	// leaf nodes, and even one of them is not
+		// 	// on the list, remove this node
+		// 	if (isConj) {
+		// 		const leafChildren = node[childElemName]
+		// 			.filter((child) => {
+		// 				return !(child[childElemName] || []).length;
+		// 			});
+		// 		const inList = leafChildren.filter(isInList);
+		// 		if (inList.length !== leafChildren.length) {
+		// 			doKeep = false;
+		// 		}
+		// 	}
 		}
 
 		node[childElemName] = children
@@ -596,11 +598,16 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 		return node;
 	};
 
-	const restoreOriginalId = (node) => {
-		node.id = node._originalId;
-		delete node._originalId;
-		(node[childElemName] || []).forEach(restoreOriginalId);
-	};
+	// const restoreOriginalId = (node) => {
+	// 	node.id = node._originalId;
+	// 	delete node._originalId;
+	// 	(node[childElemName] || []).forEach(restoreOriginalId);
+	// };
+
+	// console.log(
+	// 	findLeafNodes(rootNode)
+	// 		.map((node) => node[attrKey].id)
+	// );
 
 	const _result = recurse(subtreeRoot);
 	if (!_result) {
@@ -608,8 +615,11 @@ function subtreeFromLeafLabels(rootNode, leafLabels) {
 	}
 
 	const result = prepareTree(_result);
-	restoreOriginalId(result);
-	return result;
+	// restoreOriginalId(result);
+
+	return {
+		[childElemName]: [result],
+	};
 };
 
 
