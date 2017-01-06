@@ -30,7 +30,7 @@ const stringToNumber =
  */
 module.exports.stringToNumber =
 function stringToNumber(str) {
-	const trimmed = str.trim();
+	const trimmed = `${str}`.trim();
 
 	const intPattern = /^\d+$/ig;
 	const floatPattern = /^\d*\.\d+$/ig;
