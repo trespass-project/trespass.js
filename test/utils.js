@@ -16,6 +16,10 @@ test.group('stringToNumber()', (test) => {
 		const result5 = utils.stringToNumber('.666');
 		t.true(result5 === 0.666);
 	});
+	test('should work, even if arg is not a string', (t) => {
+		const result = utils.stringToNumber(1234);
+		t.true(result === 1234);
+	});
 });
 
 
